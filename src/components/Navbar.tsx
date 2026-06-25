@@ -24,7 +24,7 @@ const Navbar: React.FC = () => {
         { name: 'Support', path: '/support' },
     ];
 
-    const isAuthPage = location.pathname === ROUTES.LOGIN || location.pathname === ROUTES.REGISTER || location.pathname === ROUTES.PAYMENT;
+    const isAuthPage = location.pathname === ROUTES.LOGIN || location.pathname === ROUTES.REGISTER || location.pathname === ROUTES.PAYMENT || location.pathname === ROUTES.PRIVACY || location.pathname === ROUTES.TERMS || location.pathname === ROUTES.COOKIES;
     const isContactPage = location.pathname === ROUTES.CONTACT;
 
     let navClasses = scrolled || isAuthPage ? 'bg-blue-900/95 backdrop-blur-lg shadow-xl py-3' : 'bg-transparent py-6';

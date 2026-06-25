@@ -60,11 +60,60 @@ const Privacy: React.FC = () => {
 
                         <section>
                             <h2 className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight flex items-center gap-3">
-                                <Shield className="text-blue-500" size={24} /> 3. Sécurité
+                                <Shield className="text-blue-500" size={24} /> 3. Sécurité et Hébergement
+                            </h2>
+                            <p className="text-slate-600 leading-relaxed mb-4">
+                                Toutes les données sont chiffrées de bout en bout (AES-256) lors de leur transmission et de leur stockage. Notre plateforme est hébergée sur des serveurs sécurisés AWS hautement disponibles, garantissant une protection maximale contre les accès non autorisés, les fuites et la perte de données.
+                            </p>
+                            <ul className="list-disc pl-6 space-y-2 text-slate-600 font-medium">
+                                <li>Sauvegardes automatiques quotidiennes chiffrées.</li>
+                                <li>Pare-feu applicatif (WAF) et protection anti-DDoS.</li>
+                                <li>Contrôle d'accès strict (RBAC) pour que chaque utilisateur n'accède qu'à ses propres données.</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h2 className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight flex items-center gap-3">
+                                <FileText className="text-blue-500" size={24} /> 4. Partage des Données
                             </h2>
                             <p className="text-slate-600 leading-relaxed">
-                                Toutes les données sont chiffrées (AES-256) et stockées sur des serveurs sécurisés basés sur une infrastructure Cloud mondialement reconnue, garantissant une protection maximale contre les accès non autorisés.
+                                Nous nous engageons formellement à ne **jamais vendre, louer ou céder** vos données personnelles à des tiers à des fins commerciales ou publicitaires. Vos données peuvent toutefois être partagées dans des contextes très stricts :
                             </p>
+                            <ul className="list-disc pl-6 space-y-2 mt-4 text-slate-600 font-medium">
+                                <li>Avec nos prestataires techniques de confiance (hébergement AWS, passerelles de paiement sécurisées) uniquement pour exécuter le service.</li>
+                                <li>Si la loi l'exige, dans le cadre de réquisitions judiciaires légales.</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h2 className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight flex items-center gap-3">
+                                <Lock className="text-blue-500" size={24} /> 5. Vos Droits et Contrôle (RGPD)
+                            </h2>
+                            <p className="text-slate-600 leading-relaxed">
+                                Conformément aux réglementations internationales sur la protection des données (RGPD, etc.), vous disposez à tout moment des droits suivants sur vos informations :
+                            </p>
+                            <ul className="list-disc pl-6 space-y-2 mt-4 text-slate-600 font-medium">
+                                <li>**Droit d'accès** : consulter les données que nous possédons sur vous.</li>
+                                <li>**Droit de rectification** : corriger les données inexactes ou incomplètes.</li>
+                                <li>**Droit à l'effacement** (Droit à l'oubli) : demander la suppression de votre compte et de vos données.</li>
+                                <li>**Droit à la portabilité** : récupérer vos données dans un format standard lisible.</li>
+                            </ul>
+                            <p className="text-slate-600 leading-relaxed mt-4">
+                                Pour exercer ces droits, le personnel de l'établissement scolaire doit d'abord être contacté, car c'est lui le "Responsable de traitement" de vos données scolaires. Vous pouvez également nous contacter directement pour toute assistance technique.
+                            </p>
+                        </section>
+
+                        <section>
+                            <h2 className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight flex items-center gap-3">
+                                <Eye className="text-blue-500" size={24} /> 6. Cookies et Traceurs
+                            </h2>
+                            <p className="text-slate-600 leading-relaxed">
+                                L'application NB-MIND School utilise des "cookies" (petits fichiers texte) de manière très limitée. Nous n'utilisons **aucun cookie publicitaire ou de suivi tiers**. Les seuls cookies utilisés sont strictement nécessaires au fonctionnement technique de l'application :
+                            </p>
+                            <ul className="list-disc pl-6 space-y-2 mt-4 text-slate-600 font-medium">
+                                <li>Cookies de session pour maintenir votre connexion sécurisée au Dashboard.</li>
+                                <li>Cookies de préférences pour mémoriser la langue ou le thème d'affichage.</li>
+                            </ul>
                         </section>
 
                         <section className="p-10 bg-slate-50 ]   italic font-medium">
