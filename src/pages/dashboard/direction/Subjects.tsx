@@ -119,15 +119,15 @@ const Subjects: React.FC = () => {
                             : "Gérez les matières spécialisées du collège et du lycée."}
                     </p>
                 </div>
-                <button onClick={() => { resetForm(); setShowSubjectModal(true); }} className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-blue-600/20">
+                <button onClick={() => { resetForm(); setShowSubjectModal(true); }} className="bg-blue-600 text-white px-6 py-3  font-black flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-blue-600/20">
                     <Plus size={18} /> Ajouter une Matière
                 </button>
             </div>
 
-            <div className="flex bg-white rounded-3xl p-4 shadow-sm border border-slate-100 mb-6 items-center gap-4 w-fit">
+            <div className="flex bg-white  p-4 shadow-sm   mb-6 items-center gap-4 w-fit">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Filtrer par Cycle</label>
                 <select
-                    className="px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 outline-none w-64 focus:bg-white focus:border-blue-200"
+                    className="px-5 py-2.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none w-64 focus:bg-white focus:"
                     value={selectedCycleFilter}
                     onChange={(e) => setSelectedCycleFilter(e.target.value)}
                 >
@@ -137,7 +137,7 @@ const Subjects: React.FC = () => {
             </div>
 
             {message.text && (
-                <div className={`p-4 rounded-2xl mb-6 font-bold flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                <div className={`p-4  mb-6 font-bold flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600  ' : 'bg-red-50 text-red-600  '}`}>
                     <div className="flex items-center gap-3">
                         {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
                         {message.text}
@@ -146,7 +146,7 @@ const Subjects: React.FC = () => {
                 </div>
             )}
 
-            <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden scrollbar-hide">
+            <div className="bg-white ]   shadow-sm overflow-hidden scrollbar-hide">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-slate-50/50 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
@@ -162,7 +162,7 @@ const Subjects: React.FC = () => {
                                 <tr key={s.id} className="hover:bg-slate-50/50 transition-colors group">
                                     <td className="px-10 py-6">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black group-hover:scale-110 transition-transform">
+                                            <div className="w-10 h-10 bg-blue-50 text-blue-600  flex items-center justify-center font-black group-hover:scale-110 transition-transform">
                                                 {s.name.charAt(0).toUpperCase()}
                                             </div>
                                             <span className="font-bold text-slate-800 tracking-tight">{s.name}</span>
@@ -170,11 +170,11 @@ const Subjects: React.FC = () => {
                                     </td>
                                     <td className="px-10 py-6">
                                         <div className="flex flex-col gap-2 items-start">
-                                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase ${!s.cycle ? 'bg-indigo-50/50 text-indigo-700' : 'bg-blue-50/50 text-blue-700'}`}>{s.cycle?.name || 'Tous Les Cycles'}</span>
+                                            <span className={`px-4 py-1.5  text-[10px] font-black tracking-widest uppercase ${!s.cycle ? 'bg-indigo-50/50 text-indigo-700' : 'bg-blue-50/50 text-blue-700'}`}>{s.cycle?.name || 'Tous Les Cycles'}</span>
                                             {institutionType !== 'ECOLE' && s.category && (
-                                                <span className={`px-3 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest ${s.category === 'SCIENTIFIQUE' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
-                                                    s.category === 'ADDITIONNELLE' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
-                                                        'bg-purple-50 text-purple-600 border border-purple-100'
+                                                <span className={`px-3 py-1  text-[9px] font-bold uppercase tracking-widest ${s.category === 'SCIENTIFIQUE' ? 'bg-emerald-50 text-emerald-600  ' :
+                                                    s.category === 'ADDITIONNELLE' ? 'bg-amber-50 text-amber-600  ' :
+                                                        'bg-purple-50 text-purple-600  '
                                                     }`}>
                                                     {s.category}
                                                 </span>
@@ -185,25 +185,25 @@ const Subjects: React.FC = () => {
                                         {s.classes && s.classes.length > 0 ? (
                                             <div className="flex flex-wrap gap-2 max-w-xs">
                                                 {s.classes.map((c: any) => (
-                                                    <div key={c.id} className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight border border-blue-100/50">
-                                                        <div className="w-1.2 h-1.2 bg-blue-400 rounded-full"></div>
+                                                    <div key={c.id} className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-2.5 py-1  text-[10px] font-black uppercase tracking-tight  ">
+                                                        <div className="w-1.2 h-1.2 bg-blue-400 "></div>
                                                         {c.name}
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-2 text-slate-400 font-medium text-[10px] uppercase font-black tracking-widest italic">
-                                                <div className="w-1.5 h-1.5 bg-purple-200 rounded-full"></div>
+                                                <div className="w-1.5 h-1.5 bg-purple-200 "></div>
                                                 Tronc commun
                                             </div>
                                         )}
                                     </td>
                                     <td className="px-10 py-6 text-right">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onClick={() => handleEditSubject(s)} className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                                            <button onClick={() => handleEditSubject(s)} className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all">
                                                 <Edit size={18} />
                                             </button>
-                                            <button onClick={() => handleDeleteSubject(s.id)} className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                                            <button onClick={() => handleDeleteSubject(s.id)} className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50  transition-all">
                                                 <Trash2 size={18} />
                                             </button>
                                         </div>
@@ -224,21 +224,21 @@ const Subjects: React.FC = () => {
 
             {showSubjectModal && (
                 <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-2xl max-h-[90vh] flex flex-col rounded-[40px] shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
+                    <div className="bg-white w-full max-w-2xl max-h-[90vh] flex flex-col ] shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
 
                         {/* Header fixe */}
-                        <div className="p-8 pb-6 border-b border-slate-100 flex justify-between items-center shrink-0 bg-white">
+                        <div className="p-8 pb-6   flex justify-between items-center shrink-0 bg-white">
                             <div>
                                 <h3 className="text-2xl font-black text-slate-800 tracking-tight">{isEditing ? "Modifier la Matière" : "Nouvelle Matière"}</h3>
                                 <p className="text-slate-400 text-sm mt-1">{isEditing ? "Ajustez les détails de l'enseignement." : "Ajoutez une discipline au programme."}</p>
                             </div>
-                            <button onClick={() => setShowSubjectModal(false)} className="w-10 h-10 bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-full flex items-center justify-center transition-colors"><X size={20} /></button>
+                            <button onClick={() => setShowSubjectModal(false)} className="w-10 h-10 bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600  flex items-center justify-center transition-colors"><X size={20} /></button>
                         </div>
 
                         {/* Corps scrollable */}
                         <div className="p-8 overflow-y-auto scrollbar-hide space-y-8 flex-1 bg-slate-50/30">
 
-                            <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-6">
+                            <div className="bg-white p-6 ]   shadow-sm space-y-6">
                                 <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-2">
                                     <BookOpen size={14} className="text-blue-500" /> Informations Générales
                                 </h4>
@@ -248,7 +248,7 @@ const Subjects: React.FC = () => {
                                     <input
                                         type="text"
                                         placeholder="Ex: Mathématiques, SVT, Anglais..."
-                                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/10 outline-none transition-all"
+                                        className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 focus:bg-white focus: focus:ring-4 focus:ring-blue-400/10 outline-none transition-all"
                                         value={newSubject.name}
                                         onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })}
                                     />
@@ -258,7 +258,7 @@ const Subjects: React.FC = () => {
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Cycle d'enseignement</label>
                                         <select
-                                            className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/10 appearance-none cursor-pointer transition-all"
+                                            className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus: focus:ring-4 focus:ring-blue-400/10 appearance-none cursor-pointer transition-all"
                                             value={newSubject.cycle.id}
                                             onChange={(e) => {
                                                 const val = e.target.value;
@@ -277,7 +277,7 @@ const Subjects: React.FC = () => {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Catégorie</label>
                                             <select
-                                                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/10 appearance-none cursor-pointer transition-all"
+                                                className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus: focus:ring-4 focus:ring-blue-400/10 appearance-none cursor-pointer transition-all"
                                                 value={newSubject.category}
                                                 onChange={(e) => setNewSubject({ ...newSubject, category: e.target.value })}
                                             >
@@ -290,7 +290,7 @@ const Subjects: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+                            <div className="bg-white p-6 ]   shadow-sm space-y-4">
                                 <div className="flex justify-between items-end mb-2">
                                     <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                         Vérification d'Affectation
@@ -307,7 +307,7 @@ const Subjects: React.FC = () => {
                                                     setNewSubject({ ...newSubject, classeIds: Array.from(new Set([...newSubject.classeIds, ...cycleClasses])) });
                                                 }
                                             }}
-                                            className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline bg-blue-50 px-3 py-1.5 rounded-lg"
+                                            className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline bg-blue-50 px-3 py-1.5 "
                                         >
                                             {classes.filter(c => newSubject.cycle.id === 'all' || String(c.cycle?.id) === String(newSubject.cycle.id)).every(c => newSubject.classeIds.includes(String(c.id))) ? "Tout décocher" : "Tout cocher"}
                                         </button>
@@ -317,7 +317,7 @@ const Subjects: React.FC = () => {
 
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                     {classes.filter(c => newSubject.cycle.id && newSubject.cycle.id !== 'all' ? String(c.cycle?.id) === String(newSubject.cycle.id) : true).map(c => (
-                                        <label key={c.id} className={`flex items-center gap-3 p-3.5 rounded-2xl cursor-pointer border-2 transition-all shadow-sm ${newSubject.classeIds.includes(String(c.id)) ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-slate-100 text-slate-600 hover:border-blue-200'}`}>
+                                        <label key={c.id} className={`flex items-center gap-3 p-3.5  cursor-pointer  transition-all shadow-sm ${newSubject.classeIds.includes(String(c.id)) ? 'bg-blue-50  text-blue-700' : 'bg-white  text-slate-600 hover:'}`}>
                                             <input
                                                 type="checkbox"
                                                 className="hidden"
@@ -327,14 +327,14 @@ const Subjects: React.FC = () => {
                                                     else setNewSubject({ ...newSubject, classeIds: newSubject.classeIds.filter((id: string) => id !== String(c.id)) });
                                                 }}
                                             />
-                                            <div className={`w-5 h-5 shrink-0 rounded-[6px] border flex items-center justify-center transition-all ${newSubject.classeIds.includes(String(c.id)) ? 'bg-blue-600 border-blue-600' : 'bg-slate-100 border-slate-300'}`}>
+                                            <div className={`w-5 h-5 shrink-0 ]  flex items-center justify-center transition-all ${newSubject.classeIds.includes(String(c.id)) ? 'bg-blue-600 ' : 'bg-slate-100 '}`}>
                                                 {newSubject.classeIds.includes(String(c.id)) && <CheckCircle2 size={12} className="text-white" />}
                                             </div>
                                             <span className="text-xs font-black uppercase tracking-tight truncate">{c.name}</span>
                                         </label>
                                     ))}
                                     {classes.filter(c => newSubject.cycle.id && newSubject.cycle.id !== 'all' ? String(c.cycle?.id) === String(newSubject.cycle.id) : true).length === 0 && (
-                                        <div className="col-span-full py-6 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                        <div className="col-span-full py-6 text-center bg-slate-50    ">
                                             <p className="text-xs text-slate-400 font-bold uppercase tracking-widest italic">Aucune classe disponible.</p>
                                         </div>
                                     )}
@@ -343,11 +343,11 @@ const Subjects: React.FC = () => {
                         </div>
 
                         {/* Footer fixe */}
-                        <div className="p-8 pt-6 border-t border-slate-100 shrink-0 bg-white">
+                        <div className="p-8 pt-6   shrink-0 bg-white">
                             <button
                                 onClick={handleCreateOrUpdateSubject}
                                 disabled={loading || !newSubject.name || !newSubject.cycle.id}
-                                className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-600/20 hover:scale-[1.02] hover:shadow-blue-600/40 active:scale-95 transition-all outline-none focus:ring-4 focus:ring-blue-600/30 disabled:opacity-50 disabled:hover:scale-100"
+                                className="w-full py-4 bg-blue-600 text-white  font-black shadow-lg shadow-blue-600/20 hover:scale-[1.02] hover:shadow-blue-600/40 active:scale-95 transition-all outline-none focus:ring-4 focus:ring-blue-600/30 disabled:opacity-50 disabled:hover:scale-100"
                             >
                                 {loading ? 'Traitement en cours...' : isEditing ? 'Appliquer les modifications' : 'Enregistrer la matière'}
                             </button>
@@ -359,13 +359,13 @@ const Subjects: React.FC = () => {
 
             {confirmDialog.isOpen && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-sm rounded-[40px] p-10 shadow-2xl animate-in zoom-in-95 duration-200 text-center">
-                        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 transition-transform hover:scale-110 ease-out duration-500"><AlertCircle size={32} /></div>
+                    <div className="bg-white w-full max-w-sm ] p-10 shadow-2xl animate-in zoom-in-95 duration-200 text-center">
+                        <div className="w-16 h-16 bg-red-50 text-red-500  flex items-center justify-center mx-auto mb-6 transition-transform hover:scale-110 ease-out duration-500"><AlertCircle size={32} /></div>
                         <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2">{confirmDialog.title}</h3>
                         <p className="text-slate-500 text-sm mb-10 leading-relaxed">{confirmDialog.message}</p>
                         <div className="flex gap-4">
-                            <button onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })} className="flex-1 py-4 rounded-2xl font-bold bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">Annuler</button>
-                            <button onClick={() => { confirmDialog.onConfirm(); setConfirmDialog({ ...confirmDialog, isOpen: false }); }} className="flex-1 py-4 rounded-2xl font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all">Confirmer</button>
+                            <button onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })} className="flex-1 py-4  font-bold bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">Annuler</button>
+                            <button onClick={() => { confirmDialog.onConfirm(); setConfirmDialog({ ...confirmDialog, isOpen: false }); }} className="flex-1 py-4  font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all">Confirmer</button>
                         </div>
                     </div>
                 </div>

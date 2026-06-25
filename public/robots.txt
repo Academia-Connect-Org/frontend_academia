@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+Allow: /login
+Disallow: /dashboard/
+Disallow: /api/
+
+# Sitemaps (if any) can be added here

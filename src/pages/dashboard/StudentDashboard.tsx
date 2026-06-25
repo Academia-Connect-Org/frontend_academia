@@ -82,7 +82,7 @@ const StudentDashboard: React.FC = () => {
         return (
             <>
                 <div className="min-h-[60vh] flex items-center justify-center">
-                    <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-16 h-16     animate-spin"></div>
                 </div>
             </>
         );
@@ -99,43 +99,43 @@ const StudentDashboard: React.FC = () => {
     return (
         <>
             {/* Main Stats / Welcome */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-700 dark:to-indigo-900 rounded-[40px] p-8 text-white shadow-2xl mb-10 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-700 dark:to-indigo-900 ] p-8 text-white shadow-2xl mb-10 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10  blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div>
                         <h2 className="text-3xl font-black mb-2 tracking-tight">Salut, {user?.firstName} ! 👋</h2>
                         <p className="text-blue-100/70 font-medium">Content de te revoir. Voici un aperçu de ta journée.</p>
                         <div className="flex gap-4 mt-8">
-                            <div className="bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md border border-white/5">
+                            <div className="bg-white/10 px-4 py-2  backdrop-blur-md  ">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-blue-200">Moyenne Actuelle</p>
                                 <p className="text-xl font-black">{stats.average > 0 ? `${stats.average}/20` : '...'}</p>
                             </div>
-                            <div className="bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md border border-white/5">
+                            <div className="bg-white/10 px-4 py-2  backdrop-blur-md  ">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-blue-200">Ma Classe</p>
                                 <p className="text-xl font-black">{user?.classe?.name || 'N/A'}</p>
                             </div>
                         </div>
                     </div>
                     {nextCourse ? (
-                        <div className="w-full md:w-auto p-6 bg-white/10 rounded-3xl backdrop-blur-md border border-white/10 text-center">
+                        <div className="w-full md:w-auto p-6 bg-white/10  backdrop-blur-md   text-center">
                             <p className="text-xs font-black uppercase tracking-widest mb-4">Ton prochain cours</p>
                             <h4 className="text-lg font-bold mb-1 text-white">{nextCourse.subject?.name}</h4>
                             <p className="text-sm text-blue-100/60 mb-4">{nextCourse.startTime} • Salle {nextCourse.room || 'N/A'}</p>
                             <button
                                 onClick={() => navigate('/dashboard/student/schedule')}
-                                className="w-full py-3 bg-white text-blue-600 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:bg-blue-50 transition-all"
+                                className="w-full py-3 bg-white text-blue-600  font-black text-xs uppercase tracking-widest shadow-xl hover:bg-blue-50 transition-all"
                             >
                                 Voir l'emploi du temps
                             </button>
                         </div>
                     ) : (
-                        <div className="w-full md:w-auto p-6 bg-white/10 rounded-3xl backdrop-blur-md border border-white/10 text-center">
+                        <div className="w-full md:w-auto p-6 bg-white/10  backdrop-blur-md   text-center">
                             <p className="text-xs font-black uppercase tracking-widest mb-4">Journée terminée</p>
                             <h4 className="text-lg font-bold mb-1 text-white">Plus de cours !</h4>
                             <p className="text-sm text-blue-100/60 mb-4">Repose-toi bien.</p>
                             <button
                                 onClick={() => navigate('/dashboard/student/homework')}
-                                className="w-full py-3 bg-white text-blue-600 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:bg-blue-50 transition-all"
+                                className="w-full py-3 bg-white text-blue-600  font-black text-xs uppercase tracking-widest shadow-xl hover:bg-blue-50 transition-all"
                             >
                                 Avancer mes devoirs
                             </button>
@@ -147,7 +147,7 @@ const StudentDashboard: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Courses & Homework */}
                 <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] shadow-xl border border-slate-100 dark:border-slate-800">
+                    <div className="bg-white dark:bg-slate-900 p-8 ] shadow-xl   dark:">
                         <h3 className="text-xl font-black text-slate-800 dark:text-blue-400 mb-8 tracking-tight">Cours du Jour</h3>
                         <div className="space-y-4">
                             {upcomingCourses.length > 0 ? upcomingCourses.map((c, i) => (
@@ -164,10 +164,10 @@ const StudentDashboard: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] shadow-xl border border-slate-100 dark:border-slate-800">
+                    <div className="bg-white dark:bg-slate-900 p-8 ] shadow-xl   dark:">
                         <div className="flex items-center justify-between mb-8">
                             <h3 className="text-xl font-black text-slate-800 dark:text-blue-400 tracking-tight">Devoirs à Rendre</h3>
-                            {homeworks.length > 0 && <span className="px-3 py-1 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg text-xs font-black uppercase tracking-widest">{homeworks.length} Urgents</span>}
+                            {homeworks.length > 0 && <span className="px-3 py-1 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400  text-xs font-black uppercase tracking-widest">{homeworks.length} Urgents</span>}
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {homeworks.length > 0 ? homeworks.map((h, i) => (
@@ -187,7 +187,7 @@ const StudentDashboard: React.FC = () => {
 
                 {/* Sidebar: Results & Resources */}
                 <div className="space-y-8">
-                    <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] shadow-xl border border-slate-100 dark:border-slate-800">
+                    <div className="bg-white dark:bg-slate-900 p-8 ] shadow-xl   dark:">
                         <h3 className="text-xl font-black text-slate-800 dark:text-blue-400 mb-6 flex items-center gap-2">
                             <TrendingUp size={20} className="text-blue-600" /> Dernières Notes
                         </h3>
@@ -206,14 +206,14 @@ const StudentDashboard: React.FC = () => {
                         </div>
                         <button
                             onClick={() => navigate('/dashboard/student/results')}
-                            className="w-full mt-8 py-4 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-700 transition-all border border-slate-100 dark:border-slate-700"
+                            className="w-full mt-8 py-4 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400  font-bold text-xs uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-700 transition-all   dark:"
                         >
                             Voir mon bulletin
                         </button>
                     </div>
 
-                    <div className="bg-slate-900 rounded-[40px] p-8 text-white shadow-2xl relative overflow-hidden">
-                        <div className="absolute -top-8 -right-8 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl"></div>
+                    <div className="bg-slate-900 ] p-8 text-white shadow-2xl relative overflow-hidden">
+                        <div className="absolute -top-8 -right-8 w-32 h-32 bg-indigo-500/20  blur-2xl"></div>
                         <h3 className="text-xl font-black mb-6 relative z-10 flex items-center gap-2">
                             <PlayCircle size={20} className="text-blue-400" /> Ressources
                         </h3>
@@ -227,8 +227,8 @@ const StudentDashboard: React.FC = () => {
                 {/* Sidebar: Classmates & Performance */}
                 <div className="space-y-8">
                     {/* Performance Widget */}
-                    <div className="bg-slate-900 rounded-[40px] p-8 text-white shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
+                    <div className="bg-slate-900 ] p-8 text-white shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20  blur-3xl"></div>
                         <h3 className="text-xl font-black mb-6 flex items-center gap-2 tracking-tight">
                             <TrendingUp size={20} className="text-blue-400" /> Moyenne
                         </h3>
@@ -238,15 +238,15 @@ const StudentDashboard: React.FC = () => {
                         </div>
                         <p className="text-blue-100/50 text-xs font-medium mb-6 uppercase tracking-wider">Moyenne générale calculée</p>
 
-                        <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden mb-6">
-                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(stats.average / 20) * 100}%` }}></div>
+                        <div className="h-2 w-full bg-white/5  overflow-hidden mb-6">
+                            <div className="h-full bg-blue-500 " style={{ width: `${(stats.average / 20) * 100}%` }}></div>
                         </div>
 
-                        <button className="w-full py-4 bg-white/10 hover:bg-white/20 border border-white/5 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">Consulter le bulletin</button>
+                        <button className="w-full py-4 bg-white/10 hover:bg-white/20    font-black text-[10px] uppercase tracking-widest transition-all">Consulter le bulletin</button>
                     </div>
 
                     {/* Classmates Widget */}
-                    <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100">
+                    <div className="bg-white p-8 ] shadow-xl  ">
                         <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
                             <Users size={20} className="text-indigo-500" /> Mes Amis
                         </h3>
@@ -254,7 +254,7 @@ const StudentDashboard: React.FC = () => {
                             {classmates.map((c: any) => (
                                 <div key={c.id} className="flex items-center justify-between group">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center font-black text-xs text-slate-400 group-hover:scale-110 transition-transform">
+                                        <div className="w-10 h-10 bg-slate-100  flex items-center justify-center font-black text-xs text-slate-400 group-hover:scale-110 transition-transform">
                                             {c.firstName[0]}{c.lastName[0]}
                                         </div>
                                         <div>
@@ -264,7 +264,7 @@ const StudentDashboard: React.FC = () => {
                                     </div>
                                     <button
                                         onClick={() => navigate(`/dashboard/student/messages?contactId=${c.id}`)}
-                                        className="p-2 bg-slate-50 text-slate-300 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
+                                        className="p-2 bg-slate-50 text-slate-300 hover:bg-blue-50 hover:text-blue-600  transition-all"
                                     >
                                         <MessageSquare size={14} />
                                     </button>
@@ -274,7 +274,7 @@ const StudentDashboard: React.FC = () => {
                                 <p className="text-slate-400 text-xs italic">Aucun camarade de classe trouvé.</p>
                             )}
                         </div>
-                        <button className="w-full mt-6 py-4 bg-slate-50 hover:bg-slate-100 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-400 transition-all">Voir tout le groupe</button>
+                        <button className="w-full mt-6 py-4 bg-slate-50 hover:bg-slate-100  font-black text-[10px] uppercase tracking-widest text-slate-400 transition-all">Voir tout le groupe</button>
                     </div>
                 </div>
             </div>
@@ -285,9 +285,9 @@ const StudentDashboard: React.FC = () => {
 const ScheduleRow = ({ subject, time, teacher, status }: { subject: string, time: string, teacher: string, status: string }) => {
     const isCurrent = status === 'current';
     return (
-        <div className={`flex items-center justify-between p-5 rounded-3xl transition-all ${isCurrent ? 'bg-blue-50 dark:bg-blue-900/10 border-2 border-blue-200 dark:border-blue-800 shadow-lg scale-[1.02]' : 'bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-900/50 hover:shadow-md'}`}>
+        <div className={`flex items-center justify-between p-5  transition-all ${isCurrent ? 'bg-blue-50 dark:bg-blue-900/10   dark: shadow-lg scale-[1.02]' : 'bg-slate-50 dark:bg-slate-800   dark: hover:bg-white dark:hover:bg-slate-900/50 hover:shadow-md'}`}>
             <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold ${isCurrent ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-700 text-slate-400 shadow-sm'}`}>
+                <div className={`w-12 h-12  flex items-center justify-center font-bold ${isCurrent ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-700 text-slate-400 shadow-sm'}`}>
                     {isCurrent ? <Clock size={24} /> : <CheckCircle size={24} className={status === 'passed' ? 'text-emerald-500' : 'text-slate-200 dark:text-slate-600'} />}
                 </div>
                 <div>
@@ -295,19 +295,19 @@ const ScheduleRow = ({ subject, time, teacher, status }: { subject: string, time
                     <p className="text-xs text-slate-400 font-bold">{teacher} • {time}</p>
                 </div>
             </div>
-            {isCurrent && <span className="px-3 py-1 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg animate-pulse">En cours</span>}
+            {isCurrent && <span className="px-3 py-1 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest  animate-pulse">En cours</span>}
         </div>
     );
 };
 
 const HomeworkCard = ({ subject, task, due, color }: { subject: string, task: string, due: string, color: 'blue' | 'amber' | 'emerald' }) => {
     const colors = {
-        blue: 'border-blue-100 bg-blue-50/50 text-blue-600',
-        amber: 'border-amber-100 bg-amber-50/50 text-amber-600',
-        emerald: 'border-emerald-100 bg-emerald-50/50 text-emerald-600'
+        blue: ' bg-blue-50/50 text-blue-600',
+        amber: ' bg-amber-50/50 text-amber-600',
+        emerald: ' bg-emerald-50/50 text-emerald-600'
     };
     return (
-        <div className={`p-6 rounded-3xl border-2 ${colors[color as keyof typeof colors]} hover:shadow-lg transition-all cursor-pointer`}>
+        <div className={`p-6   ${colors[color as keyof typeof colors]} hover:shadow-lg transition-all cursor-pointer`}>
             <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-black uppercase tracking-widest">{subject}</span>
                 <span className="text-[10px] font-bold opacity-60 flex items-center gap-1"><Clock size={12} /> {due}</span>
@@ -320,7 +320,7 @@ const HomeworkCard = ({ subject, task, due, color }: { subject: string, task: st
 const GradeItem = ({ subject, grade, date, trend }: { subject: string, grade: string, date: string, trend: 'up' | 'down' }) => (
     <div className="flex items-center justify-between group cursor-pointer">
         <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-all">
+            <div className="w-10 h-10  bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-all">
                 <TrendingUp size={18} className={trend === 'down' ? 'rotate-180' : ''} />
             </div>
             <div>
@@ -333,9 +333,9 @@ const GradeItem = ({ subject, grade, date, trend }: { subject: string, grade: st
 );
 
 const ResourceItem = ({ title, type }: { title: string, type: 'PDF' | 'VIDEO' | 'LINK' }) => (
-    <div className="flex items-center justify-between p-3 rounded-xl hover:bg-white/10 transition-all cursor-pointer group border border-transparent hover:border-white/5">
+    <div className="flex items-center justify-between p-3  hover:bg-white/10 transition-all cursor-pointer group   hover:">
         <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-blue-400">
+            <div className="w-8 h-8  bg-white/10 flex items-center justify-center text-blue-400">
                 {type === 'PDF' && <Download size={16} />}
                 {type === 'VIDEO' && <PlayCircle size={16} />}
                 {type === 'LINK' && <AlertCircle size={16} />}

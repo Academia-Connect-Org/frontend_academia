@@ -402,12 +402,12 @@ const Schedule: React.FC = () => {
                 <div className="flex gap-4">
                     <button
                         onClick={() => setIsConfigModalOpen(true)}
-                        className="bg-white border-2 border-slate-100 p-3 rounded-2xl font-bold text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"
+                        className="bg-white   p-3  font-bold text-slate-400 hover:text-indigo-600 hover: transition-all shadow-sm"
                         title="Configurer le planning"
                     >
                         <Settings size={22} />
                     </button>
-                    <button className="bg-white border-2 border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+                    <button className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
                         <Download size={18} /> Exporter PDF
                     </button>
                     <button
@@ -425,7 +425,7 @@ const Schedule: React.FC = () => {
                             });
                             setIsAddModalOpen(true);
                         }}
-                        className="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="bg-indigo-600 text-white px-8 py-3  font-black flex items-center gap-2 shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all"
                     >
                         <Plus size={20} /> Nouvelle Session
                     </button>
@@ -435,7 +435,7 @@ const Schedule: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
                 {/* Left Controls */}
                 <div className="lg:col-span-3 space-y-6">
-                    <div className="bg-white p-8 rounded-[38px] shadow-xl shadow-slate-200/50 border border-slate-100 ring-1 ring-slate-400/5">
+                    <div className="bg-white p-8 ] shadow-xl shadow-slate-200/50   ring-1 ring-slate-400/5">
                         <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
                             <Filter size={16} /> Filtres Vue
                         </h3>
@@ -444,7 +444,7 @@ const Schedule: React.FC = () => {
                             <div>
                                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3 ml-1">Par Classe</label>
                                 <select
-                                    className="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500/20 focus:bg-white rounded-2xl py-4 px-5 text-sm font-bold text-slate-700 transition-all outline-none appearance-none"
+                                    className="w-full bg-slate-50   focus: focus:bg-white  py-4 px-5 text-sm font-bold text-slate-700 transition-all outline-none appearance-none"
                                     value={selectedClasse}
                                     onChange={(e) => {
                                         setSelectedClasse(e.target.value);
@@ -458,7 +458,7 @@ const Schedule: React.FC = () => {
 
                             <div className="relative">
                                 <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                                    <div className="w-full border-t border-slate-100"></div>
+                                    <div className="w-full  "></div>
                                 </div>
                                 <div className="relative flex justify-center text-xs uppercase font-black text-slate-300">
                                     <span className="bg-white px-3">OU</span>
@@ -468,7 +468,7 @@ const Schedule: React.FC = () => {
                             <div>
                                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3 ml-1">Par Enseignant</label>
                                 <select
-                                    className="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500/20 focus:bg-white rounded-2xl py-4 px-5 text-sm font-bold text-slate-700 transition-all outline-none appearance-none"
+                                    className="w-full bg-slate-50   focus: focus:bg-white  py-4 px-5 text-sm font-bold text-slate-700 transition-all outline-none appearance-none"
                                     value={selectedTeacher}
                                     onChange={(e) => {
                                         setSelectedTeacher(e.target.value);
@@ -483,17 +483,17 @@ const Schedule: React.FC = () => {
                     </div>
 
                     {/* Stats Card */}
-                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-8 rounded-[40px] text-white shadow-2xl shadow-indigo-600/20 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-white/20 transition-all duration-500"></div>
+                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-8 ] text-white shadow-2xl shadow-indigo-600/20 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10  -mr-16 -mt-16 blur-3xl group-hover:bg-white/20 transition-all duration-500"></div>
                         <h4 className="text-xl font-black mb-6 flex items-center gap-2">
                             <Layout size={20} /> Vue d'ensemble
                         </h4>
                         <div className="space-y-5">
-                            <div className="flex justify-between items-center bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/5">
+                            <div className="flex justify-between items-center bg-white/10 p-4  backdrop-blur-sm  ">
                                 <span className="text-indigo-100 text-xs font-bold uppercase tracking-wider">Total Cours</span>
                                 <span className="text-2xl font-black">{entries.length}</span>
                             </div>
-                            <div className="flex justify-between items-center bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/5">
+                            <div className="flex justify-between items-center bg-white/10 p-4  backdrop-blur-sm  ">
                                 <span className="text-indigo-100 text-xs font-bold uppercase tracking-wider">Matières</span>
                                 <span className="text-2xl font-black">{new Set(entries.map(e => e.subjectName)).size}</span>
                             </div>
@@ -503,7 +503,7 @@ const Schedule: React.FC = () => {
 
                 {/* Main Content: Timetable Grid */}
                 <div className="lg:col-span-9">
-                    <div className="bg-white rounded-[45px] shadow-2xl shadow-slate-200/40 border border-slate-100 overflow-hidden relative">
+                    <div className="bg-white ] shadow-2xl shadow-slate-200/40   overflow-hidden relative">
                         {loading && (
                             <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-50 flex items-center justify-center">
                                 <Loader2 className="animate-spin text-indigo-600" size={48} />
@@ -511,11 +511,11 @@ const Schedule: React.FC = () => {
                         )}
 
                         {/* Top bar with days */}
-                        <div className="bg-slate-50/50 border-b border-slate-100 p-2 flex">
+                        <div className="bg-slate-50/50   p-2 flex">
                             <div className="w-20 flex-shrink-0"></div>
                             <div className="grid grid-cols-6 flex-1 text-center">
                                 {DAYS.map(day => (
-                                    <div key={day} className="py-4 font-black text-[11px] text-slate-400 uppercase tracking-widest border-l border-slate-100 first:border-0">
+                                    <div key={day} className="py-4 font-black text-[11px] text-slate-400 uppercase tracking-widest   first:">
                                         {day}
                                     </div>
                                 ))}
@@ -525,12 +525,12 @@ const Schedule: React.FC = () => {
                         {/* Grid Content */}
                         <div ref={gridRef} className="flex relative" style={{ height: `${timeSlots.length * 100}px` }}>
                             {/* Time labels */}
-                            <div className="w-20 flex-shrink-0 border-r border-slate-100/60 relative z-20 bg-white/50 backdrop-blur-sm">
+                            <div className="w-20 flex-shrink-0   relative z-20 bg-white/50 backdrop-blur-sm">
                                 {timeSlots.map(time => {
                                     const { top } = calculatePositionAndHeight(time, time); // Hack to get top only
                                     return (
                                         <div key={time} style={{ top }} className="absolute inset-x-0 h-4 -mt-2 text-[10px] font-black text-slate-400 text-center flex flex-col justify-start">
-                                            <span className="bg-slate-100/50 mx-2 py-1 rounded-lg border border-slate-100 tracking-tighter shadow-sm">{time}</span>
+                                            <span className="bg-slate-100/50 mx-2 py-1    tracking-tighter shadow-sm">{time}</span>
                                         </div>
                                     );
                                 })}
@@ -540,7 +540,7 @@ const Schedule: React.FC = () => {
                                 <div className="w-20"></div>
                                 <div className="grid grid-cols-6 flex-1">
                                     {DAYS.map((day, i) => (
-                                        <div key={i} className="border-l border-slate-100/60 h-full relative">
+                                        <div key={i} className="  h-full relative">
                                             {timeSlots.slice(0, -1).map((time, j) => {
                                                 const isBreakStart = timetableConfig.breaks.some(b => b.startTime === time);
                                                 if (isBreakStart) return null;
@@ -554,7 +554,7 @@ const Schedule: React.FC = () => {
                                                         key={j}
                                                         onClick={() => handleGridClick(day, time)}
                                                         style={{ height }}
-                                                        className="border-b border-slate-50/80 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                                                        className="  cursor-pointer hover:bg-slate-50/50 transition-colors"
                                                     ></div>
                                                 );
                                             })}
@@ -580,7 +580,7 @@ const Schedule: React.FC = () => {
                                             return (
                                                 <div
                                                     key={`break-${i}`}
-                                                    className="absolute inset-x-0 bg-slate-100/40 backdrop-blur-[1px] border-y border-slate-200/50 flex items-center justify-center pointer-events-none z-0"
+                                                    className="absolute inset-x-0 bg-slate-100/40 backdrop-blur-[1px]   flex items-center justify-center pointer-events-none z-0"
                                                     style={{ top, height }}
                                                 >
                                                     <div className="flex flex-col items-center">
@@ -613,7 +613,7 @@ const Schedule: React.FC = () => {
                                                         animate={{ opacity: 1, scale: 1, y: 0 }}
                                                         exit={{ opacity: 0, scale: 0.9 }}
                                                         onClick={() => openEditModal(entry)}
-                                                        className="absolute inset-x-0 rounded-3xl p-4 shadow-xl shadow-slate-200/50 border-l-4 overflow-hidden group hover:z-20 hover:scale-[1.03] transition-all cursor-pointer backdrop-blur-md active:z-30 active:scale-105 active:shadow-2xl"
+                                                        className="absolute inset-x-0  p-4 shadow-xl shadow-slate-200/50  overflow-hidden group hover:z-20 hover:scale-[1.03] transition-all cursor-pointer backdrop-blur-md active:z-30 active:scale-105 active:shadow-2xl"
                                                         style={{
                                                             top,
                                                             height,
@@ -623,7 +623,7 @@ const Schedule: React.FC = () => {
                                                     >
                                                         <div className="flex flex-col h-full">
                                                             <div className="flex justify-between items-start mb-2">
-                                                                <span className="text-[10px] font-black px-2 py-1 rounded-full bg-white/80 text-slate-600 shadow-sm uppercase tracking-tighter">
+                                                                <span className="text-[10px] font-black px-2 py-1  bg-white/80 text-slate-600 shadow-sm uppercase tracking-tighter">
                                                                     {entry.startTime} - {entry.endTime}
                                                                 </span>
                                                                 <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
@@ -643,7 +643,7 @@ const Schedule: React.FC = () => {
                                                                             setEditingEntry(null); // Clear editing to make it a "new" entry
                                                                             setIsAddModalOpen(true);
                                                                         }}
-                                                                        className="p-1.5 bg-white/60 text-indigo-400 hover:text-indigo-600 rounded-lg border border-slate-100 shadow-sm transition-colors"
+                                                                        className="p-1.5 bg-white/60 text-indigo-400 hover:text-indigo-600    shadow-sm transition-colors"
                                                                         title="Dupliquer"
                                                                     >
                                                                         <Copy size={12} />
@@ -653,7 +653,7 @@ const Schedule: React.FC = () => {
                                                                             e.stopPropagation();
                                                                             confirmDelete(entry.id);
                                                                         }}
-                                                                        className="p-1.5 bg-white/60 text-slate-400 hover:text-rose-600 rounded-lg border border-slate-100 shadow-sm transition-colors"
+                                                                        className="p-1.5 bg-white/60 text-slate-400 hover:text-rose-600    shadow-sm transition-colors"
                                                                         title="Supprimer"
                                                                     >
                                                                         <Trash2 size={12} />
@@ -667,7 +667,7 @@ const Schedule: React.FC = () => {
                                                                 <User size={10} className="text-slate-300" /> {selectedTeacher ? entry.classeName : entry.teacherName}
                                                             </p>
                                                             <div className="mt-auto flex items-center gap-2">
-                                                                <span className="text-[10px] font-black text-slate-400 flex items-center gap-1 bg-white/50 px-2 py-1 rounded-lg">
+                                                                <span className="text-[10px] font-black text-slate-400 flex items-center gap-1 bg-white/50 px-2 py-1 ">
                                                                     <MapPin size={10} /> {entry.room}
                                                                 </span>
                                                             </div>
@@ -683,7 +683,7 @@ const Schedule: React.FC = () => {
 
                         {!selectedClasse && !selectedTeacher && (
                             <div className="absolute inset-0 bg-slate-50/80 backdrop-blur-sm z-40 flex flex-col items-center justify-center text-center p-10">
-                                <div className="p-8 bg-white rounded-full shadow-2xl shadow-indigo-100 mb-6 motion-safe:animate-bounce">
+                                <div className="p-8 bg-white  shadow-2xl shadow-indigo-100 mb-6 motion-safe:animate-bounce">
                                     <SearchX size={48} className="text-indigo-200" />
                                 </div>
                                 <h3 className="text-2xl font-black text-slate-800 mb-2">Aucune sélection</h3>
@@ -709,9 +709,9 @@ const Schedule: React.FC = () => {
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="bg-white rounded-[48px] w-full max-w-2xl overflow-hidden shadow-2xl relative z-10 border border-slate-100"
+                            className="bg-white ] w-full max-w-2xl overflow-hidden shadow-2xl relative z-10  "
                         >
-                            <div className="p-10 border-b border-slate-100 bg-slate-50/50">
+                            <div className="p-10   bg-slate-50/50">
                                 <h3 className="text-3xl font-black text-slate-800 tracking-tight">
                                     {editingEntry ? 'Modifier la Session' : 'Nouvelle Session'}
                                 </h3>
@@ -820,14 +820,14 @@ const Schedule: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setIsAddModalOpen(false)}
-                                        className="flex-1 bg-slate-100 text-slate-600 py-4 rounded-3xl font-black hover:bg-slate-200 transition-all"
+                                        className="flex-1 bg-slate-100 text-slate-600 py-4  font-black hover:bg-slate-200 transition-all"
                                     >
                                         Annuler
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="flex-[2] bg-indigo-600 text-white py-4 rounded-3xl font-black shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="flex-[2] bg-indigo-600 text-white py-4  font-black shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : "Enregistrer"}
                                     </button>
@@ -852,9 +852,9 @@ const Schedule: React.FC = () => {
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="bg-white rounded-[40px] p-10 w-full max-w-md shadow-2xl relative z-10 border border-slate-100 text-center"
+                            className="bg-white ] p-10 w-full max-w-md shadow-2xl relative z-10   text-center"
                         >
-                            <div className="w-20 h-20 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <div className="w-20 h-20 bg-rose-50 text-rose-600  flex items-center justify-center mx-auto mb-6">
                                 <Trash2 size={40} />
                             </div>
                             <h3 className="text-2xl font-black text-slate-800 mb-2">Supprimer la session ?</h3>
@@ -862,14 +862,14 @@ const Schedule: React.FC = () => {
                             <div className="flex gap-4">
                                 <button
                                     onClick={() => setIsDeleteModalOpen(false)}
-                                    className="flex-1 bg-slate-100 text-slate-600 py-4 rounded-3xl font-black hover:bg-slate-200 transition-all"
+                                    className="flex-1 bg-slate-100 text-slate-600 py-4  font-black hover:bg-slate-200 transition-all"
                                 >
                                     Annuler
                                 </button>
                                 <button
                                     onClick={handleDeleteEntry}
                                     disabled={isSubmitting}
-                                    className="flex-1 bg-rose-600 text-white py-4 rounded-3xl font-black shadow-xl shadow-rose-600/30 hover:bg-rose-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="flex-1 bg-rose-600 text-white py-4  font-black shadow-xl shadow-rose-600/30 hover:bg-rose-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
                                     {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : "Supprimer"}
                                 </button>
@@ -886,9 +886,9 @@ const Schedule: React.FC = () => {
                         initial={{ opacity: 0, y: 50, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 rounded-3xl shadow-2xl flex items-center gap-3 border backdrop-blur-md ${toast.type === 'success'
-                            ? 'bg-emerald-500/90 border-emerald-400 text-white'
-                            : 'bg-rose-500/90 border-rose-400 text-white'
+                        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] px-6 py-4  shadow-2xl flex items-center gap-3  backdrop-blur-md ${toast.type === 'success'
+                            ? 'bg-emerald-500/90  text-white'
+                            : 'bg-rose-500/90  text-white'
                             }`}
                     >
                         {toast.type === 'success' ? <CheckCircle2 size={20} /> : <X size={20} />}
@@ -923,7 +923,7 @@ const Schedule: React.FC = () => {
                         width: 100%;
                         background-color: #f8fafc;
                         border: 2px solid transparent;
-                        border-radius: 1.25rem;
+                        -radius: 1.25rem;
                         padding: 1rem 1.25rem;
                         font-size: 0.875rem;
                         font-weight: 700;
@@ -932,7 +932,7 @@ const Schedule: React.FC = () => {
                         outline: none;
                     }
                     .form-input-sophisticated:focus {
-                        border-color: #6366f133;
+                        -color: #6366f133;
                         background-color: #ffffff;
                         box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.05);
                     }
@@ -973,14 +973,14 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                className="bg-white rounded-[40px] w-full max-w-xl overflow-hidden shadow-2xl relative z-10 border border-slate-100"
+                className="bg-white ] w-full max-w-xl overflow-hidden shadow-2xl relative z-10  "
             >
-                <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                <div className="p-8   bg-slate-50/50 flex justify-between items-center">
                     <div>
                         <h3 className="text-2xl font-black text-slate-800 tracking-tight">Configuration Académique</h3>
                         <p className="text-slate-500 font-medium text-sm">Définissez les paramètres globaux de l'établissement.</p>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
+                    <button onClick={onClose} className="p-2 hover:bg-slate-200  transition-colors">
                         <X size={20} className="text-slate-400" />
                     </button>
                 </div>
@@ -1021,7 +1021,7 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                         />
                     </div>
 
-                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                    <div className="space-y-4 pt-4  ">
                         <div className="flex justify-between items-center">
                             <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block ml-1">Heures de récréation / Pauses</label>
                             <button
@@ -1033,9 +1033,9 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                         </div>
                         <div className="grid gap-3">
                             {localConfig.breaks.map((b: any, i: number) => (
-                                <div key={i} className="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-indigo-200 hover:bg-white transition-all">
+                                <div key={i} className="flex items-center justify-between bg-slate-50 p-4    group hover: hover:bg-white transition-all">
                                     <div className="flex gap-4 items-center">
-                                        <div className="bg-indigo-600 text-white p-2 rounded-lg">
+                                        <div className="bg-indigo-600 text-white p-2 ">
                                             <Calendar size={14} />
                                         </div>
                                         <div>
@@ -1052,7 +1052,7 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                                 </div>
                             ))}
                             {localConfig.breaks.length === 0 && (
-                                <div className="text-center py-6 border-2 border-dashed border-slate-100 rounded-3xl">
+                                <div className="text-center py-6    ">
                                     <p className="text-slate-400 text-sm font-medium">Aucune pause définie</p>
                                 </div>
                             )}
@@ -1060,16 +1060,16 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                     </div>
                 </div>
 
-                <div className="p-8 border-t border-slate-100 flex gap-4">
+                <div className="p-8   flex gap-4">
                     <button
                         onClick={onClose}
-                        className="flex-1 bg-slate-100 text-slate-600 py-4 rounded-3xl font-black hover:bg-slate-200 transition-all"
+                        className="flex-1 bg-slate-100 text-slate-600 py-4  font-black hover:bg-slate-200 transition-all"
                     >
                         Annuler
                     </button>
                     <button
                         onClick={() => onSave(localConfig)}
-                        className="flex-[2] bg-indigo-600 text-white py-4 rounded-3xl font-black shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="flex-[2] bg-indigo-600 text-white py-4  font-black shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all"
                     >
                         Enregistrer
                     </button>
@@ -1090,7 +1090,7 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                                 initial={{ scale: 0.9, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 exit={{ scale: 0.9, opacity: 0 }}
-                                className="bg-white rounded-[32px] p-8 w-full max-w-sm shadow-2xl relative z-10 border border-slate-100"
+                                className="bg-white ] p-8 w-full max-w-sm shadow-2xl relative z-10  "
                             >
                                 <h4 className="text-xl font-black text-slate-800 mb-6">Ajouter une pause</h4>
                                 <div className="space-y-4 mb-8">
@@ -1116,7 +1116,7 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                                 <div className="flex gap-3">
                                     <button
                                         onClick={() => setShowBreakAdd(false)}
-                                        className="flex-1 bg-slate-50 text-slate-600 py-3 rounded-2xl font-bold hover:bg-slate-100 transition-all"
+                                        className="flex-1 bg-slate-50 text-slate-600 py-3  font-bold hover:bg-slate-100 transition-all"
                                     >
                                         Fermer
                                     </button>
@@ -1125,7 +1125,7 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                                             setLocalConfig({ ...localConfig, breaks: [...localConfig.breaks, newBreak].sort((a, b) => a.startTime.localeCompare(b.startTime)) });
                                             setShowBreakAdd(false);
                                         }}
-                                        className="flex-[2] bg-indigo-600 text-white py-3 rounded-2xl font-black shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all"
+                                        className="flex-[2] bg-indigo-600 text-white py-3  font-black shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all"
                                     >
                                         Confirmer
                                     </button>

@@ -701,7 +701,7 @@ const Grades: React.FC = () => {
         return (
             <>
                 <div className="min-h-[60vh] flex flex-col items-center justify-center">
-                    <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <div className="w-16 h-16     animate-spin mb-4"></div>
                 </div>
             </>
         );
@@ -715,28 +715,28 @@ const Grades: React.FC = () => {
                     <h2 className="text-4xl font-black text-slate-800 tracking-tight leading-none mb-3">Gestion des Notes</h2>
                     <p className="text-slate-500 font-medium">Saisissez les notes, calculez les moyennes et exportez les résultats.</p>
                 </div>
-                <div className="flex bg-slate-100 p-2 rounded-[32px] shadow-inner">
+                <div className="flex bg-slate-100 p-2 ] shadow-inner">
                     <button
                         onClick={() => setView('HISTORY')}
-                        className={`flex items-center gap-3 px-6 py-4 rounded-[24px] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'HISTORY' ? 'bg-white text-blue-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`flex items-center gap-3 px-6 py-4 ] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'HISTORY' ? 'bg-white text-blue-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
                     >
                         <History size={20} /> Hist. Notes
                     </button>
                     <button
                         onClick={() => setView('AVERAGE_HISTORY')}
-                        className={`flex items-center gap-3 px-6 py-4 rounded-[24px] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'AVERAGE_HISTORY' ? 'bg-white text-indigo-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`flex items-center gap-3 px-6 py-4 ] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'AVERAGE_HISTORY' ? 'bg-white text-indigo-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
                     >
                         <Calculator size={20} /> Hist. Moyennes
                     </button>
                     <button
                         onClick={switchToCreate}
-                        className={`flex items-center gap-3 px-6 py-4 rounded-[24px] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'CREATE' ? 'bg-white text-emerald-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`flex items-center gap-3 px-6 py-4 ] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'CREATE' ? 'bg-white text-emerald-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
                     >
                         <Plus size={20} /> Saisie Notes
                     </button>
                     <button
                         onClick={() => handleCalculateAverages()}
-                        className={`flex items-center gap-3 px-6 py-4 rounded-[24px] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'AVERAGES' ? 'bg-white text-amber-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`flex items-center gap-3 px-6 py-4 ] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'AVERAGES' ? 'bg-white text-amber-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
                     >
                         <TrendingUp size={20} /> Calcul Moyennes
                     </button>

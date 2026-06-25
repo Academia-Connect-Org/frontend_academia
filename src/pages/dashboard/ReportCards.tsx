@@ -387,7 +387,7 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
     if (loading) {
         return (
             <div className="min-h-[60vh] flex flex-col items-center justify-center">
-                <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-16 h-16     animate-spin"></div>
             </div>
         );
     }
@@ -400,7 +400,7 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
                     <p className="text-slate-500 font-medium italic">Génération et impression des bulletins de notes trimestriels.</p>
                 </div>
                 <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl px-4 py-2 shadow-sm">
+                    <div className="flex items-center gap-2 bg-white    px-4 py-2 shadow-sm">
                         <Users size={18} className="text-slate-400" />
                         <select
                             className="bg-transparent border-none outline-none font-black text-slate-700 text-sm"
@@ -418,7 +418,7 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
                     </div>
 
                     <select
-                        className="bg-white border border-slate-200 rounded-2xl px-4 py-2 font-black text-slate-700 text-sm outline-none shadow-sm"
+                        className="bg-white    px-4 py-2 font-black text-slate-700 text-sm outline-none shadow-sm"
                         value={trimester}
                         onChange={(e) => setTrimester(e.target.value)}
                     >
@@ -431,9 +431,9 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
                         <button
                             onClick={loadReportData}
                             disabled={!selectedClass || isGenerating}
-                            className="bg-blue-600 text-white px-6 py-2 rounded-2xl font-black flex items-center gap-3 shadow-xl shadow-blue-600/30 hover:bg-blue-700 disabled:opacity-50 transition-all"
+                            className="bg-blue-600 text-white px-6 py-2  font-black flex items-center gap-3 shadow-xl shadow-blue-600/30 hover:bg-blue-700 disabled:opacity-50 transition-all"
                         >
-                            {isGenerating ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Search size={18} />}
+                            {isGenerating ? <div className="w-4 h-4     animate-spin"></div> : <Search size={18} />}
                             Calculer
                         </button>
 
@@ -454,7 +454,7 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
                                 setIsPreviewOpen(true);
                             }}
                             disabled={!selectedClass || students.length === 0}
-                            className="bg-emerald-600 text-white px-6 py-2 rounded-2xl font-black flex items-center gap-3 shadow-xl shadow-emerald-600/30 hover:bg-emerald-700"
+                            className="bg-emerald-600 text-white px-6 py-2  font-black flex items-center gap-3 shadow-xl shadow-emerald-600/30 hover:bg-emerald-700"
                         >
                             <Printer size={18} /> Tout Imprimer
                         </button>
@@ -464,8 +464,8 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
 
             {selectedClass ? (
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    <div className="lg:col-span-3 bg-white rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden">
-                        <div className="p-8 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
+                    <div className="lg:col-span-3 bg-white ] shadow-2xl   overflow-hidden">
+                        <div className="p-8   bg-slate-50/50 flex justify-between items-center">
                             <h3 className="text-lg font-black text-slate-800 tracking-tight flex items-center gap-3">
                                 <GraduationCap className="text-blue-600" />
                                 Liste des élèves - {selectedClass.name}
@@ -488,7 +488,7 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
                                             <tr key={student.id} className="hover:bg-slate-50/50 transition-colors">
                                                 <td className="px-8 py-5">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center font-black text-slate-400 text-xs">
+                                                        <div className="w-10 h-10 bg-slate-100  flex items-center justify-center font-black text-slate-400 text-xs">
                                                             {student.lastName[0]}{student.firstName[0]}
                                                         </div>
                                                         <div>
@@ -511,13 +511,13 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
                                                             setPreviewData([{ student, stats }]);
                                                             setIsPreviewOpen(true);
                                                         }}
-                                                        className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-blue-600 transition-all"
+                                                        className="p-3 hover:bg-slate-100  text-slate-400 hover:text-blue-600 transition-all"
                                                     >
                                                         <Eye size={20} />
                                                     </button>
                                                     <button 
                                                         onClick={() => generatePDF(student)}
-                                                        className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-emerald-600 transition-all"
+                                                        className="p-3 hover:bg-slate-100  text-slate-400 hover:text-emerald-600 transition-all"
                                                     >
                                                         <FileText size={20} />
                                                     </button>
@@ -532,10 +532,10 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
 
                     <div className="lg:col-span-1 space-y-6">
                         {isEcole && (
-                            <div className="bg-white rounded-[32px] p-6 shadow-xl border border-slate-100 italic">
+                            <div className="bg-white ] p-6 shadow-xl   italic">
                                 <button 
                                     onClick={() => setShowOrderModal(true)}
-                                    className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl hover:bg-slate-100 transition-all font-black text-[10px] uppercase tracking-widest text-slate-600"
+                                    className="w-full flex items-center justify-between p-4 bg-slate-50    hover:bg-slate-100 transition-all font-black text-[10px] uppercase tracking-widest text-slate-600"
                                 >
                                     <span className="flex items-center gap-3">
                                         <TrendingUp size={18} className="text-blue-500" />
@@ -546,7 +546,7 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
                             </div>
                         )}
 
-                        <div className="bg-white rounded-[32px] p-6 shadow-xl border border-slate-100">
+                        <div className="bg-white ] p-6 shadow-xl  ">
                             <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
                                 <CheckCircle2 size={16} className="text-blue-500" />
                                 Suivi des Matières
@@ -555,12 +555,12 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
                                 {[...submissionStatus]
                                     .sort((a,b) => (a.subject.orderIndex || 0) - (b.subject.orderIndex || 0))
                                     .map((s) => (
-                                        <div key={s.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <div key={s.id} className="flex items-center justify-between p-3 bg-slate-50   ">
                                             <div className="overflow-hidden">
                                                 <p className="text-xs font-black text-slate-700 truncate">{s.subject.name}</p>
                                                 <p className="text-[9px] font-bold text-slate-400">Index: {s.subject.orderIndex || 0}</p>
                                             </div>
-                                            <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                                            <div className="w-6 h-6  bg-emerald-100 text-emerald-600 flex items-center justify-center">
                                                 <CheckCircle2 size={12} />
                                             </div>
                                         </div>
@@ -568,7 +568,7 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
                             </div>
                         </div>
 
-                         <div className="bg-blue-600 rounded-[32px] p-6 shadow-2xl shadow-blue-600/20 text-white">
+                         <div className="bg-blue-600 ] p-6 shadow-2xl shadow-blue-600/20 text-white">
                               <h4 className="text-xs font-black uppercase tracking-widest mb-3 opacity-60">Info {isEcole ? 'Direction' : 'PP'}</h4>
                               <p className="text-xs opacity-90 italic">
                                 {isEcole 
@@ -580,7 +580,7 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
                     </div>
                 </div>
             ) : (
-                <div className="min-h-[400px] bg-slate-50 rounded-[48px] border-4 border-dashed border-slate-200 flex flex-col items-center justify-center text-center p-12">
+                <div className="min-h-[400px] bg-slate-50 ]    flex flex-col items-center justify-center text-center p-12">
                     <Printer size={64} className="text-slate-300 mb-6" />
                     <h3 className="text-xl font-black text-slate-800 mb-2">Aucune classe sélectionnée</h3>
                     <p className="text-slate-500 max-w-sm">Choisissez une classe pour commencer la gestion.</p>
@@ -613,7 +613,7 @@ const ReportCards: React.FC<ReportCardsProps> = ({ role: initialRole }) => {
 
             <AnimatePresence>
                 {showToast && (
-                    <motion.div initial={{y:50}} animate={{y:0}} exit={{y:50}} className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-3xl shadow-2xl">
+                    <motion.div initial={{y:50}} animate={{y:0}} exit={{y:50}} className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4  shadow-2xl">
                         {toastMessage}
                     </motion.div>
                 )}
@@ -640,8 +640,8 @@ const SubjectOrderModal = ({ subjects, onClose, onUpdate }: { subjects: any[], o
 
     return (
         <div className="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-[40px] w-full max-w-lg shadow-2xl overflow-hidden">
-                <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+            <div className="bg-white ] w-full max-w-lg shadow-2xl overflow-hidden">
+                <div className="p-8   flex items-center justify-between">
                     <div>
                         <h3 className="text-xl font-black text-slate-800">Ordre des Matières</h3>
                         <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Définissez l'ordre numérique</p>
@@ -649,12 +649,12 @@ const SubjectOrderModal = ({ subjects, onClose, onUpdate }: { subjects: any[], o
                 </div>
                 <div className="p-8 max-h-[60vh] overflow-y-auto space-y-4">
                     {localSubjects.map((s, idx) => (
-                        <div key={s.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                             <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-black text-xs">{idx + 1}</div>
+                        <div key={s.id} className="flex items-center gap-4 p-4 bg-slate-50   ">
+                             <div className="w-8 h-8 bg-blue-100 text-blue-600  flex items-center justify-center font-black text-xs">{idx + 1}</div>
                              <p className="flex-1 text-sm font-black text-slate-700">{s.name}</p>
                              <input 
                                 type="number" 
-                                className="w-16 p-2 rounded-xl border border-slate-200 text-center font-black"
+                                className="w-16 p-2    text-center font-black"
                                 value={s.orderIndex || 0}
                                 onChange={(e) => {
                                     const val = parseInt(e.target.value) || 0;
@@ -666,7 +666,7 @@ const SubjectOrderModal = ({ subjects, onClose, onUpdate }: { subjects: any[], o
                 </div>
                 <div className="p-8 bg-slate-50 flex gap-4">
                     <button onClick={onClose} className="flex-1 font-black text-xs uppercase tracking-widest text-slate-400">Annuler</button>
-                    <button onClick={handleSave} disabled={isSaving} className="flex-1 bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl">
+                    <button onClick={handleSave} disabled={isSaving} className="flex-1 bg-slate-900 text-white py-4  font-black text-xs uppercase tracking-widest shadow-xl">
                         {isSaving ? "Chargement..." : "Enregistrer"}
                     </button>
                 </div>

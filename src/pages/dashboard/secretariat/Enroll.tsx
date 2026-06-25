@@ -151,23 +151,23 @@ const Enroll: React.FC = () => {
                 {/* Main Content */}
                 <div className="flex-1">
                     {/* Toggle Type */}
-                    <div className="flex bg-white rounded-3xl p-2 shadow-sm border border-slate-100 mb-8 w-fit">
+                    <div className="flex bg-white  p-2 shadow-sm   mb-8 w-fit">
                         <button
                             onClick={() => { setEnrollType('ELEVE'); setStep(1); setMessage({ type: '', text: '' }); }}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all ${enrollType === 'ELEVE' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
+                            className={`flex items-center gap-2 px-6 py-3  font-bold transition-all ${enrollType === 'ELEVE' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
                         >
                             <GraduationCap size={20} /> Nouvel Élève
                         </button>
                         <button
                             onClick={() => { setEnrollType('ENSEIGNANT'); setMessage({ type: '', text: '' }); }}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all ${enrollType === 'ENSEIGNANT' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
+                            className={`flex items-center gap-2 px-6 py-3  font-bold transition-all ${enrollType === 'ENSEIGNANT' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
                         >
                             <BookOpen size={20} /> Nouvel Enseignant
                         </button>
                     </div>
 
                     {message.text && (
-                        <div className={`p-4 rounded-2xl mb-6 font-bold flex items-center gap-3 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                        <div className={`p-4  mb-6 font-bold flex items-center gap-3 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600  ' : 'bg-red-50 text-red-600  '}`}>
                             {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
                             {message.text}
                         </div>
@@ -177,7 +177,7 @@ const Enroll: React.FC = () => {
                     {enrollType === 'ELEVE' && (
                         <>
                             {/* Stepper Header */}
-                            <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-6">
+                            <div className="bg-white p-6  shadow-sm   mb-6">
                                 <div className="flex items-center justify-between relative px-4">
                                     <StepIndicator active={step >= 1} current={step === 1} number={1} label="Élève" />
                                     <div className={`flex-1 h-0.5 mx-4 ${step >= 2 ? 'bg-blue-600' : 'bg-slate-100'}`}></div>
@@ -187,8 +187,8 @@ const Enroll: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                            <div className="bg-white p-8 ] shadow-xl   relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50/50  blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
                                 {step === 1 && (
                                     <div className="space-y-6 animate-in fade-in duration-500">
@@ -202,7 +202,7 @@ const Enroll: React.FC = () => {
                                             <div className="space-y-1.5 flex flex-col">
                                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-0.5">Cycle</label>
                                                 <select
-                                                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-600/5 transition-all outline-none appearance-none cursor-pointer"
+                                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 focus:bg-white focus: focus:ring-4 focus:ring-blue-600/5 transition-all outline-none appearance-none cursor-pointer"
                                                     value={studentData.cycleId}
                                                     onChange={(e) => setStudentData({ ...studentData, cycleId: e.target.value, classeId: null, classeName: '' })}
                                                 >
@@ -216,7 +216,7 @@ const Enroll: React.FC = () => {
                                             <div className="flex flex-col">
                                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5">Classe principale</label>
                                                 <select
-                                                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-600/5 transition-all outline-none appearance-none cursor-pointer"
+                                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 focus:bg-white focus: focus:ring-4 focus:ring-blue-600/5 transition-all outline-none appearance-none cursor-pointer"
                                                     value={studentData.classeId || ''}
                                                     onChange={(e) => {
                                                         const sel = availableClasses.find((c: any) => String(c.id) === e.target.value);
@@ -251,7 +251,7 @@ const Enroll: React.FC = () => {
                                             <FormInput label="Téléphone personnel (optionnel)" placeholder="+225 00 00 00 00" value={studentData.phone} onChange={(e) => setStudentData({ ...studentData, phone: e.target.value })} />
                                         </div>
 
-                                        <div className="border-t border-slate-100 pt-6 mt-6">
+                                        <div className="  pt-6 mt-6">
                                             <h3 className="text-xl font-black text-slate-800 mb-4">Informations de la Mère</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <FormInput label="Prénom" value={studentData.motherFirstName} onChange={(e) => setStudentData({ ...studentData, motherFirstName: e.target.value })} />
@@ -261,7 +261,7 @@ const Enroll: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        <div className="border-t border-slate-100 pt-6 mt-6">
+                                        <div className="  pt-6 mt-6">
                                             <h3 className="text-xl font-black text-slate-800 mb-4">Informations du Père</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <FormInput label="Prénom" value={studentData.fatherFirstName} onChange={(e) => setStudentData({ ...studentData, fatherFirstName: e.target.value })} />
@@ -283,11 +283,11 @@ const Enroll: React.FC = () => {
                                     </div>
                                 )}
 
-                                <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
-                                    <button onClick={() => step > 1 && setStep(step - 1)} className={`px-6 py-3 rounded-xl font-bold text-slate-400 hover:bg-slate-50 transition-all ${step === 1 ? 'opacity-0 pointer-events-none' : ''}`}>
+                                <div className="mt-8 pt-6   flex items-center justify-between">
+                                    <button onClick={() => step > 1 && setStep(step - 1)} className={`px-6 py-3  font-bold text-slate-400 hover:bg-slate-50 transition-all ${step === 1 ? 'opacity-0 pointer-events-none' : ''}`}>
                                         Retour
                                     </button>
-                                    <button onClick={() => step < 3 ? setStep(step + 1) : handleStudentSubmit()} disabled={loading} className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 disabled:scale-100">
+                                    <button onClick={() => step < 3 ? setStep(step + 1) : handleStudentSubmit()} disabled={loading} className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white  font-bold shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 disabled:scale-100">
                                         {loading ? 'Traitement...' : step === 3 ? 'Inscrire l\'élève' : 'Continuer'}
                                         {!loading && <ArrowRight size={18} />}
                                     </button>
@@ -298,8 +298,8 @@ const Enroll: React.FC = () => {
 
                     {/* ENSEIGNANT FORM */}
                     {enrollType === 'ENSEIGNANT' && (
-                        <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100 relative overflow-hidden animate-in fade-in duration-500">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                        <div className="bg-white p-8 ] shadow-xl   relative overflow-hidden animate-in fade-in duration-500">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50  blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
                             <h3 className="text-xl font-black text-slate-800 mb-6">Ajouter un enseignant</h3>
 
@@ -315,7 +315,7 @@ const Enroll: React.FC = () => {
 
                                 <div className="space-y-1.5 md:col-span-1">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Cycles d'enseignement</label>
-                                    <div className="flex flex-wrap gap-2 p-2 bg-slate-50 border border-slate-100 rounded-xl">
+                                    <div className="flex flex-wrap gap-2 p-2 bg-slate-50   ">
                                         {cycles.map((cycle: any) => {
                                             const isSelected = teacherData.cycleIds.includes(Number(cycle.id));
                                             return (
@@ -329,8 +329,8 @@ const Enroll: React.FC = () => {
                                                             : [...teacherData.cycleIds, id];
                                                         setTeacherData({ ...teacherData, cycleIds: newIds });
                                                     }}
-                                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border
-                                                        ${isSelected ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-500 border-slate-200 hover:border-blue-300'}`}
+                                                    className={`px-3 py-1.5  text-xs font-bold transition-all 
+                                                        ${isSelected ? 'bg-blue-600 text-white ' : 'bg-white text-slate-500  hover:'}`}
                                                 >
                                                     {cycle.name}
                                                 </button>
@@ -340,7 +340,7 @@ const Enroll: React.FC = () => {
                                 </div>
                                 <div className="space-y-1.5 md:col-span-1">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Spécialités / Matières</label>
-                                    <div className="flex flex-wrap gap-2 p-2 bg-slate-50 border border-slate-100 rounded-xl">
+                                    <div className="flex flex-wrap gap-2 p-2 bg-slate-50   ">
                                         {availableSubjects.map((subj: any) => {
                                             const currentSpecs = teacherData.specialties.split(',').map((s: string) => s.trim()).filter(Boolean);
                                             const isSelected = currentSpecs.includes(subj.name);
@@ -354,8 +354,8 @@ const Enroll: React.FC = () => {
                                                             : [...currentSpecs, subj.name];
                                                         setTeacherData({ ...teacherData, specialties: newSpecs.join(', ') });
                                                     }}
-                                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border
-                                                        ${isSelected ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-500 border-slate-200 hover:border-indigo-300'}`}
+                                                    className={`px-3 py-1.5  text-xs font-bold transition-all 
+                                                        ${isSelected ? 'bg-indigo-600 text-white ' : 'bg-white text-slate-500  hover:'}`}
                                                 >
                                                     {subj.name}
                                                 </button>
@@ -374,17 +374,17 @@ const Enroll: React.FC = () => {
                                             placeholder="Ou ajouter manuellement (ex: Sport, Musique...)"
                                             value={teacherData.specialties}
                                             onChange={(e) => setTeacherData({ ...teacherData, specialties: e.target.value })}
-                                            className="w-full px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg text-xs font-bold text-slate-700 focus:bg-white outline-none"
+                                            className="w-full px-4 py-2 bg-slate-50    text-xs font-bold text-slate-700 focus:bg-white outline-none"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="md:col-span-2 flex flex-col">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5">Classes attribuées (Sélectionnez parmis les classes disponibles)</label>
-                                    <div className="min-h-[54px] w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-xl flex flex-wrap gap-2 items-center">
+                                    <div className="min-h-[54px] w-full px-5 py-3 bg-slate-50    flex flex-wrap gap-2 items-center">
                                         {teacherData.classes ? (
                                             teacherData.classes.split(',').map((s: string) => s.trim()).filter(Boolean).map((cls: string, idx: number) => (
-                                                <span key={idx} className="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-2">
+                                                <span key={idx} className="bg-indigo-600 text-white px-3 py-1  text-xs font-bold flex items-center gap-2">
                                                     {cls}
                                                     <button
                                                         onClick={() => {
@@ -416,8 +416,8 @@ const Enroll: React.FC = () => {
                                                             setTeacherData({ ...teacherData, classes: [...current, c.name].join(', ') });
                                                         }
                                                     }}
-                                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border
-                                                        ${isSelected ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-white text-indigo-600 border-indigo-100 hover:border-indigo-600 hover:bg-indigo-50'}`}
+                                                    className={`px-3 py-1.5  text-xs font-bold transition-all 
+                                                        ${isSelected ? 'bg-slate-100 text-slate-400  cursor-not-allowed' : 'bg-white text-indigo-600  hover: hover:bg-indigo-50'}`}
                                                 >
                                                     + {c.name}
                                                 </button>
@@ -437,8 +437,8 @@ const Enroll: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="mt-8 pt-6 border-t border-slate-50 flex justify-end">
-                                <button onClick={handleTeacherSubmit} disabled={loading} className="inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 disabled:scale-100">
+                            <div className="mt-8 pt-6   flex justify-end">
+                                <button onClick={handleTeacherSubmit} disabled={loading} className="inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white  font-bold shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 disabled:scale-100">
                                     {loading ? 'Traitement...' : 'Enregistrer l\'enseignant'}
                                     {!loading && <CheckCircle2 size={18} />}
                                 </button>
@@ -449,8 +449,8 @@ const Enroll: React.FC = () => {
 
                 {/* Right Sidebar */}
                 <div className="lg:w-80 space-y-6">
-                    <div className="bg-slate-900 p-8 rounded-[32px] text-white shadow-xl overflow-hidden relative">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl"></div>
+                    <div className="bg-slate-900 p-8 ] text-white shadow-xl overflow-hidden relative">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20  blur-2xl"></div>
                         <h4 className="text-lg font-black mb-4 flex items-center gap-2 relative z-10">
                             <Info size={18} className="text-blue-400" /> Information
                         </h4>
@@ -470,9 +470,9 @@ const Enroll: React.FC = () => {
 // Internal Components
 const StepIndicator = ({ number, label, active, current }: { number: number, label: string, active: boolean, current: boolean }) => (
     <div className="flex flex-col items-center gap-2 relative z-10 transition-all duration-500">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm transition-all duration-500
+        <div className={`w-10 h-10  flex items-center justify-center font-black text-sm transition-all duration-500
             ${current ? 'bg-blue-600 text-white scale-110 shadow-lg shadow-blue-500/30' :
-                active ? 'bg-emerald-500 text-white' : 'bg-slate-50 text-slate-400 border border-slate-200'}`}>
+                active ? 'bg-emerald-500 text-white' : 'bg-slate-50 text-slate-400  '}`}>
             {active && !current ? <CheckCircle2 size={20} /> : number}
         </div>
         <span className={`text-[10px] font-black uppercase tracking-widest ${current ? 'text-blue-600' : 'text-slate-400'}`}>
@@ -489,7 +489,7 @@ const FormInput = ({ label, type = "text", placeholder, value, onChange }: { lab
             placeholder={placeholder}
             value={value}
             onChange={onChange}
-            className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-600/5 transition-all outline-none"
+            className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 focus:bg-white focus: focus:ring-4 focus:ring-blue-600/5 transition-all outline-none"
         />
     </div>
 );
@@ -497,7 +497,7 @@ const FormInput = ({ label, type = "text", placeholder, value, onChange }: { lab
 const FormSelect = ({ label, options, value, onChange }: { label: string, options: string[], value?: string, onChange?: (e: any) => void }) => (
     <div className="space-y-1.5">
         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</label>
-        <select value={value} onChange={onChange} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-600/5 transition-all outline-none appearance-none cursor-pointer">
+        <select value={value} onChange={onChange} className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 focus:bg-white focus: focus:ring-4 focus:ring-blue-600/5 transition-all outline-none appearance-none cursor-pointer">
             {/* Blank Option if value is empty */}
             {(!value || value === "") && <option value="" disabled>Sélectionner...</option>}
             {options.map((opt: string, i: number) => (

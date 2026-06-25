@@ -76,6 +76,8 @@ const Payment: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const institutionIdParam = queryParams.get('institutionId');
+
     React.useEffect(() => {
         const fetchInstitutions = async () => {
             if (!user?.id) return;
@@ -85,12 +87,20 @@ const Payment: React.FC = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setInstitutions(res.data);
+
+                if (institutionIdParam) {
+                    const inst = res.data.find((i: any) => i.id === Number(institutionIdParam));
+                    if (inst) {
+                        setSelectedInstitution(inst);
+                        setStep(2);
+                    }
+                }
             } catch (err) {
                 console.error("Fetch institutions error:", err);
             }
         };
         fetchInstitutions();
-    }, [user?.id, token]);
+    }, [user?.id, token, institutionIdParam]);
 
     const filteredCountries = COUNTRIES.filter(c =>
         c.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -98,7 +108,7 @@ const Payment: React.FC = () => {
 
     const handleBack = () => {
         if (step > 1) setStep(step - 1);
-        else navigate(ROUTES.PRICING);
+        else navigate(-1);
     };
 
     const handleInstitutionSelect = (inst: any) => {
@@ -174,16 +184,16 @@ const Payment: React.FC = () => {
                                 <button
                                     key={inst.id}
                                     onClick={() => handleInstitutionSelect(inst)}
-                                    className={`flex items-center gap-4 p-5 rounded-3xl border-2 transition-all text-left group ${selectedInstitution?.id === inst.id ? 'border-blue-600 bg-blue-50' : 'border-slate-100 hover:border-blue-200 bg-white'}`}
+                                    className={`flex items-center gap-4 p-5   transition-all text-left group ${selectedInstitution?.id === inst.id ? ' bg-blue-50' : ' hover: bg-white'}`}
                                 >
-                                    <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all overflow-hidden">
+                                    <div className="w-12 h-12  bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all overflow-hidden">
                                         {inst.logoUrl ? <img src={getFileUrl(inst.logoUrl)} alt={inst.name} className="w-full h-full object-cover" /> : <Building size={24} />}
                                     </div>
                                     <div className="flex-1">
                                         <h4 className="font-bold text-slate-800">{inst.name}</h4>
                                         <p className="text-xs text-slate-400 capitalize">{inst.type.toLowerCase()}</p>
                                     </div>
-                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedInstitution?.id === inst.id ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-200'}`}>
+                                    <div className={`w-6 h-6   flex items-center justify-center transition-all ${selectedInstitution?.id === inst.id ? ' bg-blue-600 text-white' : ''}`}>
                                         {selectedInstitution?.id === inst.id && <ArrowRight size={14} />}
                                     </div>
                                 </button>
@@ -210,7 +220,7 @@ const Payment: React.FC = () => {
                                 placeholder="Rechercher votre pays..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-100 border-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-slate-700"
+                                className="w-full pl-12 pr-4 py-4  bg-slate-100 border-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-slate-700"
                             />
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
@@ -218,7 +228,7 @@ const Payment: React.FC = () => {
                                 <button
                                     key={c.code}
                                     onClick={() => handleCountrySelect(c)}
-                                    className="flex flex-col items-center gap-3 p-6 rounded-3xl border-2 border-slate-100 hover:border-blue-500 hover:bg-blue-50/50 transition-all group"
+                                    className="flex flex-col items-center gap-3 p-6    hover: hover:bg-blue-50/50 transition-all group"
                                 >
                                     <span className="text-4xl group-hover:scale-110 transition-transform">{c.flag}</span>
                                     <span className="font-bold text-slate-700">{c.name}</span>
@@ -241,9 +251,9 @@ const Payment: React.FC = () => {
                                 <button
                                     key={methodId}
                                     onClick={() => handleMethodSelect(method)}
-                                    className="w-full flex items-center gap-6 p-6 rounded-3xl border-2 border-slate-100 hover:border-blue-500 hover:bg-blue-50/50 transition-all text-left group"
+                                    className="w-full flex items-center gap-6 p-6    hover: hover:bg-blue-50/50 transition-all text-left group"
                                 >
-                                    <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
+                                    <div className="w-14 h-14  bg-white   flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
                                         <method.icon size={28} />
                                     </div>
                                     <div>
@@ -263,7 +273,7 @@ const Payment: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         className="space-y-6"
                     >
-                        <div className="bg-blue-50 p-4 rounded-2xl flex items-center gap-4 text-blue-700 font-medium">
+                        <div className="bg-blue-50 p-4  flex items-center gap-4 text-blue-700 font-medium">
                             {selectedMethod && <selectedMethod.icon size={20} />}
                             <span>Paiement via {selectedMethod?.name}</span>
                         </div>
@@ -276,31 +286,31 @@ const Payment: React.FC = () => {
                                         <input
                                             type="text"
                                             placeholder="0000 0000 0000 0000"
-                                            className="w-full p-4 rounded-xl bg-slate-100 border-none focus:ring-2 focus:ring-blue-500 font-mono text-lg"
+                                            className="w-full p-4  bg-slate-100 border-none focus:ring-2 focus:ring-blue-500 font-mono text-lg"
                                         />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Expiration</label>
-                                            <input type="text" placeholder="MM / YY" className="w-full p-4 rounded-xl bg-slate-100 border-none focus:ring-2 focus:ring-blue-500" />
+                                            <input type="text" placeholder="MM / YY" className="w-full p-4  bg-slate-100 border-none focus:ring-2 focus:ring-blue-500" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">CVC</label>
-                                            <input type="text" placeholder="123" className="w-full p-4 rounded-xl bg-slate-100 border-none focus:ring-2 focus:ring-blue-500" />
+                                            <input type="text" placeholder="123" className="w-full p-4  bg-slate-100 border-none focus:ring-2 focus:ring-blue-500" />
                                         </div>
                                     </div>
                                 </>
                             ) : selectedMethod?.id === 'bank' ? (
-                                <div className="p-6 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200">
+                                <div className="p-6  bg-slate-50   ">
                                     <Building className="text-slate-400 mb-4" size={40} />
                                     <h5 className="font-bold text-slate-800 mb-2">Informations de virement</h5>
                                     <p className="text-slate-500 text-sm mb-6">Veuillez effectuer le virement vers notre compte ECOBANK :</p>
                                     <div className="space-y-3">
-                                        <div className="flex justify-between p-3 bg-white rounded-xl text-sm border border-slate-100 uppercase tracking-tighter">
+                                        <div className="flex justify-between p-3 bg-white  text-sm   uppercase tracking-tighter">
                                             <span className="text-slate-400">IBAN</span>
                                             <span className="font-black text-slate-800">TD65 1010 1000 1234 5678 90</span>
                                         </div>
-                                        <div className="flex justify-between p-3 bg-white rounded-xl text-sm border border-slate-100 uppercase tracking-tighter">
+                                        <div className="flex justify-between p-3 bg-white  text-sm   uppercase tracking-tighter">
                                             <span className="text-slate-400">BIC/SWIFT</span>
                                             <span className="font-black text-slate-800">ECOBTDCT</span>
                                         </div>
@@ -310,11 +320,11 @@ const Payment: React.FC = () => {
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Numéro de Téléphone {selectedMethod?.name}</label>
                                     <div className="flex gap-2">
-                                        <div className="p-4 bg-slate-100 rounded-xl font-bold text-slate-500">+{selectedCountry?.code === 'TD' ? '235' : selectedCountry?.code === 'CM' ? '237' : '225'}</div>
+                                        <div className="p-4 bg-slate-100  font-bold text-slate-500">+{selectedCountry?.code === 'TD' ? '235' : selectedCountry?.code === 'CM' ? '237' : '225'}</div>
                                         <input
                                             type="tel"
                                             placeholder="Numéro de compte"
-                                            className="flex-1 p-4 rounded-xl bg-slate-100 border-none focus:ring-2 focus:ring-blue-500 font-bold text-lg"
+                                            className="flex-1 p-4  bg-slate-100 border-none focus:ring-2 focus:ring-blue-500 font-bold text-lg"
                                         />
                                     </div>
                                     <p className="text-xs text-slate-400 mt-2 italic">* Une demande de confirmation apparaîtra sur votre téléphone.</p>
@@ -323,14 +333,14 @@ const Payment: React.FC = () => {
                         </div>
 
                         {error && (
-                            <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-bold border border-red-100 flex items-center gap-3">
+                            <div className="p-4 bg-red-50 text-red-600  text-sm font-bold   flex items-center gap-3">
                                 <ShieldCheck size={16} />
                                 {error}
                             </div>
                         )}
 
                         <button
-                            className="w-full py-5 rounded-3xl bg-blue-600 text-white font-black text-lg shadow-xl shadow-blue-600/30 hover:bg-blue-700 disabled:opacity-50 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-3 mt-8"
+                            className="w-full py-5  bg-blue-600 text-white font-black text-lg shadow-xl shadow-blue-600/30 hover:bg-blue-700 disabled:opacity-50 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-3 mt-8"
                             onClick={handleConfirmPayment}
                             disabled={isLoading}
                         >
@@ -346,14 +356,14 @@ const Payment: React.FC = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         className="text-center py-12"
                     >
-                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+                        <div className="w-24 h-24 bg-green-100 text-green-600  flex items-center justify-center mx-auto mb-8 animate-bounce">
                             <CheckCircle2 size={48} />
                         </div>
                         <h2 className="text-3xl font-black text-slate-900 mb-4">Paiement Réussi !</h2>
                         <p className="text-slate-500 text-lg mb-10 max-w-sm mx-auto">Votre abonnement <strong>{plan}</strong> pour <strong>{selectedInstitution?.name}</strong> est maintenant actif.</p>
                         <button
                             onClick={() => navigate('/dashboard/pdg')}
-                            className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black shadow-xl hover:bg-slate-800 transition-all"
+                            className="px-10 py-4 bg-slate-900 text-white  font-black shadow-xl hover:bg-slate-800 transition-all"
                         >
                             Accéder à mon Dashboard
                         </button>
@@ -365,7 +375,7 @@ const Payment: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 py-12 px-4">
+        <div className="min-h-screen bg-slate-50 pt-28 pb-12 px-4">
             <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8 items-start">
 
                 {/* Left side: Form */}
@@ -378,7 +388,7 @@ const Payment: React.FC = () => {
                         Retour
                     </button>
 
-                    <div className="bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 p-8 md:p-12 border border-slate-100 flex-1 min-h-[600px] flex flex-col">
+                    <div className="bg-white ] shadow-2xl shadow-slate-200/50 p-8 md:p-12   flex-1 min-h-[600px] flex flex-col">
                         <header className="mb-10">
                             <div className="flex items-center gap-3 text-blue-600 font-black text-xs uppercase tracking-[0.2em] mb-4">
                                 <span className="w-8 h-[2px] bg-blue-600"></span>
@@ -404,7 +414,7 @@ const Payment: React.FC = () => {
                             </AnimatePresence>
                         </div>
 
-                        <footer className="mt-12 pt-8 border-t border-slate-50 flex items-center justify-between text-slate-400 text-sm">
+                        <footer className="mt-12 pt-8   flex items-center justify-between text-slate-400 text-sm">
                             <div className="flex items-center gap-2">
                                 <ShieldCheck size={16} className="text-green-500" />
                                 Paiement Sécurisé SSL
@@ -416,10 +426,10 @@ const Payment: React.FC = () => {
 
                 {/* Right side: Summary (Sticky) */}
                 <aside className="lg:w-[400px] w-full sticky top-12">
-                    <div className="bg-blue-900 rounded-[40px] p-10 text-white shadow-2xl shadow-blue-900/30 overflow-hidden relative">
+                    <div className="bg-blue-900 ] p-10 text-white shadow-2xl shadow-blue-900/30 overflow-hidden relative">
                         {/* Abstract background decors */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5  blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/10  blur-3xl translate-y-1/2 -translate-x-1/2"></div>
 
                         <h3 className="text-xl font-black mb-8 relative z-10 flex items-center gap-3">
                             <Building size={20} className="text-blue-400" />
@@ -433,7 +443,7 @@ const Payment: React.FC = () => {
                                         <p className="text-blue-300/60 text-xs font-black uppercase tracking-widest mb-1">Établissement</p>
                                         <h4 className="text-xl font-black">{selectedInstitution.name}</h4>
                                     </div>
-                                    <div className="p-3 bg-white/10 rounded-2xl">
+                                    <div className="p-3 bg-white/10 ">
                                         <Building className="text-blue-400" size={24} />
                                     </div>
                                 </div>
@@ -444,7 +454,7 @@ const Payment: React.FC = () => {
                                     <p className="text-blue-300/60 text-xs font-black uppercase tracking-widest mb-1">Plan Sélectionné</p>
                                     <h4 className="text-2xl font-black">{plan}</h4>
                                 </div>
-                                <div className="p-3 bg-white/10 rounded-2xl">
+                                <div className="p-3 bg-white/10 ">
                                     <Globe className="text-blue-400" size={24} />
                                 </div>
                             </div>
@@ -470,8 +480,8 @@ const Payment: React.FC = () => {
                             </div>
 
                             {selectedCountry && (
-                                <div className="pt-8 border-t border-white/10 flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-3xl">
+                                <div className="pt-8   flex items-center gap-4">
+                                    <div className="w-12 h-12  bg-white/10 flex items-center justify-center text-3xl">
                                         {selectedCountry.flag}
                                     </div>
                                     <div>
@@ -482,19 +492,19 @@ const Payment: React.FC = () => {
                             )}
 
                             <div className="pt-10">
-                                <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-4">
+                                <div className="p-6  bg-white/5   space-y-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full bg-green-500 shadow-sm shadow-green-500"></div>
+                                        <div className="w-2 h-2  bg-green-500 shadow-sm shadow-green-500"></div>
                                         <span className="text-sm font-bold text-blue-100">Activation instantanée</span>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                                        <div className="w-2 h-2  bg-blue-400"></div>
                                         <span className="text-sm font-bold text-blue-100">Facture numérique incluse</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="mt-8 pt-8 border-t border-white/10">
+                            <div className="mt-8 pt-8  ">
                                 <button className="w-full flex items-center justify-center gap-2 text-white/40 hover:text-white text-xs font-bold transition-colors">
                                     <LogOut size={14} />
                                     Annuler et recharger
@@ -509,7 +519,7 @@ const Payment: React.FC = () => {
             <style>{`
                 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; -radius: 10px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
             `}</style>
         </div>

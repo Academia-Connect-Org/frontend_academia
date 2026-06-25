@@ -135,12 +135,12 @@ const StudentSchedule: React.FC = () => {
                         Classe de <span className="text-blue-600 font-black uppercase">{user?.classe?.name || 'Non assigné'}</span>
                     </p>
                 </div>
-                <button className="bg-white border border-slate-200 px-6 py-3.5 rounded-3xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+                <button className="bg-white   px-6 py-3.5  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
                     <Download size={18} /> Télécharger
                 </button>
             </div>
 
-            <div className="bg-white rounded-[45px] shadow-2xl border border-blue-50 overflow-hidden relative mb-12 min-w-[800px]">
+            <div className="bg-white ] shadow-2xl   overflow-hidden relative mb-12 min-w-[800px]">
                 {loading && (
                     <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-50 flex items-center justify-center">
                         <Loader2 className="animate-spin text-blue-600" size={48} />
@@ -148,11 +148,11 @@ const StudentSchedule: React.FC = () => {
                 )}
 
                 {/* Top bar with days */}
-                <div className="bg-slate-50/50 border-b border-blue-50 p-2 flex">
+                <div className="bg-slate-50/50   p-2 flex">
                     <div className="w-20 flex-shrink-0"></div>
                     <div className="grid grid-cols-6 flex-1 text-center">
                         {DAYS.map(day => (
-                            <div key={day} className="py-4 font-black text-[11px] text-slate-400 uppercase tracking-widest border-l border-blue-50 first:border-0 border-dashed">
+                            <div key={day} className="py-4 font-black text-[11px] text-slate-400 uppercase tracking-widest   first: ">
                                 {day}
                             </div>
                         ))}
@@ -162,12 +162,12 @@ const StudentSchedule: React.FC = () => {
                 {/* Grid Content */}
                 <div className="flex relative" style={{ height: `${timeSlots.length * 100}px` }}>
                     {/* Time labels */}
-                    <div className="w-20 flex-shrink-0 border-r border-blue-50 border-dashed relative z-20">
+                    <div className="w-20 flex-shrink-0    relative z-20">
                         {timeSlots.map(time => {
                             const { top } = calculatePositionAndHeight(time, time);
                             return (
                                 <div key={time} style={{ top }} className="absolute inset-x-0 h-4 -mt-2 text-[10px] font-black text-slate-400 text-center flex flex-col justify-start">
-                                    <span className="bg-slate-50 mx-2 py-1 rounded-lg border border-slate-100">{time}</span>
+                                    <span className="bg-slate-50 mx-2 py-1   ">{time}</span>
                                 </div>
                             );
                         })}
@@ -178,14 +178,14 @@ const StudentSchedule: React.FC = () => {
                         <div className="w-20"></div>
                         <div className="grid grid-cols-6 flex-1">
                             {DAYS.map((_, i) => (
-                                <div key={i} className="border-l border-blue-50 border-dashed h-full relative">
+                                <div key={i} className="   h-full relative">
                                     {timeSlots.slice(0, -1).map((time, j) => {
                                         const isBreakStart = timetableConfig.breaks.some(b => b.startTime === time);
                                         if (isBreakStart) return null;
                                         const nextTime = timeSlots[j + 1];
                                         const { height } = calculatePositionAndHeight(time, nextTime);
                                         return (
-                                            <div key={j} style={{ height }} className="border-b border-blue-50 border-dashed"></div>
+                                            <div key={j} style={{ height }} className="  "></div>
                                         );
                                     })}
                                 </div>
@@ -210,7 +210,7 @@ const StudentSchedule: React.FC = () => {
                                     return (
                                         <div
                                             key={`break-${i}`}
-                                            className="absolute inset-x-0 bg-slate-100/40 backdrop-blur-[1px] border-y border-slate-200/50 flex flex-col items-center justify-center pointer-events-none z-0"
+                                            className="absolute inset-x-0 bg-slate-100/40 backdrop-blur-[1px]   flex flex-col items-center justify-center pointer-events-none z-0"
                                             style={{ top, height }}
                                         >
                                             <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Pause</span>
@@ -235,7 +235,7 @@ const StudentSchedule: React.FC = () => {
                                                 initial={{ opacity: 0, scale: 0.9 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 onClick={() => setSelectedEntry(entry)}
-                                                className="absolute inset-x-0 rounded-3xl p-5 shadow-xl border-l-4 overflow-hidden group hover:z-20 hover:scale-[1.02] transition-all cursor-pointer backdrop-blur-md active:scale-95"
+                                                className="absolute inset-x-0  p-5 shadow-xl  overflow-hidden group hover:z-20 hover:scale-[1.02] transition-all cursor-pointer backdrop-blur-md active:scale-95"
                                                 style={{
                                                     top,
                                                     height,
@@ -244,7 +244,7 @@ const StudentSchedule: React.FC = () => {
                                                 }}
                                             >
                                                 <div className="flex flex-col h-full uppercase">
-                                                    <span className="text-[10px] font-black px-2 py-1 rounded-full bg-white/80 text-slate-500 shadow-sm w-fit mb-3 tracking-tighter">
+                                                    <span className="text-[10px] font-black px-2 py-1  bg-white/80 text-slate-500 shadow-sm w-fit mb-3 tracking-tighter">
                                                         {entry.startTime} - {entry.endTime}
                                                     </span>
                                                     <h5 className="font-extrabold text-slate-800 text-sm leading-tight mb-2 tracking-tight">
@@ -271,24 +271,24 @@ const StudentSchedule: React.FC = () => {
 
             {/* Bottom Section: Summary & Info */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-                <div className="bg-slate-900 p-8 rounded-[40px] text-white shadow-2xl relative overflow-hidden flex flex-col justify-center min-h-[220px]">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
+                <div className="bg-slate-900 p-8 ] text-white shadow-2xl relative overflow-hidden flex flex-col justify-center min-h-[220px]">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10  blur-3xl"></div>
                     <h3 className="text-lg font-black mb-6 flex items-center gap-2">
                         <BookOpen size={22} className="text-blue-400" /> Résumé
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white/5 p-4 rounded-3xl border border-white/5">
+                        <div className="bg-white/5 p-4   ">
                             <p className="text-blue-300 text-[9px] font-black uppercase mb-1">Matières</p>
                             <p className="text-2xl font-black">{new Set(entries.map(e => e.subjectId)).size}</p>
                         </div>
-                        <div className="bg-white/5 p-4 rounded-3xl border border-white/5">
+                        <div className="bg-white/5 p-4   ">
                             <p className="text-blue-300 text-[9px] font-black uppercase mb-1">Charge Horaires</p>
                             <p className="text-2xl font-black">{entries.length * 2}h</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="md:col-span-2 bg-blue-600 p-8 rounded-[40px] text-white shadow-2xl relative overflow-hidden flex flex-col justify-center group">
+                <div className="md:col-span-2 bg-blue-600 p-8 ] text-white shadow-2xl relative overflow-hidden flex flex-col justify-center group">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-indigo-800 opacity-90 group-hover:scale-110 transition-transform duration-700"></div>
                     <div className="relative z-10">
                         <h4 className="text-xl font-black mb-4 flex items-center gap-2 tracking-tight">
@@ -316,15 +316,15 @@ const StudentSchedule: React.FC = () => {
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="bg-white rounded-[40px] w-full max-w-lg overflow-hidden shadow-2xl relative z-10 border border-slate-100"
+                            className="bg-white ] w-full max-w-lg overflow-hidden shadow-2xl relative z-10  "
                         >
                             <div className="p-8 pb-0 flex justify-between items-start">
-                                <div className="w-16 h-16 rounded-3xl flex items-center justify-center shadow-lg mb-6" style={{ backgroundColor: `${selectedEntry.subjectColor}15`, color: selectedEntry.subjectColor }}>
+                                <div className="w-16 h-16  flex items-center justify-center shadow-lg mb-6" style={{ backgroundColor: `${selectedEntry.subjectColor}15`, color: selectedEntry.subjectColor }}>
                                     <BookOpen size={32} />
                                 </div>
                                 <button
                                     onClick={() => setSelectedEntry(null)}
-                                    className="p-3 bg-slate-50 text-slate-400 hover:text-slate-600 rounded-2xl transition-all"
+                                    className="p-3 bg-slate-50 text-slate-400 hover:text-slate-600  transition-all"
                                 >
                                     <X size={20} />
                                 </button>
@@ -337,8 +337,8 @@ const StudentSchedule: React.FC = () => {
                                 </h3>
 
                                 <div className="space-y-6">
-                                    <div className="flex items-center gap-5 p-5 bg-slate-50 rounded-3xl border border-slate-100/50">
-                                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-blue-600">
+                                    <div className="flex items-center gap-5 p-5 bg-slate-50   ">
+                                        <div className="w-12 h-12 bg-white  flex items-center justify-center shadow-sm text-blue-600">
                                             <Clock size={22} />
                                         </div>
                                         <div>
@@ -347,8 +347,8 @@ const StudentSchedule: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-5 p-5 bg-slate-50 rounded-3xl border border-slate-100/50">
-                                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-indigo-600">
+                                    <div className="flex items-center gap-5 p-5 bg-slate-50   ">
+                                        <div className="w-12 h-12 bg-white  flex items-center justify-center shadow-sm text-indigo-600">
                                             <User size={22} />
                                         </div>
                                         <div>
@@ -358,8 +358,8 @@ const StudentSchedule: React.FC = () => {
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="flex items-center gap-5 p-5 bg-slate-50 rounded-3xl border border-slate-100/50">
-                                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-purple-600">
+                                        <div className="flex items-center gap-5 p-5 bg-slate-50   ">
+                                            <div className="w-12 h-12 bg-white  flex items-center justify-center shadow-sm text-purple-600">
                                                 <Layers size={22} />
                                             </div>
                                             <div>
@@ -367,8 +367,8 @@ const StudentSchedule: React.FC = () => {
                                                 <p className="font-black text-slate-700">{selectedEntry.classeName}</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-5 p-5 bg-slate-50 rounded-3xl border border-slate-100/50">
-                                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-emerald-600">
+                                        <div className="flex items-center gap-5 p-5 bg-slate-50   ">
+                                            <div className="w-12 h-12 bg-white  flex items-center justify-center shadow-sm text-emerald-600">
                                                 <MapPin size={22} />
                                             </div>
                                             <div>
@@ -381,7 +381,7 @@ const StudentSchedule: React.FC = () => {
 
                                 <button
                                     onClick={() => setSelectedEntry(null)}
-                                    className="w-full mt-10 bg-slate-900 text-white py-5 rounded-[2rem] font-black shadow-xl hover:bg-slate-800 transition-all active:scale-95"
+                                    className="w-full mt-10 bg-slate-900 text-white py-5 ] font-black shadow-xl hover:bg-slate-800 transition-all active:scale-95"
                                 >
                                     Fermer
                                 </button>

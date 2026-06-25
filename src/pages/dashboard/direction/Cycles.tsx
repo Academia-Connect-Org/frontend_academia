@@ -5,12 +5,12 @@ import { useAuth } from '../../../context/AuthContext';
 import { motion } from 'framer-motion';
 
 const CYCLE_COLORS = [
-    { bg: 'bg-blue-50', border: 'border-blue-100', text: 'text-blue-600', hover: 'hover:bg-blue-100', accent: 'bg-blue-600', lightAccent: 'text-blue-500' },
-    { bg: 'bg-purple-50', border: 'border-purple-100', text: 'text-purple-600', hover: 'hover:bg-purple-100', accent: 'bg-purple-600', lightAccent: 'text-purple-500' },
-    { bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-600', hover: 'hover:bg-emerald-100', accent: 'bg-emerald-600', lightAccent: 'text-emerald-500' },
-    { bg: 'bg-orange-50', border: 'border-orange-100', text: 'text-orange-600', hover: 'hover:bg-orange-100', accent: 'bg-orange-600', lightAccent: 'text-orange-500' },
-    { bg: 'bg-pink-50', border: 'border-pink-100', text: 'text-pink-600', hover: 'hover:bg-pink-100', accent: 'bg-pink-600', lightAccent: 'text-pink-500' },
-    { bg: 'bg-indigo-50', border: 'border-indigo-100', text: 'text-indigo-600', hover: 'hover:bg-indigo-100', accent: 'bg-indigo-600', lightAccent: 'text-indigo-500' },
+    { bg: 'bg-blue-50', border: '', text: 'text-blue-600', hover: 'hover:bg-blue-100', accent: 'bg-blue-600', lightAccent: 'text-blue-500' },
+    { bg: 'bg-purple-50', border: '', text: 'text-purple-600', hover: 'hover:bg-purple-100', accent: 'bg-purple-600', lightAccent: 'text-purple-500' },
+    { bg: 'bg-emerald-50', border: '', text: 'text-emerald-600', hover: 'hover:bg-emerald-100', accent: 'bg-emerald-600', lightAccent: 'text-emerald-500' },
+    { bg: 'bg-orange-50', border: '', text: 'text-orange-600', hover: 'hover:bg-orange-100', accent: 'bg-orange-600', lightAccent: 'text-orange-500' },
+    { bg: 'bg-pink-50', border: '', text: 'text-pink-600', hover: 'hover:bg-pink-100', accent: 'bg-pink-600', lightAccent: 'text-pink-500' },
+    { bg: 'bg-indigo-50', border: '', text: 'text-indigo-600', hover: 'hover:bg-indigo-100', accent: 'bg-indigo-600', lightAccent: 'text-indigo-500' },
 ];
 
 interface CyclesProps {
@@ -141,7 +141,7 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                     <p className="text-slate-500 font-medium mt-1">Consultez et gérez les cycles académiques de votre établissement.</p>
                 </div>
                 {canEdit && (
-                    <button onClick={handleAddCyclePrompt} className="bg-indigo-600 text-white px-8 py-4 rounded-[20px] font-black flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-indigo-600/20 active:scale-95">
+                    <button onClick={handleAddCyclePrompt} className="bg-indigo-600 text-white px-8 py-4 ] font-black flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-indigo-600/20 active:scale-95">
                         <Plus size={20} /> Nouveau Cycle
                     </button>
                 )}
@@ -151,23 +151,23 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className={`p-5 rounded-[24px] mb-8 font-bold flex items-center justify-between gap-3 shadow-sm ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}
+                    className={`p-5 ] mb-8 font-bold flex items-center justify-between gap-3 shadow-sm ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600  ' : 'bg-red-50 text-red-600  '}`}
                 >
                     <div className="flex items-center gap-3">
                         {message.type === 'success' ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
                         <span className="text-lg">{message.text}</span>
                     </div>
-                    <button onClick={() => setMessage({ type: '', text: '' })} className="hover:bg-black/5 p-2 rounded-full transition-colors"><X size={20} /></button>
+                    <button onClick={() => setMessage({ type: '', text: '' })} className="hover:bg-black/5 p-2  transition-colors"><X size={20} /></button>
                 </motion.div>
             )}
 
             {loading && cycles.length === 0 ? (
                 <div className="flex items-center justify-center p-20">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                    <div className="animate-spin  h-12 w-12  "></div>
                 </div>
             ) : cycles.length === 0 ? (
-                <div className="bg-white rounded-[32px] p-16 text-center border-2 border-dashed border-slate-200">
-                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                <div className="bg-white ] p-16 text-center   ">
+                    <div className="w-20 h-20 bg-slate-50  flex items-center justify-center mx-auto mb-6 text-slate-300">
                         <Layers size={40} />
                     </div>
                     <h3 className="text-2xl font-black text-slate-800 mb-2">Aucun cycle enregistré</h3>
@@ -190,20 +190,20 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                className={`relative group bg-white rounded-[28px] border ${color.border} overflow-hidden shadow-lg shadow-slate-200/40 hover:shadow-2xl hover:shadow-slate-300/50 transition-all duration-500 hover:-translate-y-1`}
+                                className={`relative group bg-white ]  ${color.border} overflow-hidden shadow-lg shadow-slate-200/40 hover:shadow-2xl hover:shadow-slate-300/50 transition-all duration-500 hover:-translate-y-1`}
                             >
                                 {/* Header Color Strip */}
                                 <div className={`h-3 w-full ${color.accent}`}></div>
 
                                 <div className="p-6">
                                     <div className="flex justify-between items-start mb-4">
-                                        <div className={`w-16 h-16 ${color.bg} ${color.text} rounded-2xl flex items-center justify-center shadow-inner`}>
+                                        <div className={`w-16 h-16 ${color.bg} ${color.text}  flex items-center justify-center shadow-inner`}>
                                             <Layers size={32} />
                                         </div>
                                         {canEdit && (
                                             <button
                                                 onClick={() => handleDeleteCycle(cycle.id)}
-                                                className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                                className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50  transition-all"
                                             >
                                                 <Trash2 size={18} />
                                             </button>
@@ -213,7 +213,7 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                                     <h3 className="text-3xl font-black text-slate-800 mb-8 tracking-tight truncate uppercase" title={cycle.name}>{cycle.name}</h3>
 
                                     <div className="space-y-4">
-                                        <div className="p-6 rounded-[24px] bg-slate-50/80 border border-slate-100 shadow-sm">
+                                        <div className="p-6 ] bg-slate-50/80   shadow-sm">
                                             <div className="flex items-center gap-3 mb-4">
                                                 <GraduationCap size={20} className={color.lightAccent} />
                                                 <span className="text-xs font-black text-slate-700 uppercase tracking-widest">Effectif Élèves</span>
@@ -223,7 +223,7 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                                                     <span className="text-3xl font-black text-slate-900">{cycle.studentCount || 0}</span>
                                                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total</span>
                                                 </div>
-                                                <div className="flex flex-col border-x-2 border-slate-200">
+                                                <div className="flex flex-col  ">
                                                     <span className="text-3xl font-black text-blue-600">{cycle.boysCount || 0}</span>
                                                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Garçons</span>
                                                 </div>
@@ -234,7 +234,7 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                                             </div>
                                         </div>
 
-                                        <div className="p-6 rounded-[24px] bg-slate-50/80 border border-slate-100 shadow-sm">
+                                        <div className="p-6 ] bg-slate-50/80   shadow-sm">
                                             <div className="flex items-center gap-3 mb-4">
                                                 <UserCheck size={20} className={color.lightAccent} />
                                                 <span className="text-xs font-black text-slate-700 uppercase tracking-widest">Corps Enseignant</span>
@@ -244,7 +244,7 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                                                     <span className="text-3xl font-black text-slate-900">{cycle.teacherCount || 0}</span>
                                                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total</span>
                                                 </div>
-                                                <div className="flex flex-col border-x-2 border-slate-200">
+                                                <div className="flex flex-col  ">
                                                     <span className="text-3xl font-black text-blue-600">{cycle.maleTeachersCount || 0}</span>
                                                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">H</span>
                                                 </div>
@@ -256,14 +256,14 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-6 mt-2">
-                                            <div className="p-6 rounded-[24px] bg-slate-900 text-white flex flex-col shadow-xl shadow-slate-900/20">
+                                            <div className="p-6 ] bg-slate-900 text-white flex flex-col shadow-xl shadow-slate-900/20">
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <Users size={16} className="text-white/60" />
                                                     <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">Classes</span>
                                                 </div>
                                                 <span className="text-4xl font-black">{cycle.classCount || 0}</span>
                                             </div>
-                                            <div className="p-6 rounded-[24px] bg-indigo-600 text-white flex flex-col shadow-xl shadow-indigo-600/20">
+                                            <div className="p-6 ] bg-indigo-600 text-white flex flex-col shadow-xl shadow-indigo-600/20">
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <BookOpen size={16} className="text-white/60" />
                                                     <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">Matières</span>
@@ -284,14 +284,14 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white w-full max-w-sm rounded-[40px] p-10 shadow-2xl text-center"
+                        className="bg-white w-full max-w-sm ] p-10 shadow-2xl text-center"
                     >
-                        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner"><Trash2 size={40} /></div>
+                        <div className="w-20 h-20 bg-red-50 text-red-500  flex items-center justify-center mx-auto mb-8 shadow-inner"><Trash2 size={40} /></div>
                         <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-4">{confirmDialog.title}</h3>
                         <p className="text-slate-500 font-medium mb-10 leading-relaxed">{confirmDialog.message}</p>
                         <div className="flex gap-4">
-                            <button onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })} className="flex-1 py-5 rounded-[20px] font-black bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Annuler</button>
-                            <button onClick={() => { confirmDialog.onConfirm(); setConfirmDialog({ ...confirmDialog, isOpen: false }); }} className="flex-1 py-5 rounded-[20px] font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all">Supprimer</button>
+                            <button onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })} className="flex-1 py-5 ] font-black bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Annuler</button>
+                            <button onClick={() => { confirmDialog.onConfirm(); setConfirmDialog({ ...confirmDialog, isOpen: false }); }} className="flex-1 py-5 ] font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all">Supprimer</button>
                         </div>
                     </motion.div>
                 </div>
@@ -302,7 +302,7 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white w-full max-w-md rounded-[40px] p-10 shadow-2xl"
+                        className="bg-white w-full max-w-md ] p-10 shadow-2xl"
                     >
                         <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2">{promptDialog.title}</h3>
                         <p className="text-slate-500 mb-8 font-medium">Entrez le nom du cycle académique à créer.</p>
@@ -315,14 +315,14 @@ const Cycles: React.FC<CyclesProps> = ({ institutionId, hideLayout = false }) =>
                                 value={promptValue}
                                 onChange={(e) => setPromptValue(e.target.value)}
                                 onKeyDown={(e) => { if (e.key === 'Enter') { promptDialog.onSubmit(promptValue); setPromptDialog({ ...promptDialog, isOpen: false }); } }}
-                                className="w-full pl-14 pr-6 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-lg font-bold text-slate-700 focus:bg-white focus:border-indigo-600 outline-none transition-all placeholder:text-slate-300"
+                                className="w-full pl-14 pr-6 py-5 bg-slate-50    text-lg font-bold text-slate-700 focus:bg-white focus: outline-none transition-all placeholder:text-slate-300"
                                 autoFocus
                             />
                         </div>
 
                         <div className="flex gap-4">
-                            <button onClick={() => setPromptDialog({ ...promptDialog, isOpen: false })} className="flex-1 py-5 rounded-[20px] font-black bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all text-lg">Annuler</button>
-                            <button onClick={() => { promptDialog.onSubmit(promptValue); setPromptDialog({ ...promptDialog, isOpen: false }); }} className="flex-1 py-5 rounded-[20px] font-black bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all text-lg">Créer le cycle</button>
+                            <button onClick={() => setPromptDialog({ ...promptDialog, isOpen: false })} className="flex-1 py-5 ] font-black bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all text-lg">Annuler</button>
+                            <button onClick={() => { promptDialog.onSubmit(promptValue); setPromptDialog({ ...promptDialog, isOpen: false }); }} className="flex-1 py-5 ] font-black bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all text-lg">Créer le cycle</button>
                         </div>
                     </motion.div>
                 </div>

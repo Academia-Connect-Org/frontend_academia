@@ -54,13 +54,16 @@ const PDGDashboard: React.FC = () => {
     const [successStats, setSuccessStats] = React.useState<any>(null);
 
     React.useEffect(() => {
-        api.get('/dashboard/overview').then(res => setOverview(res.data)).catch(console.error);
-        api.get('/dashboard/schools-performance').then(res => setSchoolsPerf(res.data)).catch(console.error);
-        api.get('/institutions').then(res => setInstitutions(res.data)).catch(console.error);
+        if (!user?.id) return;
+        const params = new URLSearchParams();
+        params.append('ceoId', user.id.toString());
+        const qs = `?${params.toString()}`;
+
+        api.get(`/dashboard/overview${qs}`).then(res => setOverview(res.data)).catch(console.error);
+        api.get(`/dashboard/schools-performance${qs}`).then(res => setSchoolsPerf(res.data)).catch(console.error);
+        api.get(`/institutions${qs}`).then(res => setInstitutions(res.data)).catch(console.error);
         
-        if (user?.id) {
-            api.get(`/dashboard/alerts?userId=${user.id}`).then(res => setAlerts(res.data)).catch(console.error);
-        }
+        api.get(`/dashboard/alerts?userId=${user.id}`).then(res => setAlerts(res.data)).catch(console.error);
     }, [user?.id]);
 
     React.useEffect(() => {
@@ -72,6 +75,7 @@ const PDGDashboard: React.FC = () => {
         const fetchSuccess = async () => {
             try {
                 const params = new URLSearchParams();
+                if (user?.id) params.append('ceoId', user.id.toString());
                 if (filter.instId) params.append('institutionId', filter.instId);
                 if (filter.cycleId) params.append('cycleId', filter.cycleId);
                 if (filter.classeId) params.append('classeId', filter.classeId);
@@ -87,8 +91,13 @@ const PDGDashboard: React.FC = () => {
     }, [filter]);
 
     React.useEffect(() => {
-        api.get(`/dashboard/growth?groupBy=${groupBy}`).then(res => setGrowthData(res.data)).catch(console.error);
-    }, [groupBy]);
+        if (!user?.id) return;
+        const params = new URLSearchParams();
+        params.append('ceoId', user.id.toString());
+        params.append('groupBy', groupBy);
+        
+        api.get(`/dashboard/growth?${params.toString()}`).then(res => setGrowthData(res.data)).catch(console.error);
+    }, [groupBy, user?.id]);
 
     const exportToPDF = () => {
         const doc = new jsPDF('l', 'mm', 'a4');
@@ -193,16 +202,16 @@ const PDGDashboard: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
                 {/* Main Sales Chart */}
-                <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100">
+                <div className="lg:col-span-2 bg-white p-8 ] shadow-xl shadow-slate-200/50  ">
                     <div className="flex items-center justify-between mb-8">
                         <div>
                             <h3 className="text-xl font-black text-slate-800 tracking-tight">Croissance du Réseau</h3>
                         </div>
-                        <div className="flex bg-slate-100 p-1.5 rounded-xl gap-2">
+                        <div className="flex bg-slate-100 p-1.5  gap-2">
                             <select
                                 value={groupBy}
                                 onChange={(e) => setGroupBy(e.target.value)}
-                                className="bg-white text-blue-600 px-3 py-1 rounded-lg text-xs font-bold border-none shadow-sm focus:ring-0 cursor-pointer"
+                                className="bg-white text-blue-600 px-3 py-1  text-xs font-bold border-none shadow-sm focus:ring-0 cursor-pointer"
                             >
                                 <option value="MONTH">Par Mois</option>
                                 <option value="YEAR">Par Année</option>
@@ -242,8 +251,8 @@ const PDGDashboard: React.FC = () => {
                 </div>
 
                 {/* Right Quick Actions / Notifications */}
-                <div className="bg-slate-900 rounded-[32px] p-8 text-white relative overflow-hidden shadow-2xl">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                <div className="bg-slate-900 ] p-8 text-white relative overflow-hidden shadow-2xl">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10  blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
                     <h3 className="text-xl font-black mb-8 relative z-10 tracking-tight">Alertes Critiques</h3>
                     <div className="space-y-6 relative z-10">
@@ -263,7 +272,7 @@ const PDGDashboard: React.FC = () => {
 
                     <button
                         onClick={() => navigate(ROUTES.DASHBOARD.PDG.MESSAGES)}
-                        className="w-full mt-12 bg-white/10 hover:bg-white/20 py-4 rounded-2xl font-bold transition-all border border-white/10 text-sm"
+                        className="w-full mt-12 bg-white/10 hover:bg-white/20 py-4  font-bold transition-all   text-sm"
                     >
                         Voir tout le journal
                     </button>
@@ -272,8 +281,8 @@ const PDGDashboard: React.FC = () => {
 
             {/* Success Statistics Section */}
             <div className="mb-10">
-                <div className="bg-white p-8 rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+                <div className="bg-white p-8 ] shadow-2xl   overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5  blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
                     
                     <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 mb-10 relative z-10">
                         <div>
@@ -286,7 +295,7 @@ const PDGDashboard: React.FC = () => {
                         
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full xl:w-auto">
                             <select 
-                                className="bg-slate-50 border-none rounded-2xl px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
+                                className="bg-slate-50 border-none  px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
                                 value={filter.year}
                                 onChange={(e) => setFilter({...filter, year: e.target.value})}
                             >
@@ -294,7 +303,7 @@ const PDGDashboard: React.FC = () => {
                                 <option value="2024-2025">2024-2025</option>
                             </select>
                             <select 
-                                className="bg-slate-50 border-none rounded-2xl px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
+                                className="bg-slate-50 border-none  px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
                                 value={filter.instId}
                                 onChange={(e) => setFilter({...filter, instId: e.target.value, cycleId: '', classeId: ''})}
                             >
@@ -302,7 +311,7 @@ const PDGDashboard: React.FC = () => {
                                 {institutions.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
                             </select>
                             <select 
-                                className="bg-slate-50 border-none rounded-2xl px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
+                                className="bg-slate-50 border-none  px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
                                 value={filter.cycleId}
                                 onChange={(e) => setFilter({...filter, cycleId: e.target.value, classeId: ''})}
                             >
@@ -310,7 +319,7 @@ const PDGDashboard: React.FC = () => {
                                 {cycles.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                             </select>
                             <select 
-                                className="bg-slate-50 border-none rounded-2xl px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
+                                className="bg-slate-50 border-none  px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
                                 value={filter.classeId}
                                 onChange={(e) => setFilter({...filter, classeId: e.target.value})}
                             >
@@ -321,21 +330,21 @@ const PDGDashboard: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 relative z-10">
-                        <div className="p-6 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[32px] text-white shadow-xl shadow-blue-500/20">
+                        <div className="p-6 bg-gradient-to-br from-blue-600 to-indigo-700 ] text-white shadow-xl shadow-blue-500/20">
                             <p className="text-blue-100 text-[10px] font-black uppercase tracking-widest mb-1">Moyenne Générale</p>
                             <h3 className="text-3xl font-black">{(Number(successStats?.average) || 0).toFixed(2)}/20</h3>
                             <div className="mt-4 flex items-center gap-2">
-                                <div className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden">
-                                    <div className="h-full bg-white rounded-full" style={{ width: `${(successStats?.average || 0) * 5}%` }}></div>
+                                <div className="h-1 flex-1 bg-white/20  overflow-hidden">
+                                    <div className="h-full bg-white " style={{ width: `${(successStats?.average || 0) * 5}%` }}></div>
                                 </div>
                             </div>
                         </div>
-                        <div className="p-6 bg-white border border-slate-100 rounded-[32px] shadow-lg shadow-slate-200/50">
+                        <div className="p-6 bg-white   ] shadow-lg shadow-slate-200/50">
                             <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Meilleure Moyenne</p>
                             <h3 className="text-3xl font-black text-emerald-600">{(Number(successStats?.highestAverage) || 0).toFixed(2)}/20</h3>
                             <p className="text-[10px] text-emerald-500 font-bold mt-2">Performance d'Excellence</p>
                         </div>
-                        <div className="p-6 bg-white border border-slate-100 rounded-[32px] shadow-lg shadow-slate-200/50">
+                        <div className="p-6 bg-white   ] shadow-lg shadow-slate-200/50">
                             <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Taux de Réussite</p>
                             <h3 className="text-3xl font-black text-blue-600">{(Number(successStats?.successRate) || 0).toFixed(1)}%</h3>
                             <p className="text-[10px] text-blue-400 font-bold mt-2">{successStats?.passingCount || 0} élèves admis</p>
@@ -344,7 +353,7 @@ const PDGDashboard: React.FC = () => {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
                         {/* Histogram: Success Rate */}
-                        <div className="bg-slate-50 p-6 rounded-[32px]">
+                        <div className="bg-slate-50 p-6 ]">
                             <h4 className="text-sm font-black text-slate-800 mb-6 uppercase tracking-widest">Répartitions de Réussite (%)</h4>
                             <div className="h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -366,7 +375,7 @@ const PDGDashboard: React.FC = () => {
                         </div>
 
                         {/* Curve: Evolution */}
-                        <div className="bg-slate-50 p-6 rounded-[32px]">
+                        <div className="bg-slate-50 p-6 ]">
                             <h4 className="text-sm font-black text-slate-800 mb-6 uppercase tracking-widest">Évolution des Moyennes</h4>
                             <div className="h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -385,8 +394,8 @@ const PDGDashboard: React.FC = () => {
             </div>
 
             {/* Recent Table or Schools list */}
-            <div className="bg-white rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-                <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+            <div className="bg-white ] shadow-xl shadow-slate-200/50   overflow-hidden">
+                <div className="p-8   flex items-center justify-between">
                     <div>
                         <h3 className="text-xl font-black text-slate-800">Performance par Établissement</h3>
                         <p className="text-slate-400 text-sm">Vue d'ensemble de la performance des écoles du réseau</p>
@@ -394,14 +403,14 @@ const PDGDashboard: React.FC = () => {
                     <div className="flex gap-4">
                         <button
                             onClick={exportToPDF}
-                            className="p-2.5 text-slate-400 hover:bg-slate-50 border border-slate-200 rounded-xl transition-all"
+                            className="p-2.5 text-slate-400 hover:bg-slate-50    transition-all"
                             title="Exporter en PDF"
                         >
                             <Download size={20} />
                         </button>
                         <button
                             onClick={() => navigate(ROUTES.DASHBOARD.PDG.STATS)}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-blue-900 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-900/20 hover:bg-blue-800 transition-all"
+                            className="flex items-center gap-2 px-5 py-2.5 bg-blue-900 text-white  font-bold text-sm shadow-lg shadow-blue-900/20 hover:bg-blue-800 transition-all"
                         >
                             <Search size={16} /> Rapport détaillé
                         </button>
@@ -410,7 +419,7 @@ const PDGDashboard: React.FC = () => {
                 <div className="p-4 overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="text-slate-400 text-xs font-black uppercase tracking-widest border-b border-slate-100">
+                            <tr className="text-slate-400 text-xs font-black uppercase tracking-widest  ">
                                 <th className="px-6 py-4">Établissement</th>
                                 <th className="px-6 py-4">Directeur</th>
                                 <th className="px-6 py-4">Effectif</th>
@@ -446,12 +455,12 @@ const PDGDashboard: React.FC = () => {
 
 // Subcomponents
 const StatCard = ({ title, value, trend, icon: Icon, color, bg }: any) => (
-    <div className="bg-white p-6 rounded-[28px] shadow-lg shadow-slate-200/50 border border-slate-100 group hover:scale-[1.02] transition-all duration-300">
+    <div className="bg-white p-6 ] shadow-lg shadow-slate-200/50   group hover:scale-[1.02] transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
-            <div className={`w-14 h-14 ${bg} ${color} rounded-2xl flex items-center justify-center transition-transform group-hover:rotate-12`}>
+            <div className={`w-14 h-14 ${bg} ${color}  flex items-center justify-center transition-transform group-hover:rotate-12`}>
                 <Icon size={28} />
             </div>
-            <div className={`flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full ${trend.startsWith('+') ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}`}>
+            <div className={`flex items-center gap-1 text-[10px] font-black px-2.5 py-1  ${trend.startsWith('+') ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}`}>
                 {trend.startsWith('+') ? <TrendingUp size={12} /> : null}
                 {trend}
             </div>
@@ -475,7 +484,7 @@ const AlertItem = ({ title, desc, time, type, onClick }: any) => {
             className="flex gap-4 group cursor-pointer hover:translate-x-1 transition-all"
         >
             <div className="relative">
-                <div className={`w-3 h-3 ${colors[type as keyof typeof colors]} rounded-full mt-1.5 shadow-[0_0_10px_rgba(239,68,68,0.5)]`}></div>
+                <div className={`w-3 h-3 ${colors[type as keyof typeof colors]}  mt-1.5 shadow-[0_0_10px_rgba(239,68,68,0.5)]`}></div>
                 <div className="absolute top-5 left-1/2 -translate-x-1/2 w-0.5 h-full bg-white/5 group-last:hidden"></div>
             </div>
             <div>
@@ -497,14 +506,14 @@ const SchoolRow = ({ name, dir, students, attendance, progress, status }: any) =
         <td className="px-6 py-5 text-sm font-bold text-slate-900">{attendance}</td>
         <td className="px-6 py-5">
             <div className="flex items-center gap-3">
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden max-w-[100px]">
-                    <div className={`h-full ${progress > 90 ? 'bg-emerald-500' : progress > 80 ? 'bg-blue-500' : 'bg-amber-500'} rounded-full`} style={{ width: `${progress}%` }}></div>
+                <div className="w-full bg-slate-100 h-2  overflow-hidden max-w-[100px]">
+                    <div className={`h-full ${progress > 90 ? 'bg-emerald-500' : progress > 80 ? 'bg-blue-500' : 'bg-amber-500'} `} style={{ width: `${progress}%` }}></div>
                 </div>
                 <span className="text-xs font-black text-slate-400">{progress}%</span>
             </div>
         </td>
         <td className="px-6 py-5 text-center">
-            <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest 
+            <span className={`px-3 py-1.5  text-[10px] font-black uppercase tracking-widest 
                 ${status === 'good' ? 'bg-emerald-50 text-emerald-600' : status === 'warning' ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-500'}`}>
                 {status === 'good' ? 'Optimale' : status === 'warning' ? 'À Surveiller' : 'Stable'}
             </span>

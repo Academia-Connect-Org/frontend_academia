@@ -62,7 +62,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         initial={{ scale: 0.9, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                        className="bg-white rounded-[40px] p-10 w-full max-w-md shadow-2xl relative z-10 border border-slate-100 text-center"
+                        className="bg-white ] p-10 w-full max-w-md shadow-2xl relative z-10   text-center"
                     >
                         <button
                             onClick={onClose}
@@ -71,7 +71,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                             <X size={20} />
                         </button>
 
-                        <div className={`w-20 h-20 ${getBgIconClass()} rounded-full flex items-center justify-center mx-auto mb-6`}>
+                        <div className={`w-20 h-20 ${getBgIconClass()}  flex items-center justify-center mx-auto mb-6`}>
                             {getIcon()}
                         </div>
 
@@ -81,7 +81,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         <div className="flex gap-4">
                             <button
                                 onClick={onClose}
-                                className="flex-1 bg-slate-100 text-slate-600 py-4 rounded-3xl font-black hover:bg-slate-200 transition-all active:scale-95"
+                                className="flex-1 bg-slate-100 text-slate-600 py-4  font-black hover:bg-slate-200 transition-all active:scale-95"
                             >
                                 {cancelText}
                             </button>
@@ -90,7 +90,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                                     onConfirm();
                                     onClose();
                                 }}
-                                className={`flex-1 text-white py-4 rounded-3xl font-black shadow-xl transition-all hover:scale-105 active:scale-95 ${getColorClass()}`}
+                                className={`flex-1 text-white py-4  font-black shadow-xl transition-all hover:scale-105 active:scale-95 ${getColorClass()}`}
                             >
                                 {confirmText}
                             </button>

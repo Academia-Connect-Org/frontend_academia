@@ -58,7 +58,7 @@ const SecretariatDashboard: React.FC = () => {
         <>
             <div className="flex items-center justify-center h-64">
                 <div className="relative">
-                    <div className="h-16 w-16 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin"></div>
+                    <div className="h-16 w-16     animate-spin"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
                         <UserPlus className="text-blue-600 animate-pulse" size={20} />
                     </div>
@@ -79,10 +79,10 @@ const SecretariatDashboard: React.FC = () => {
                     <p className="text-slate-500 font-medium">Suivi des inscriptions, dossiers élèves et assiduité quotidienne.</p>
                 </div>
                 <div className="flex gap-4">
-                    <button className="bg-white border-2 border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+                    <button className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
                         <Printer size={18} /> Rapports
                     </button>
-                    <button className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all">
+                    <button className="bg-blue-600 text-white px-8 py-3  font-black flex items-center gap-2 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all">
                         <UserPlus size={20} /> Nouvelle Inscription
                     </button>
                 </div>
@@ -123,8 +123,8 @@ const SecretariatDashboard: React.FC = () => {
             {/* Main Content Area */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Registrations List */}
-                <div className="lg:col-span-2 bg-white rounded-[40px] shadow-2xl shadow-slate-200/40 border border-slate-100 overflow-hidden min-h-[600px] flex flex-col">
-                    <div className="p-8 border-b border-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div className="lg:col-span-2 bg-white ] shadow-2xl shadow-slate-200/40   overflow-hidden min-h-[600px] flex flex-col">
+                    <div className="p-8   flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                         <div>
                             <h3 className="text-xl font-black text-slate-800">Dossiers Récents</h3>
                             <p className="text-slate-400 text-sm font-medium">Les dernières inscriptions enregistrées</p>
@@ -136,7 +136,7 @@ const SecretariatDashboard: React.FC = () => {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder="Rechercher un dossier..."
-                                className="pl-12 pr-6 py-3.5 bg-slate-50 border-2 border-transparent focus:border-blue-500/20 focus:bg-white rounded-2xl text-sm font-bold w-full transition-all outline-none"
+                                className="pl-12 pr-6 py-3.5 bg-slate-50   focus: focus:bg-white  text-sm font-bold w-full transition-all outline-none"
                             />
                         </div>
                     </div>
@@ -163,7 +163,7 @@ const SecretariatDashboard: React.FC = () => {
                                         >
                                             <td className="px-8 py-6">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 font-black text-sm flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-inner">
+                                                    <div className="w-12 h-12  bg-slate-100 text-slate-600 font-black text-sm flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-inner">
                                                         {student.firstName[0]}{student.lastName[0]}
                                                     </div>
                                                     <div>
@@ -191,9 +191,9 @@ const SecretariatDashboard: React.FC = () => {
                                             </td>
                                             <td className="px-8 py-6">
                                                 <div className="flex items-center justify-center gap-2">
-                                                    <button className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all" title="Imprimer Dossier"><Printer size={18} /></button>
-                                                    <button className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all" title="Envoyer Message"><Mail size={18} /></button>
-                                                    <button className="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-100 rounded-xl transition-all"><MoreVertical size={18} /></button>
+                                                    <button className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all" title="Imprimer Dossier"><Printer size={18} /></button>
+                                                    <button className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50  transition-all" title="Envoyer Message"><Mail size={18} /></button>
+                                                    <button className="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-100  transition-all"><MoreVertical size={18} /></button>
                                                 </div>
                                             </td>
                                         </motion.tr>
@@ -204,7 +204,7 @@ const SecretariatDashboard: React.FC = () => {
                                     <tr>
                                         <td colSpan={4} className="px-8 py-20 text-center">
                                             <div className="flex flex-col items-center gap-3">
-                                                <div className="p-4 bg-slate-50 rounded-full text-slate-300">
+                                                <div className="p-4 bg-slate-50  text-slate-300">
                                                     <SearchX size={40} />
                                                 </div>
                                                 <p className="text-slate-400 font-bold italic">Aucun dossier trouvé pour cette recherche</p>
@@ -220,8 +220,8 @@ const SecretariatDashboard: React.FC = () => {
                 {/* Side info / Quick Access */}
                 <div className="space-y-8">
                     {/* Distribution Summary */}
-                    <div className="bg-gradient-to-br from-slate-900 to-indigo-950 p-8 rounded-[40px] text-white shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-white/10 transition-all duration-500"></div>
+                    <div className="bg-gradient-to-br from-slate-900 to-indigo-950 p-8 ] text-white shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5  -mr-16 -mt-16 blur-2xl group-hover:bg-white/10 transition-all duration-500"></div>
                         <h4 className="text-lg font-black mb-8 flex items-center gap-2">
                             Vue d'ensemble
                         </h4>
@@ -233,19 +233,19 @@ const SecretariatDashboard: React.FC = () => {
                             <SmallStat label="Total Matières" count={overview?.totalSubjects || 0} icon={BookOpen} color="text-amber-400" />
                         </div>
 
-                        <div className="mt-10 p-5 bg-white/10 rounded-3xl border border-white/10 flex items-center justify-between">
+                        <div className="mt-10 p-5 bg-white/10    flex items-center justify-between">
                             <div>
                                 <p className="text-[10px] font-black uppercase text-indigo-200 tracking-wider">Taux d'Inscription</p>
                                 <p className="text-xl font-black">+18% <span className="text-[10px] font-medium text-emerald-400 ml-1">Ce mois</span></p>
                             </div>
-                            <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
+                            <div className="w-12 h-12 bg-white/10  flex items-center justify-center">
                                 <ArrowUpRight className="text-emerald-400" />
                             </div>
                         </div>
                     </div>
 
                     {/* Pending Actions */}
-                    <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100 ring-1 ring-slate-400/5">
+                    <div className="bg-white p-8 ] shadow-xl   ring-1 ring-slate-400/5">
                         <h4 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
                             <Filter size={18} className="text-blue-600" /> Actions Rapides
                         </h4>
@@ -270,14 +270,14 @@ const KPICard = ({ label, count, icon: Icon, color, trend }: any) => {
     };
 
     return (
-        <div className="bg-white p-6 rounded-[32px] shadow-xl shadow-slate-200/40 border border-slate-100 group transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] relative overflow-hidden">
-            <div className={`w-14 h-14 ${colorVariants[color].split(' ')[2]} ${colorVariants[color].split(' ')[3]} rounded-2xl flex items-center justify-center mb-5 group-hover:rotate-6 transition-all shadow-inner`}>
+        <div className="bg-white p-6 ] shadow-xl shadow-slate-200/40   group transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] relative overflow-hidden">
+            <div className={`w-14 h-14 ${colorVariants[color].split(' ')[2]} ${colorVariants[color].split(' ')[3]}  flex items-center justify-center mb-5 group-hover:rotate-6 transition-all shadow-inner`}>
                 <Icon size={28} />
             </div>
             <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.15em] mb-1">{label}</p>
             <div className="flex items-end justify-between">
                 <h4 className="text-3xl font-black text-slate-800 tracking-tight leading-none">{count}</h4>
-                <div className={`text-[10px] font-black px-2 py-1 rounded-lg ${trend.startsWith('+') ? 'text-emerald-600 bg-emerald-50' : 'text-slate-400 bg-slate-50'}`}>
+                <div className={`text-[10px] font-black px-2 py-1  ${trend.startsWith('+') ? 'text-emerald-600 bg-emerald-50' : 'text-slate-400 bg-slate-50'}`}>
                     {trend}
                 </div>
             </div>
@@ -288,7 +288,7 @@ const KPICard = ({ label, count, icon: Icon, color, trend }: any) => {
 
 const SmallStat = ({ label, count, icon: Icon, color }: any) => (
     <div className="flex items-center gap-4 group">
-        <div className={`w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center ${color} group-hover:scale-110 transition-transform`}>
+        <div className={`w-10 h-10 bg-white/10  flex items-center justify-center ${color} group-hover:scale-110 transition-transform`}>
             <Icon size={18} />
         </div>
         <div className="flex-1">
@@ -299,8 +299,8 @@ const SmallStat = ({ label, count, icon: Icon, color }: any) => (
 );
 
 const QuickActionButton = ({ label, icon: Icon, color }: any) => (
-    <button className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-all group group-active:scale-95 border border-transparent hover:border-slate-100">
-        <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+    <button className="w-full flex items-center gap-4 p-4  hover:bg-slate-50 transition-all group group-active:scale-95   hover:">
+        <div className={`w-10 h-10 ${color}  flex items-center justify-center group-hover:scale-110 transition-transform`}>
             <Icon size={18} />
         </div>
         <span className="text-sm font-bold text-slate-700">{label}</span>

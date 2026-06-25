@@ -62,11 +62,11 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
     const hasParentInfo = user?.fatherFirstName || user?.motherFirstName || user?.parent || user?.fatherAccount || user?.motherAccount;
 
     return (
-        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 z-30 transition-colors">
+        <header className="h-20 bg-white dark:bg-slate-900   dark: flex items-center justify-between px-8 sticky top-0 z-30 transition-colors">
             <div className="flex items-center gap-4 lg:gap-6 flex-1">
                 <button
                     onClick={onMenuClick}
-                    className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all lg:hidden"
+                    className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400  transition-all lg:hidden"
                     title="Ouvrir le menu"
                 >
                     <Menu size={20} />
@@ -74,7 +74,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
 
                 <Link
                     to="/"
-                    className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all hover:scale-105 active:scale-95"
+                    className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400  transition-all hover:scale-105 active:scale-95"
                     title="Retour à l'accueil"
                 >
                     <Home size={20} />
@@ -82,7 +82,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
 
                 <h2 className="text-xl font-black text-blue-900 dark:text-blue-400 whitespace-nowrap hidden sm:block">{title}</h2>
 
-                <div className="hidden md:flex items-center gap-3 bg-slate-100 dark:bg-slate-800 px-4 py-2.5 rounded-2xl w-full max-w-md group focus-within:ring-2 focus-within:ring-blue-500 transition-all border border-transparent focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-slate-200 dark:focus-within:border-slate-700">
+                <div className="hidden md:flex items-center gap-3 bg-slate-100 dark:bg-slate-800 px-4 py-2.5  w-full max-w-md group focus-within:ring-2 focus-within:ring-blue-500 transition-all   focus-within:bg-white dark:focus-within:bg-slate-900 focus-within: dark:focus-within:">
                     <Search className="text-slate-400 group-focus-within:text-blue-500" size={18} />
                     <input
                         type="text"
@@ -96,7 +96,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                 {/* Theme Toggle */}
                 <button
                     onClick={toggleTheme}
-                    className="p-3 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl transition-all"
+                    className="p-3 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20  transition-all"
                     title={isDark ? "Mode clair" : "Mode sombre"}
                 >
                     {isDark ? <Sun size={20} /> : <Moon size={20} />}
@@ -115,12 +115,12 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                         else if (r === 'eleve') path = '/dashboard/student/messages';
                         navigate(path);
                     }}
-                    className="p-3 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl transition-all relative"
+                    className="p-3 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20  transition-all relative"
                     title="Messagerie"
                 >
                     <Mail size={20} />
                     {unreadMessages > 0 && (
-                        <span className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 bg-blue-600 text-white rounded-full border-2 border-white dark:border-slate-900 text-[10px] font-black flex items-center justify-center shadow-lg">
+                        <span className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 bg-blue-600 text-white    dark: text-[10px] font-black flex items-center justify-center shadow-lg">
                             {unreadMessages > 9 ? '9+' : unreadMessages}
                         </span>
                     )}
@@ -129,7 +129,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                 {/* Help */}
                 <button
                     onClick={() => navigate(ROUTES.SUPPORT)}
-                    className="hidden sm:flex p-3 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl transition-all"
+                    className="hidden sm:flex p-3 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20  transition-all"
                     title="Support & Guide"
                 >
                     <HelpCircle size={20} />
@@ -149,10 +149,10 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                         <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">{role}</p>
                     </div>
                     <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-500/20 group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700  flex items-center justify-center text-white shadow-xl shadow-blue-500/20 group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">
                             <User size={24} />
                         </div>
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500   dark: "></div>
                     </div>
                 </div>
             </div>
@@ -175,7 +175,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                         />
                         <motion.div
                             layoutId="profile-modal"
-                            className="bg-white/95 dark:bg-slate-900/98 backdrop-blur-3xl w-full max-w-2xl max-h-[85vh] rounded-[48px] shadow-2xl overflow-hidden relative border border-white/20 dark:border-slate-800 flex flex-col"
+                            className="bg-white/95 dark:bg-slate-900/98 backdrop-blur-3xl w-full max-w-2xl max-h-[85vh] ] shadow-2xl overflow-hidden relative   dark: flex flex-col"
                             initial={{ scale: 0.98, y: 15, opacity: 0 }}
                             animate={{ scale: 1, y: 0, opacity: 1 }}
                             exit={{ scale: 0.98, y: 15, opacity: 0 }}
@@ -190,19 +190,19 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
 
                                     <button
                                         onClick={() => setIsProfileOpen(false)}
-                                        className="absolute top-8 right-8 p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-2xl transition-all hover:rotate-90 border border-white/10 z-10"
+                                        className="absolute top-8 right-8 p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white  transition-all hover:rotate-90   z-10"
                                     >
                                         <X size={18} />
                                     </button>
 
                                     <div className="absolute -bottom-10 left-12 flex items-end gap-6">
                                         <div className="relative">
-                                            <div className="w-32 h-32 bg-white dark:bg-slate-900 p-2 rounded-[36px] shadow-2xl transition-transform hover:scale-105">
-                                                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 rounded-[28px] flex items-center justify-center text-white shadow-inner">
+                                            <div className="w-32 h-32 bg-white dark:bg-slate-900 p-2 ] shadow-2xl transition-transform hover:scale-105">
+                                                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 ] flex items-center justify-center text-white shadow-inner">
                                                     <User size={56} className="drop-shadow-lg" />
                                                 </div>
                                             </div>
-                                            <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-2 rounded-[18px] border-4 border-white dark:border-slate-900 shadow-xl">
+                                            <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-2 ]   dark: shadow-xl">
                                                 <Check size={18} strokeWidth={4} />
                                             </div>
                                         </div>
@@ -250,7 +250,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.8 }}
-                                            className="bg-slate-50 dark:bg-slate-800/40 rounded-[40px] p-8 border border-slate-100 dark:border-slate-800 space-y-8"
+                                            className="bg-slate-50 dark:bg-slate-800/40 ] p-8   dark: space-y-8"
                                         >
                                             <h4 className="flex items-center gap-3 text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
                                                 <Heart size={18} className="text-rose-500" /> Contacts Responsables Légaux
@@ -260,10 +260,10 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                                                 {/* Father Column */}
                                                 {(user?.fatherFirstName || user?.fatherAccount || (user?.parent && user.parent.firstName)) && (
                                                     <div className="space-y-4">
-                                                        <div className="px-4 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg text-[9px] font-black uppercase tracking-widest inline-block">Père / Tuteur</div>
+                                                        <div className="px-4 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400  text-[9px] font-black uppercase tracking-widest inline-block">Père / Tuteur</div>
                                                         <div className="space-y-3">
                                                             <div className="flex gap-3">
-                                                                <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><User size={14} /></div>
+                                                                <div className="w-8 h-8  bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><User size={14} /></div>
                                                                 <div>
                                                                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Nom</p>
                                                                     <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
@@ -272,7 +272,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                                                                 </div>
                                                             </div>
                                                             <div className="flex gap-3">
-                                                                <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><Phone size={14} /></div>
+                                                                <div className="w-8 h-8  bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><Phone size={14} /></div>
                                                                 <div>
                                                                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Téléphone</p>
                                                                     <p className="text-xs font-bold text-slate-700 dark:text-slate-300">{user.fatherPhone || user.fatherAccount?.phone || user.parent?.phone || 'N/A'}</p>
@@ -284,11 +284,11 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
 
                                                 {/* Mother Column */}
                                                 {(user?.motherFirstName || user?.motherAccount) && (
-                                                    <div className="space-y-4 border-l border-slate-200 dark:border-slate-700 md:pl-8">
-                                                        <div className="px-4 py-1.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-lg text-[9px] font-black uppercase tracking-widest inline-block">Mère / Tutrice</div>
+                                                    <div className="space-y-4   dark: md:pl-8">
+                                                        <div className="px-4 py-1.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400  text-[9px] font-black uppercase tracking-widest inline-block">Mère / Tutrice</div>
                                                         <div className="space-y-3">
                                                             <div className="flex gap-3">
-                                                                <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><User size={14} /></div>
+                                                                <div className="w-8 h-8  bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><User size={14} /></div>
                                                                 <div>
                                                                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Nom</p>
                                                                     <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
@@ -297,7 +297,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                                                                 </div>
                                                             </div>
                                                             <div className="flex gap-3">
-                                                                <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><Phone size={14} /></div>
+                                                                <div className="w-8 h-8  bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><Phone size={14} /></div>
                                                                 <div>
                                                                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Téléphone</p>
                                                                     <p className="text-xs font-bold text-slate-700 dark:text-slate-300">{user.motherPhone || user.motherAccount?.phone || 'N/A'}</p>
@@ -313,7 +313,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                             </div>
 
                             {/* Footer Sticky Buttons (Removed any finance links) */}
-                            <div className="p-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-5 px-12 group/footer">
+                            <div className="p-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl   dark: flex items-center justify-between gap-5 px-12 group/footer">
                                 <motion.button
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
@@ -321,7 +321,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                                         setIsProfileOpen(false);
                                         navigate(ROUTES.PROFILE);
                                     }}
-                                    className="flex-1 py-4.5 bg-slate-900 dark:bg-indigo-600 text-white rounded-[24px] font-black shadow-xl shadow-indigo-600/10 hover:shadow-indigo-600/30 transition-all text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 border border-white/5"
+                                    className="flex-1 py-4.5 bg-slate-900 dark:bg-indigo-600 text-white ] font-black shadow-xl shadow-indigo-600/10 hover:shadow-indigo-600/30 transition-all text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3  "
                                 >
                                     Mon Compte <User size={14} />
                                 </motion.button>
@@ -333,7 +333,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                                         setIsProfileOpen(false);
                                         logout();
                                     }}
-                                    className="px-8 py-4.5 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-[22px] font-black hover:bg-red-600 hover:text-white transition-all text-[10px] uppercase tracking-widest border border-red-100 dark:border-red-900/20"
+                                    className="px-8 py-4.5 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 ] font-black hover:bg-red-600 hover:text-white transition-all text-[10px] uppercase tracking-widest   dark:"
                                 >
                                     <LogOut size={18} />
                                 </motion.button>
@@ -347,7 +347,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                 {`
                     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
                     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; -radius: 10px; }
                     .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; }
                 `}
             </style>
@@ -357,11 +357,11 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
 
 const ProfileInfoCard = ({ icon: Icon, label, value, color, delay }: { icon: any, label: string, value: string, color: string, delay: number }) => {
     const colors: Record<string, string> = {
-        blue: 'text-blue-500 bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800/30',
-        indigo: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-800/30',
-        purple: 'text-purple-500 bg-purple-50 dark:bg-purple-900/20 border-purple-100 dark:border-purple-800/30',
-        emerald: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/30',
-        amber: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-800/30',
+        blue: 'text-blue-500 bg-blue-50 dark:bg-blue-900/20  dark:',
+        indigo: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20  dark:',
+        purple: 'text-purple-500 bg-purple-50 dark:bg-purple-900/20  dark:',
+        emerald: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20  dark:',
+        amber: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20  dark:',
     };
 
     return (
@@ -369,9 +369,9 @@ const ProfileInfoCard = ({ icon: Icon, label, value, color, delay }: { icon: any
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay, duration: 0.4 }}
-            className="p-5 bg-white dark:bg-slate-900/40 rounded-[24px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all"
+            className="p-5 bg-white dark:bg-slate-900/40 ]   dark: shadow-sm transition-all"
         >
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${colors[color]}`}>
+            <div className={`w-10 h-10  flex items-center justify-center mb-3 ${colors[color]}`}>
                 <Icon size={16} />
             </div>
             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">{label}</p>
@@ -390,9 +390,9 @@ const ShortcutButton = ({ icon: Icon, label, sub, color, onClick }: { icon: any,
     return (
         <button
             onClick={onClick}
-            className="flex-1 flex items-center gap-4 p-4 bg-white dark:bg-slate-900/30 rounded-[24px] border border-slate-50 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group/btn"
+            className="flex-1 flex items-center gap-4 p-4 bg-white dark:bg-slate-900/30 ]   dark: hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group/btn"
         >
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconColors[color]}`}>
+            <div className={`w-10 h-10  flex items-center justify-center shrink-0 ${iconColors[color]}`}>
                 <Icon size={16} />
             </div>
             <div className="text-left">

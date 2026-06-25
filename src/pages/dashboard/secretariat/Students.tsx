@@ -23,7 +23,7 @@ const Students: React.FC = () => {
                     <p className="text-slate-500 text-sm">Organisez et gérez les informations des étudiants.</p>
                 </div>
                 <div className="flex gap-4">
-                    <button className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+                    <button className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
                         <Printer size={18} /> Impression de masse
                     </button>
                 </div>
@@ -42,17 +42,17 @@ const Students: React.FC = () => {
 };
 
 const MatrixItem = ({ label, value, color, trend }: { label: string, value: string, color: string, trend: string }) => (
-    <div className="bg-white p-6 rounded-[32px] shadow-lg border border-slate-100 group transition-all duration-300 hover:bg-slate-50/50">
+    <div className="bg-white p-6 ] shadow-lg   group transition-all duration-300 hover:bg-slate-50/50">
         <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">{label}</p>
         <div className="flex items-center justify-between">
             <h4 className="text-2xl font-black text-slate-800 tracking-tight">{value}</h4>
-            <div className={`px-2 py-0.5 rounded-lg text-[10px] font-black 
+            <div className={`px-2 py-0.5  text-[10px] font-black 
                 ${trend.startsWith('+') ? 'text-emerald-600 bg-emerald-50' : 'text-slate-400 bg-slate-50'}`}>
                 {trend}
             </div>
         </div>
-        <div className="mt-4 h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
-            <div className={`h-full ${color} rounded-full`} style={{ width: '65%' }}></div>
+        <div className="mt-4 h-1.5 w-full bg-slate-50  overflow-hidden">
+            <div className={`h-full ${color} `} style={{ width: '65%' }}></div>
         </div>
     </div>
 );

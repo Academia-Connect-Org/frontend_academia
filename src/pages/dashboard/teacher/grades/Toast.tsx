@@ -27,9 +27,9 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
                     initial={{ opacity: 0, y: 50, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                    className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 rounded-3xl shadow-2xl flex items-center gap-3 border backdrop-blur-md ${toast.type === 'success'
-                        ? 'bg-emerald-500/90 border-emerald-400 text-white'
-                        : 'bg-rose-500/90 border-rose-400 text-white'
+                    className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] px-6 py-4  shadow-2xl flex items-center gap-3  backdrop-blur-md ${toast.type === 'success'
+                        ? 'bg-emerald-500/90  text-white'
+                        : 'bg-rose-500/90  text-white'
                         }`}
                 >
                     {toast.type === 'success' ? <CheckCircle2 size={20} /> : <X size={20} />}

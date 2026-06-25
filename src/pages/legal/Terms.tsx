@@ -15,9 +15,9 @@ const Terms: React.FC = () => {
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-[48px] p-12 md:p-20 shadow-2xl shadow-slate-200 border border-slate-100"
+                    className="bg-white ] p-12 md:p-20 shadow-2xl shadow-slate-200  "
                 >
-                    <div className="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center mb-10">
+                    <div className="w-20 h-20 bg-indigo-50 text-indigo-600  flex items-center justify-center mb-10">
                         <Scale size={40} />
                     </div>
 

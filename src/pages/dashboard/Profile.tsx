@@ -173,12 +173,12 @@ const Profile: React.FC = () => {
     return (
         <div className="max-w-4xl mx-auto">
             {/* Header Card */}
-            <div className="bg-white dark:bg-slate-900 rounded-[40px] p-8 md:p-12 shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 mb-10 flex flex-col md:flex-row items-center gap-10">
+            <div className="bg-white dark:bg-slate-900 ] p-8 md:p-12 shadow-xl shadow-slate-200/40 dark:shadow-none   dark: mb-10 flex flex-col md:flex-row items-center gap-10">
                 <div className="relative group">
-                    <div className="w-32 h-32 rounded-[32px] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-32 h-32 ] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-2xl group-hover:scale-105 transition-transform duration-300">
                         <UserIcon size={56} />
                     </div>
-                    <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2 rounded-xl border-4 border-white dark:border-slate-900 shadow-lg">
+                    <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2    dark: shadow-lg">
                         <CheckCircle2 size={20} />
                     </div>
                 </div>
@@ -188,7 +188,7 @@ const Profile: React.FC = () => {
                         <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
                             {profileForm.firstName} {profileForm.lastName}
                         </h2>
-                        <span className="px-4 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-[10px] font-black uppercase tracking-widest self-center md:self-auto">
+                        <span className="px-4 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400  text-[10px] font-black uppercase tracking-widest self-center md:self-auto">
                             {user?.role}
                         </span>
                     </div>
@@ -208,10 +208,10 @@ const Profile: React.FC = () => {
             </div>
 
             {/* Tabs */}
-            <div className="flex flex-wrap gap-2 mb-10 bg-slate-100 dark:bg-slate-800/50 p-2 rounded-[24px] w-fit">
+            <div className="flex flex-wrap gap-2 mb-10 bg-slate-100 dark:bg-slate-800/50 p-2 ] w-fit">
                 <button
                     onClick={() => setActiveTab('info')}
-                    className={`flex items-center gap-3 px-8 py-3.5 rounded-[20px] font-black transition-all ${activeTab === 'info'
+                    className={`flex items-center gap-3 px-8 py-3.5 ] font-black transition-all ${activeTab === 'info'
                         ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-md scale-105'
                         : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                         }`}
@@ -221,7 +221,7 @@ const Profile: React.FC = () => {
                 </button>
                 <button
                     onClick={() => setActiveTab('security')}
-                    className={`flex items-center gap-3 px-8 py-3.5 rounded-[20px] font-black transition-all ${activeTab === 'security'
+                    className={`flex items-center gap-3 px-8 py-3.5 ] font-black transition-all ${activeTab === 'security'
                         ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-md scale-105'
                         : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                         }`}
@@ -231,7 +231,7 @@ const Profile: React.FC = () => {
                 </button>
                 <button
                     onClick={() => setActiveTab('danger')}
-                    className={`flex items-center gap-3 px-8 py-3.5 rounded-[20px] font-black transition-all ${activeTab === 'danger'
+                    className={`flex items-center gap-3 px-8 py-3.5 ] font-black transition-all ${activeTab === 'danger'
                         ? 'bg-white dark:bg-slate-700 text-red-600 dark:text-red-400 shadow-md scale-105'
                         : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                         }`}
@@ -248,14 +248,14 @@ const Profile: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className={`mb-8 p-6 rounded-[24px] flex items-center gap-4 border-2 ${message.type === 'success'
-                            ? 'bg-emerald-50 border-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-900/30 dark:text-emerald-400'
-                            : 'bg-red-50 border-red-100 text-red-700 dark:bg-red-900/20 dark:border-red-900/30 dark:text-red-400'
+                        className={`mb-8 p-6 ] flex items-center gap-4  ${message.type === 'success'
+                            ? 'bg-emerald-50  text-emerald-700 dark:bg-emerald-900/20 dark: dark:text-emerald-400'
+                            : 'bg-red-50  text-red-700 dark:bg-red-900/20 dark: dark:text-red-400'
                             }`}
                     >
                         {message.type === 'success' ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
                         <p className="font-bold flex-1">{message.text}</p>
-                        <button onClick={() => setMessage(null)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl">
+                        <button onClick={() => setMessage(null)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 ">
                             <Save size={18} className="rotate-45" />
                         </button>
                     </motion.div>
@@ -263,11 +263,11 @@ const Profile: React.FC = () => {
             </AnimatePresence>
 
             {/* Form Sections */}
-            <div className="bg-white dark:bg-slate-900 rounded-[40px] p-8 md:p-12 shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800">
+            <div className="bg-white dark:bg-slate-900 ] p-8 md:p-12 shadow-xl shadow-slate-200/40 dark:shadow-none   dark:">
                 {activeTab === 'info' && (
                     <form onSubmit={handleUpdateProfile} className="space-y-8">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600">
+                            <div className="w-10 h-10  bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600">
                                 <Info size={22} />
                             </div>
                             <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Détails Personnels</h3>
@@ -283,7 +283,7 @@ const Profile: React.FC = () => {
                                         type="text"
                                         value={profileForm.firstName}
                                         onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-[20px] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
                                     />
                                 </div>
                             </div>
@@ -296,7 +296,7 @@ const Profile: React.FC = () => {
                                         type="text"
                                         value={profileForm.lastName}
                                         onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-[20px] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
                                     />
                                 </div>
                             </div>
@@ -309,7 +309,7 @@ const Profile: React.FC = () => {
                                         type="email"
                                         value={profileForm.email}
                                         onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-[20px] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
                                     />
                                 </div>
                             </div>
@@ -321,7 +321,7 @@ const Profile: React.FC = () => {
                                         type="text"
                                         value={profileForm.phone}
                                         onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-[20px] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
                                     />
                                 </div>
                             </div>
@@ -333,7 +333,7 @@ const Profile: React.FC = () => {
                                         type="text"
                                         value={profileForm.address}
                                         onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-[20px] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
                                     />
                                 </div>
                             </div>
@@ -342,7 +342,7 @@ const Profile: React.FC = () => {
                                 <select
                                     value={profileForm.gender}
                                     onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
-                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-[20px] px-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200 appearance-none"
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] px-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200 appearance-none"
                                 >
                                     <option value="">Non défini</option>
                                     <option value="MALE">Masculin</option>
@@ -355,7 +355,7 @@ const Profile: React.FC = () => {
                             <button
                                 disabled={updating}
                                 type="submit"
-                                className="bg-indigo-600 text-white px-10 py-4 rounded-[24px] font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-600/20 disabled:opacity-50"
+                                className="bg-indigo-600 text-white px-10 py-4 ] font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-600/20 disabled:opacity-50"
                             >
                                 {updating ? <Loader2 className="animate-spin" /> : <Save size={22} />}
                                 Mettre à jour le profil
@@ -367,7 +367,7 @@ const Profile: React.FC = () => {
                 {activeTab === 'security' && (
                     <form onSubmit={handleChangePassword} className="space-y-8">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-600">
+                            <div className="w-10 h-10  bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-600">
                                 <Lock size={22} />
                             </div>
                             <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Changer le Mot de Passe</h3>
@@ -383,7 +383,7 @@ const Profile: React.FC = () => {
                                         type={showCurrentPassword ? "text" : "password"}
                                         value={passwordForm.currentPassword}
                                         onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-[20px] pl-14 pr-14 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-14 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
                                     />
                                     <button
                                         type="button"
@@ -403,7 +403,7 @@ const Profile: React.FC = () => {
                                         type={showNewPassword ? "text" : "password"}
                                         value={passwordForm.newPassword}
                                         onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-[20px] pl-14 pr-14 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-14 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
                                     />
                                     <button
                                         type="button"
@@ -426,7 +426,7 @@ const Profile: React.FC = () => {
                                         type={showConfirmPassword ? "text" : "password"}
                                         value={passwordForm.confirmPassword}
                                         onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-[20px] pl-14 pr-14 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-14 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
                                     />
                                     <button
                                         type="button"
@@ -443,7 +443,7 @@ const Profile: React.FC = () => {
                             <button
                                 disabled={updating}
                                 type="submit"
-                                className="bg-indigo-600 text-white px-10 py-4 rounded-[24px] font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-600/20 disabled:opacity-50"
+                                className="bg-indigo-600 text-white px-10 py-4 ] font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-600/20 disabled:opacity-50"
                             >
                                 {updating ? <Loader2 className="animate-spin" /> : <Save size={22} />}
                                 Mettre à jour le mot de passe
@@ -455,13 +455,13 @@ const Profile: React.FC = () => {
                 {activeTab === 'danger' && (
                     <div className="space-y-8">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center text-red-600">
+                            <div className="w-10 h-10  bg-red-50 dark:bg-red-900/30 flex items-center justify-center text-red-600">
                                 <Trash2 size={22} />
                             </div>
                             <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Zone de Danger</h3>
                         </div>
 
-                        <div className="bg-red-50 dark:bg-red-950/20 border-2 border-red-100 dark:border-red-900/30 p-8 rounded-[32px]">
+                        <div className="bg-red-50 dark:bg-red-950/20   dark: p-8 ]">
                             <h4 className="text-red-800 dark:text-red-400 font-black text-lg mb-4 uppercase tracking-tight">Supprimer définitivement le compte</h4>
                             <p className="text-red-600 dark:text-red-400/70 font-medium mb-8 leading-relaxed">
                                 En supprimant votre compte, vous perdrez l'accès à toutes vos données, y compris vos messages, vos préférences et vos informations liées à NB-MIND School. <br />
@@ -471,7 +471,7 @@ const Profile: React.FC = () => {
                             <button
                                 onClick={() => setShowDeleteModal(true)}
                                 disabled={updating}
-                                className="bg-red-600 hover:bg-red-700 text-white px-10 py-4 rounded-[24px] font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-red-600/20 disabled:opacity-50"
+                                className="bg-red-600 hover:bg-red-700 text-white px-10 py-4 ] font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-red-600/20 disabled:opacity-50"
                             >
                                 <Trash2 size={22} />
                                 Supprimer mon compte
@@ -489,9 +489,9 @@ const Profile: React.FC = () => {
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[40px] p-10 shadow-2xl text-center border dark:border-slate-800"
+                            className="bg-white dark:bg-slate-900 w-full max-w-md ] p-10 shadow-2xl text-center  dark:"
                         >
-                            <div className="w-20 h-20 bg-red-50 dark:bg-red-900/30 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <div className="w-20 h-20 bg-red-50 dark:bg-red-900/30 text-red-500  flex items-center justify-center mx-auto mb-6">
                                 <Trash2 size={40} />
                             </div>
                             <h3 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight mb-2 uppercase">Supprimer le compte ?</h3>
@@ -502,14 +502,14 @@ const Profile: React.FC = () => {
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <button
                                     onClick={() => setShowDeleteModal(false)}
-                                    className="flex-1 py-4 rounded-[20px] font-black bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all uppercase tracking-widest text-xs"
+                                    className="flex-1 py-4 ] font-black bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all uppercase tracking-widest text-xs"
                                     disabled={updating}
                                 >
                                     Annuler
                                 </button>
                                 <button
                                     onClick={handleDeleteAccount}
-                                    className="flex-1 py-4 rounded-[20px] font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:bg-red-600 transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
+                                    className="flex-1 py-4 ] font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:bg-red-600 transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
                                     disabled={updating}
                                 >
                                     {updating ? (

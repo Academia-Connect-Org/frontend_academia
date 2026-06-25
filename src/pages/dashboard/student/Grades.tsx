@@ -84,13 +84,13 @@ const StudentGrades: React.FC = () => {
                     <select
                         value={selectedYear}
                         onChange={e => setSelectedYear(e.target.value)}
-                        className="bg-white border border-slate-200 px-6 py-3.5 rounded-3xl font-bold text-slate-600 outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm"
+                        className="bg-white   px-6 py-3.5  font-bold text-slate-600 outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm"
                     >
                         {years.map(y => <option key={y} value={y}>{y}</option>)}
                     </select>
                     <button
                         onClick={() => setIsBulletinOpen(true)}
-                        className="bg-slate-900 text-white px-8 py-3.5 rounded-3xl font-black flex items-center gap-3 shadow-xl hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all outline-none"
+                        className="bg-slate-900 text-white px-8 py-3.5  font-black flex items-center gap-3 shadow-xl hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all outline-none"
                     >
                         <Download size={18} /> Voir Bulletin Complet
                     </button>
@@ -99,7 +99,7 @@ const StudentGrades: React.FC = () => {
 
             {/* Quick Filters */}
             <div className="flex flex-wrap gap-4 mb-10 no-print">
-                <div className="flex items-center gap-2 bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100">
+                <div className="flex items-center gap-2 bg-white px-6 py-3  shadow-sm  ">
                     <span className="text-[10px] font-black uppercase text-slate-400">Trimestre:</span>
                     <select value={selectedTrimestre} onChange={e => setSelectedTrimestre(e.target.value)} className="text-xs font-bold text-slate-600 bg-transparent border-none outline-none">
                         <option value="Tous">Tous</option>
@@ -108,7 +108,7 @@ const StudentGrades: React.FC = () => {
                         <option value="3ème Trimestre">3ème</option>
                     </select>
                 </div>
-                <div className="flex items-center gap-2 bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100">
+                <div className="flex items-center gap-2 bg-white px-6 py-3  shadow-sm  ">
                     <span className="text-[10px] font-black uppercase text-slate-400">Matière:</span>
                     <select value={selectedSubject} onChange={e => setSelectedSubject(e.target.value)} className="text-xs font-bold text-slate-600 bg-transparent border-none outline-none">
                         <option value="Tous">Toutes</option>
@@ -122,7 +122,7 @@ const StudentGrades: React.FC = () => {
                         placeholder="Rechercher une évaluation ou un sujet..."
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        className="w-full bg-white border border-slate-100 rounded-3xl pl-16 pr-6 py-4 text-sm font-bold shadow-sm focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                        className="w-full bg-white    pl-16 pr-6 py-4 text-sm font-bold shadow-sm focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
                     />
                 </div>
             </div>
@@ -135,8 +135,8 @@ const StudentGrades: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 {/* Notes Table */}
-                <div className="lg:col-span-2 bg-white rounded-[48px] shadow-2xl border border-blue-50 overflow-hidden print-full">
-                    <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-gradient-to-r from-slate-50 to-transparent">
+                <div className="lg:col-span-2 bg-white ] shadow-2xl   overflow-hidden print-full">
+                    <div className="p-8   flex justify-between items-center bg-gradient-to-r from-slate-50 to-transparent">
                         <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Dernières Évaluations Publiées</h3>
                         <Award size={24} className="text-blue-600" />
                     </div>
@@ -144,12 +144,12 @@ const StudentGrades: React.FC = () => {
                     <div className="p-4 overflow-x-auto min-h-[400px]">
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-20 gap-4">
-                                <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                <div className="w-12 h-12     animate-spin"></div>
                                 <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Chargement des résultats...</p>
                             </div>
                         ) : filteredGrades.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-20 text-center">
-                                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6 text-slate-200">
+                                <div className="w-20 h-20 bg-slate-50  flex items-center justify-center mb-6 text-slate-200">
                                     <AlertCircle size={40} />
                                 </div>
                                 <h4 className="text-slate-800 font-black uppercase mb-2">Aucun résultat trouvé</h4>
@@ -158,7 +158,7 @@ const StudentGrades: React.FC = () => {
                         ) : (
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-50">
+                                    <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400  ">
                                         <th className="px-8 py-6">Matière & Devoir</th>
                                         <th className="px-8 py-6">Date</th>
                                         <th className="px-8 py-6 text-center">Note / {filteredGrades[0]?.homework?.maxPoints}</th>
@@ -170,7 +170,7 @@ const StudentGrades: React.FC = () => {
                                         <tr key={row.id} className="hover:bg-blue-50/30 group transition-all">
                                             <td className="px-8 py-7">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-2xl bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center font-black text-sm text-blue-600 group-hover:scale-110 transition-transform">
+                                                    <div className="w-12 h-12  bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center font-black text-sm text-blue-600 group-hover:scale-110 transition-transform">
                                                         {(row.homework?.subject?.name || '??').substring(0, 2).toUpperCase()}
                                                     </div>
                                                     <div>
@@ -210,8 +210,8 @@ const StudentGrades: React.FC = () => {
 
                 {/* Info Sidebar */}
                 <div className="space-y-8 no-print">
-                    <div className="bg-slate-900 p-10 rounded-[48px] text-white shadow-3xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-48 h-48 bg-blue-600/20 rounded-full blur-[80px] group-hover:bg-blue-600/30 transition-all duration-500"></div>
+                    <div className="bg-slate-900 p-10 ] text-white shadow-3xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-blue-600/20  blur-[80px] group-hover:bg-blue-600/30 transition-all duration-500"></div>
                         <h3 className="text-xl font-black mb-10 relative z-10 flex items-center gap-3 uppercase tracking-tight italic">
                             <TrendingUp size={24} className="text-blue-400" /> Progression
                         </h3>
@@ -236,15 +236,15 @@ const StudentGrades: React.FC = () => {
 
 // Sub-components
 const MatrixItem = ({ label, value, trend, icon: Icon, color }: { label: string, value: string, trend: string, icon: any, color: string }) => (
-    <div className="group bg-white p-10 rounded-[56px] shadow-2xl border border-slate-50 transition-all duration-300 hover:-translate-y-2 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-700 opacity-50"></div>
-        <div className={`w-16 h-16 ${color} text-white rounded-3xl flex items-center justify-center mb-8 relative z-10 shadow-xl shadow-slate-900/10 group-hover:rotate-12 transition-transform duration-500`}>
+    <div className="group bg-white p-10 ] shadow-2xl   transition-all duration-300 hover:-translate-y-2 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50  -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-700 opacity-50"></div>
+        <div className={`w-16 h-16 ${color} text-white  flex items-center justify-center mb-8 relative z-10 shadow-xl shadow-slate-900/10 group-hover:rotate-12 transition-transform duration-500`}>
             <Icon size={30} />
         </div>
         <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2 relative z-10">{label}</p>
         <div className="flex items-end justify-between relative z-10">
             <h4 className="text-4xl font-black text-slate-800 tracking-tighter leading-none">{value}</h4>
-            <span className="px-3 py-1.5 bg-slate-50 text-slate-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-100 italic">
+            <span className="px-3 py-1.5 bg-slate-50 text-slate-400  text-[10px] font-black uppercase tracking-widest   italic">
                 {trend}
             </span>
         </div>
@@ -257,8 +257,8 @@ const SubjectBar = ({ label, value, max, color }: { label: string, value: number
             <span className="text-[11px] font-black text-blue-200 uppercase tracking-widest italic">{label}</span>
             <span className="font-black text-sm text-white">{value.toFixed(1)}<span className="text-blue-400 text-[10px] ml-0.5">/{max}</span></span>
         </div>
-        <div className="h-2.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-0.5 shadow-inner">
-            <div className={`h-full ${color} rounded-full shadow-lg transition-all duration-1000 ease-out`} style={{ width: `${(value / max) * 100}%` }}></div>
+        <div className="h-2.5 w-full bg-white/5  overflow-hidden   p-0.5 shadow-inner">
+            <div className={`h-full ${color}  shadow-lg transition-all duration-1000 ease-out`} style={{ width: `${(value / max) * 100}%` }}></div>
         </div>
     </div>
 );

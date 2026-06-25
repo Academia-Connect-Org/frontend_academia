@@ -287,7 +287,14 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
 
     const fetchAnnouncements = async () => {
         try {
-            const res = await api.get('announcements');
+            const params = new URLSearchParams();
+            if (role === 'PDG' && user?.id) {
+                params.append('ceoId', user.id.toString());
+            } else if (user?.institution?.id) {
+                params.append('institutionId', user.institution.id.toString());
+            }
+            const qs = params.toString() ? `?${params.toString()}` : '';
+            const res = await api.get(`announcements${qs}`);
             setAnnouncements(res.data);
         } catch (err) {
             console.error(err);
@@ -583,7 +590,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
 
     return (
         <>
-            <div className="bg-slate-100/50 rounded-[40px] shadow-2l flex h-[calc(100vh-140px)] overflow-hidden border border-white">
+            <div className="bg-slate-100/50 ] shadow-2l flex h-[calc(100vh-140px)] overflow-hidden  ">
 
                 {/* Notification Popup */}
                 <AnimatePresence>
@@ -594,11 +601,11 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                             exit={{ opacity: 0, y: -100 }}
                             className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] min-w-[320px]"
                         >
-                            <div className={`px-6 py-4 rounded-3xl shadow-2xl border backdrop-blur-md flex items-center gap-4 ${notification.type === 'error' ? 'bg-red-50/90 border-red-200 text-red-600' :
-                                notification.type === 'success' ? 'bg-emerald-50/90 border-emerald-200 text-emerald-600' :
-                                    'bg-blue-50/90 border-blue-200 text-blue-600'
+                            <div className={`px-6 py-4  shadow-2xl  backdrop-blur-md flex items-center gap-4 ${notification.type === 'error' ? 'bg-red-50/90  text-red-600' :
+                                notification.type === 'success' ? 'bg-emerald-50/90  text-emerald-600' :
+                                    'bg-blue-50/90  text-blue-600'
                                 }`}>
-                                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${notification.type === 'error' ? 'bg-red-600 text-white' :
+                                <div className={`w-10 h-10  flex items-center justify-center shrink-0 ${notification.type === 'error' ? 'bg-red-600 text-white' :
                                     notification.type === 'success' ? 'bg-emerald-600 text-white' :
                                         'bg-blue-600 text-white'
                                     }`}>
@@ -608,7 +615,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                     <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-0.5">{notification.type}</p>
                                     <p className="text-sm font-bold leading-tight">{notification.message}</p>
                                 </div>
-                                <button onClick={() => setNotification(null)} className="p-2 hover:bg-black/5 rounded-full transition-all">
+                                <button onClick={() => setNotification(null)} className="p-2 hover:bg-black/5  transition-all">
                                     <X size={16} />
                                 </button>
                             </div>
@@ -617,40 +624,40 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                 </AnimatePresence>
 
                 {/* Sidebar */}
-                <div className={`w-full md:w-80 lg:w-96 flex flex-col bg-white border-r border-slate-200 shadow-sm z-10 ${selectedRoom ? 'hidden md:flex' : 'flex'}`}>
+                <div className={`w-full md:w-80 lg:w-96 flex flex-col bg-white   shadow-sm z-10 ${selectedRoom ? 'hidden md:flex' : 'flex'}`}>
 
                     {/* Sidebar Header */}
                     <div className="p-6 bg-white/80 backdrop-blur-md sticky top-0 z-20">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
                                 Messagerie
-                                {activeTab === 'communities' && <span className="bg-blue-100 text-blue-600 text-[10px] px-2 py-1 rounded-full uppercase">Communautés</span>}
+                                {activeTab === 'communities' && <span className="bg-blue-100 text-blue-600 text-[10px] px-2 py-1  uppercase">Communautés</span>}
                             </h3>
                             <button
                                 onClick={() => setShowCreateGroup(true)}
-                                className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-xl shadow-slate-900/20"
+                                className="w-10 h-10  bg-slate-900 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-xl shadow-slate-900/20"
                             >
                                 <Plus size={20} />
                             </button>
                         </div>
 
                         {/* Tabs */}
-                        <div className="flex bg-slate-100 p-1.5 rounded-2xl mb-6">
+                        <div className="flex bg-slate-100 p-1.5  mb-6">
                             <button
                                 onClick={() => setActiveTab('chats')}
-                                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black transition-all ${activeTab === 'chats' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                className={`flex-1 flex items-center justify-center gap-2 py-2.5  text-xs font-black transition-all ${activeTab === 'chats' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 <MessageCircle size={16} /> Discussions
                             </button>
                             <button
                                 onClick={() => setActiveTab('communities')}
-                                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black transition-all ${activeTab === 'communities' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                className={`flex-1 flex items-center justify-center gap-2 py-2.5  text-xs font-black transition-all ${activeTab === 'communities' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 <Users size={16} /> Communautés
                             </button>
                             <button
                                 onClick={() => setActiveTab('announcements')}
-                                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black transition-all ${activeTab === 'announcements' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                className={`flex-1 flex items-center justify-center gap-2 py-2.5  text-xs font-black transition-all ${activeTab === 'announcements' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 <Megaphone size={16} /> Annonces
                             </button>
@@ -666,7 +673,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                     value={searchQuery}
                                     onChange={(e) => isSearching ? handleSearchUsers(e.target.value) : setSearchQuery(e.target.value)}
                                     onFocus={() => setIsSearching(true)}
-                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:bg-white focus:border-blue-500 transition-all outline-none"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-50    text-sm focus:ring-2 focus:ring-blue-500/20 focus:bg-white focus: transition-all outline-none"
                                 />
                                 {isSearching && (
                                     <button
@@ -690,10 +697,10 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                         {roomSearchResults.map(room => (
                                             <div
                                                 key={room.id}
-                                                className="p-4 rounded-[28px] hover:bg-slate-50 flex gap-4 items-center justify-between transition-all border border-transparent hover:border-slate-100 group"
+                                                className="p-4 ] hover:bg-slate-50 flex gap-4 items-center justify-between transition-all   hover: group"
                                             >
                                                 <div className="flex gap-4 items-center flex-1">
-                                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black ${room.type === 'COMMUNITY' ? 'bg-amber-100 text-amber-600' : 'bg-purple-100 text-purple-600'}`}>
+                                                    <div className={`w-12 h-12  flex items-center justify-center font-black ${room.type === 'COMMUNITY' ? 'bg-amber-100 text-amber-600' : 'bg-purple-100 text-purple-600'}`}>
                                                         {(room.name || "G")[0]}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
@@ -714,7 +721,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                             showNotify("Action impossible.", "error");
                                                         }
                                                     }}
-                                                    className="px-4 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all opacity-0 group-hover:opacity-100 whitespace-nowrap"
+                                                    className="px-4 py-2 bg-blue-600 text-white  text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all opacity-0 group-hover:opacity-100 whitespace-nowrap"
                                                 >
                                                     Rejoindre
                                                 </button>
@@ -730,9 +737,9 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                             <div
                                                 key={u.id}
                                                 onClick={() => startPrivateChat(u)}
-                                                className="p-3 rounded-[24px] hover:bg-slate-50 cursor-pointer flex gap-3 items-center transition-all border border-transparent hover:border-slate-100"
+                                                className="p-3 ] hover:bg-slate-50 cursor-pointer flex gap-3 items-center transition-all   hover:"
                                             >
-                                                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-xs">
+                                                <div className="w-10 h-10  bg-blue-50 text-blue-600 flex items-center justify-center font-black text-xs">
                                                     {u.firstName[0]}{u.lastName[0]}
                                                 </div>
                                                 <div>
@@ -751,10 +758,10 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                         key={ann.id}
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        className="p-5 rounded-[32px] bg-amber-50/50 border border-amber-100 hover:bg-amber-50 transition-all"
+                                        className="p-5 ] bg-amber-50/50   hover:bg-amber-50 transition-all"
                                     >
                                         <div className="flex items-center gap-2 mb-2">
-                                            <div className="w-6 h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center">
+                                            <div className="w-6 h-6  bg-amber-500 text-white flex items-center justify-center">
                                                 <Megaphone size={12} fill="currentColor" />
                                             </div>
                                             <h4 className="font-black text-slate-900 text-sm line-clamp-1">{ann.title}</h4>
@@ -773,13 +780,13 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                     <div
                                         key={room.id}
                                         onClick={() => setSelectedRoom(room)}
-                                        className={`p-3 rounded-[24px] cursor-pointer transition-all duration-300 flex gap-3 items-center group relative ${selectedRoom?.id === room.id ? 'bg-white shadow-xl shadow-slate-200/40 border border-slate-100' : 'hover:bg-slate-50'}`}
+                                        className={`p-3 ] cursor-pointer transition-all duration-300 flex gap-3 items-center group relative ${selectedRoom?.id === room.id ? 'bg-white shadow-xl shadow-slate-200/40  ' : 'hover:bg-slate-50'}`}
                                     >
                                         <div className="relative">
-                                            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center overflow-hidden font-black text-base ${room.type === 'COMMUNITY' ? 'bg-amber-100 text-amber-600' : room.type === 'GROUP' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
+                                            <div className={`w-11 h-11  flex items-center justify-center overflow-hidden font-black text-base ${room.type === 'COMMUNITY' ? 'bg-amber-100 text-amber-600' : room.type === 'GROUP' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
                                                 {room.imageUrl ? <img src={room.imageUrl} alt="" className="w-full h-full object-cover" /> : (room.name ? room.name[0] : '?')}
                                             </div>
-                                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></div>
+                                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500   "></div>
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-center mb-0.5">
@@ -792,13 +799,13 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                     Dernier message ici...
                                                 </p>
                                                 {room.unreadCount ? (
-                                                    <span className="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 shadow-sm ml-2">
+                                                    <span className="w-5 h-5 bg-red-500 text-white  flex items-center justify-center text-[10px] font-bold shrink-0 shadow-sm ml-2">
                                                         {room.unreadCount > 99 ? '99+' : room.unreadCount}
                                                     </span>
                                                 ) : null}
                                             </div>
                                         </div>
-                                        {selectedRoom?.id === room.id && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-blue-600 rounded-r-full shadow-[4px_0_15px_rgba(37,99,235,0.4)]"></div>}
+                                        {selectedRoom?.id === room.id && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-blue-600  shadow-[4px_0_15px_rgba(37,99,235,0.4)]"></div>}
                                     </div>
                                 ))}
                             </div>
@@ -811,22 +818,22 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                     {selectedRoom ? (
                         <>
                             {/* Chat Header */}
-                            <div className="p-3 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between">
+                            <div className="p-3   bg-white/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <button
                                         onClick={() => setSelectedRoom(null)}
-                                        className="p-2 hover:bg-slate-100 rounded-full md:hidden text-slate-500"
+                                        className="p-2 hover:bg-slate-100  md:hidden text-slate-500"
                                     >
                                         <ArrowLeft size={20} />
                                     </button>
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-base ${selectedRoom.type === 'COMMUNITY' ? 'bg-amber-100 text-amber-600' : selectedRoom.type === 'GROUP' ? 'bg-purple-100 text-purple-600' : 'bg-slate-900 text-white'}`}>
+                                    <div className={`w-10 h-10  flex items-center justify-center font-black text-base ${selectedRoom.type === 'COMMUNITY' ? 'bg-amber-100 text-amber-600' : selectedRoom.type === 'GROUP' ? 'bg-purple-100 text-purple-600' : 'bg-slate-900 text-white'}`}>
                                         {selectedRoom.imageUrl ? <img src={selectedRoom.imageUrl} alt="" className="w-full h-full object-cover" /> : (selectedRoom.name ? selectedRoom.name[0] : '?')}
                                     </div>
                                     <div>
                                         <h4 className="font-black text-slate-900 text-sm leading-none mb-1.5">{selectedRoom.name}</h4>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded-md">{selectedRoom.type}</span>
-                                            <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                            <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 bg-slate-100 text-slate-500 ">{selectedRoom.type}</span>
+                                            <span className="w-1 h-1 bg-slate-300 "></span>
                                             <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">En ligne</span>
                                         </div>
                                     </div>
@@ -835,26 +842,26 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                     {selectedRoom.type !== 'PRIVATE' && (
                                         <button
                                             onClick={() => setShowInviteLink(true)}
-                                            className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all"
+                                            className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600  text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all"
                                         >
                                             <Share2 size={13} /> Inviter
                                         </button>
                                     )}
-                                    <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"><Phone size={16} /></button>
-                                    <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"><Video size={16} /></button>
+                                    <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all"><Phone size={16} /></button>
+                                    <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all"><Video size={16} /></button>
                                     {selectedRoom.type !== 'PRIVATE' && (userRole === 'ADMIN') && (
                                         <button
                                             onClick={() => {
                                                 setEditGroupName(selectedRoom.name || '');
                                                 setShowEditGroup(true);
                                             }}
-                                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all"
                                         >
                                             <Settings2 size={16} />
                                         </button>
                                     )}
                                     <div className="w-px h-5 bg-slate-100 mx-1"></div>
-                                    <button className="p-2 text-slate-400 hover:bg-slate-100 rounded-xl transition-all"><MoreVertical size={16} /></button>
+                                    <button className="p-2 text-slate-400 hover:bg-slate-100  transition-all"><MoreVertical size={16} /></button>
                                 </div>
                             </div>
 
@@ -867,7 +874,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                             >
                                 <div className="flex flex-col gap-6">
                                     <div className="flex justify-center">
-                                        <span className="px-4 py-1.5 bg-white border border-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm">Aujourd'hui</span>
+                                        <span className="px-4 py-1.5 bg-white   text-slate-400 text-[10px] font-black uppercase tracking-widest  shadow-sm">Aujourd'hui</span>
                                     </div>
 
                                     <AnimatePresence>
@@ -884,7 +891,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                 >
                                                     <div className={`max-w-[85%] lg:max-w-[70%] flex gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>
                                                         {!isMe && (
-                                                            <div className="w-6 h-6 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center font-black text-[9px] shrink-0 self-end mb-4">
+                                                            <div className="w-6 h-6  bg-slate-100 text-slate-600 flex items-center justify-center font-black text-[9px] shrink-0 self-end mb-4">
                                                                 {msg.sender.firstName[0]}
                                                             </div>
                                                         )}
@@ -894,15 +901,15 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                             )}
 
                                                             {msg.parentMessage && (
-                                                                <div className={`mb-1 p-2 rounded-xl bg-slate-100/50 border-l-2 border-blue-400 max-w-[200px] truncate opacity-80 ${isMe ? 'mr-1' : 'ml-1'}`}>
+                                                                <div className={`mb-1 p-2  bg-slate-100/50   max-w-[200px] truncate opacity-80 ${isMe ? 'mr-1' : 'ml-1'}`}>
                                                                     <p className="text-[8px] font-black text-blue-600 uppercase">En réponse à {msg.parentMessage.sender.firstName}</p>
                                                                     <p className="text-[10px] text-slate-500 truncate">{msg.parentMessage.content}</p>
                                                                 </div>
                                                             )}
 
-                                                            <div className={`group relative px-3 py-2 rounded-[18px] text-[12px] shadow-sm transition-all duration-300 ${isMe
-                                                                ? 'bg-blue-600 text-white rounded-tr-none shadow-blue-600/20'
-                                                                : 'bg-white text-slate-700 border border-slate-100 rounded-tl-none shadow-slate-200/50'
+                                                            <div className={`group relative px-3 py-2 ] text-[12px] shadow-sm transition-all duration-300 ${isMe
+                                                                ? 'bg-blue-600 text-white  shadow-blue-600/20'
+                                                                : 'bg-white text-slate-700    shadow-slate-200/50'
                                                                 } ${editingMessageId === msg.id && isSaving ? 'animate-pulse scale-[0.98] opacity-70' : ''}`}>
                                                                 {/* Success flash when edited */}
                                                                 <AnimatePresence>
@@ -911,20 +918,20 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                             initial={{ opacity: 0.8, scale: 1 }}
                                                                             animate={{ opacity: 0, scale: 1.2 }}
                                                                             exit={{ opacity: 0 }}
-                                                                            className="absolute inset-0 bg-emerald-400 rounded-[18px] z-[-1]"
+                                                                            className="absolute inset-0 bg-emerald-400 ] z-[-1]"
                                                                         />
                                                                     )}
                                                                 </AnimatePresence>
                                                                 {msg.type === 'IMAGE' ? (
                                                                     <div className="space-y-2 group/media relative">
                                                                         <a href={getFileUrl(msg.fileUrl)} target="_blank" rel="noopener noreferrer" className="block">
-                                                                            <img src={getFileUrl(msg.fileUrl)} alt="" className="rounded-2xl max-h-96 w-full object-contain bg-black/5 hover:opacity-90 transition-opacity" />
+                                                                            <img src={getFileUrl(msg.fileUrl)} alt="" className=" max-h-96 w-full object-contain bg-black/5 hover:opacity-90 transition-opacity" />
                                                                         </a>
                                                                         <div className="absolute top-3 right-3 opacity-0 group-hover/media:opacity-100 transition-opacity flex gap-2">
                                                                             <a
                                                                                 href={getFileUrl(msg.fileUrl, true)}
                                                                                 download={msg.fileName || 'image.jpg'}
-                                                                                className="p-3 bg-white/90 backdrop-blur-sm text-slate-900 rounded-2xl shadow-xl hover:bg-white transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest no-underline"
+                                                                                className="p-3 bg-white/90 backdrop-blur-sm text-slate-900  shadow-xl hover:bg-white transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest no-underline"
                                                                             >
                                                                                 <Download size={18} /> Télécharger
                                                                             </a>
@@ -936,7 +943,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                         <video
                                                                             src={getFileUrl(msg.fileUrl)}
                                                                             controls
-                                                                            className="rounded-2xl max-h-96 w-full bg-black shadow-2xl"
+                                                                            className=" max-h-96 w-full bg-black shadow-2xl"
                                                                             poster={getFileUrl(msg.fileUrl) + '#t=0.5'}
                                                                         />
                                                                         <div className="absolute top-3 right-3 opacity-0 group-hover/media:opacity-100 transition-opacity z-10 flex gap-2">
@@ -944,14 +951,14 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                                 href={getFileUrl(msg.fileUrl)}
                                                                                 target="_blank"
                                                                                 rel="noopener noreferrer"
-                                                                                className="p-3 bg-white/90 backdrop-blur-sm text-slate-900 rounded-2xl shadow-xl hover:bg-white transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest no-underline"
+                                                                                className="p-3 bg-white/90 backdrop-blur-sm text-slate-900  shadow-xl hover:bg-white transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest no-underline"
                                                                             >
                                                                                 <Share2 size={18} /> Voir
                                                                             </a>
                                                                             <a
                                                                                 href={getFileUrl(msg.fileUrl, true)}
                                                                                 download={msg.fileName || 'video.mp4'}
-                                                                                className="p-3 bg-white/90 backdrop-blur-sm text-slate-900 rounded-2xl shadow-xl hover:bg-white transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest no-underline"
+                                                                                className="p-3 bg-white/90 backdrop-blur-sm text-slate-900  shadow-xl hover:bg-white transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest no-underline"
                                                                             >
                                                                                 <Download size={18} /> Télécharger
                                                                             </a>
@@ -959,15 +966,15 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                         {msg.content && <p className="text-sm px-1">{msg.content}</p>}
                                                                     </div>
                                                                 ) : msg.type === 'FILE' ? (
-                                                                    <div className={`flex items-center gap-4 p-3 rounded-2xl ${isMe ? 'bg-blue-500/50' : 'bg-slate-50'}`}>
-                                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isMe ? 'bg-blue-400' : 'bg-white shadow-sm text-blue-600'}`}>
+                                                                    <div className={`flex items-center gap-4 p-3  ${isMe ? 'bg-blue-500/50' : 'bg-slate-50'}`}>
+                                                                        <div className={`w-12 h-12  flex items-center justify-center ${isMe ? 'bg-blue-400' : 'bg-white shadow-sm text-blue-600'}`}>
                                                                             <FileText size={24} />
                                                                         </div>
                                                                         <div className="flex-1 min-w-0 pr-8">
                                                                             <p className="font-bold text-xs truncate">{msg.fileName}</p>
                                                                             <p className={`text-[10px] font-black ${isMe ? 'text-blue-100' : 'text-slate-400'}`}>{(msg.fileSize || 0) / 1024 > 1024 ? ((msg.fileSize || 0) / (1024 * 1024)).toFixed(1) + ' MB' : ((msg.fileSize || 0) / 1024).toFixed(0) + ' KB'}</p>
                                                                         </div>
-                                                                        <a href={getFileUrl(msg.fileUrl, true)} download={msg.fileName || 'file'} className="p-2 hover:bg-black/10 rounded-full transition-all">
+                                                                        <a href={getFileUrl(msg.fileUrl, true)} download={msg.fileName || 'file'} className="p-2 hover:bg-black/10  transition-all">
                                                                             <Download size={20} />
                                                                         </a>
                                                                     </div>
@@ -975,7 +982,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                     <span className="text-4xl">{msg.content}</span>
                                                                 ) : msg.type === 'VOICE' ? (
                                                                     <div className="flex items-center gap-3 min-w-[300px] py-1">
-                                                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isMe ? 'bg-white/20' : 'bg-blue-600 text-white'}`}>
+                                                                        <div className={`w-10 h-10  flex items-center justify-center shrink-0 ${isMe ? 'bg-white/20' : 'bg-blue-600 text-white'}`}>
                                                                             <Volume2 size={12} />
                                                                         </div>
                                                                         <div className="flex-1 min-w-[200px]">
@@ -992,7 +999,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                                         };
                                                                                     }
                                                                                 }}
-                                                                                className="w-full h-10 filter brightness-100 contrast-100 invert-0 bg-white rounded-full shadow-inner"
+                                                                                className="w-full h-10 filter brightness-100 contrast-100 invert-0 bg-white  shadow-inner"
                                                                             />
                                                                             <div className="flex justify-between mt-1 px-1">
                                                                                 <span className={`text-[8px] font-black uppercase tracking-widest ${isMe ? 'text-blue-100' : 'text-slate-400'}`}>
@@ -1015,7 +1022,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                                     if (e.key === 'Enter') saveEdit();
                                                                                     if (e.key === 'Escape') setEditingMessageId(null);
                                                                                 }}
-                                                                                className="w-full bg-white/20 border-none outline-none text-white text-[12px] p-1 rounded"
+                                                                                className="w-full bg-white/20 border-none outline-none text-white text-[12px] p-1 "
                                                                                 autoFocus
                                                                             />
                                                                             <div className="flex justify-end gap-2 text-[8px] font-black uppercase">
@@ -1049,19 +1056,19 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                                                             exit={{ opacity: 0, scale: 0.9, y: 10 }}
                                                                             onClick={(e) => e.stopPropagation()}
-                                                                            className={`absolute top-full ${isMe ? 'right-0' : 'left-0'} mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-2xl p-1.5 z-[60]`}
+                                                                            className={`absolute top-full ${isMe ? 'right-0' : 'left-0'} mt-2 w-48 bg-white    shadow-2xl p-1.5 z-[60]`}
                                                                         >
                                                                             {!showReactionsMenu ? (
                                                                                 <>
                                                                                     <button
                                                                                         onClick={() => { setReplyingTo(msg); setActiveMessageMenu(null); }}
-                                                                                        className="w-full flex items-center gap-2.5 p-2 hover:bg-slate-50 rounded-xl text-left transition-all"
+                                                                                        className="w-full flex items-center gap-2.5 p-2 hover:bg-slate-50  text-left transition-all"
                                                                                     >
                                                                                         <Reply size={14} className="text-blue-600" />
                                                                                         <span className="text-[10px] font-black uppercase tracking-tight text-slate-700">Répondre</span>
                                                                                     </button>
                                                                                     <button
-                                                                                        className="w-full flex items-center gap-2.5 p-2 hover:bg-slate-50 rounded-xl text-left transition-all"
+                                                                                        className="w-full flex items-center gap-2.5 p-2 hover:bg-slate-50  text-left transition-all"
                                                                                         onClick={() => setShowReactionsMenu(true)}
                                                                                     >
                                                                                         <Heart size={14} className="text-rose-500" />
@@ -1073,7 +1080,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                                                 href={getFileUrl(msg.fileUrl)}
                                                                                                 target="_blank"
                                                                                                 rel="noopener noreferrer"
-                                                                                                className="w-full flex items-center gap-2.5 p-2 hover:bg-slate-50 rounded-xl text-left transition-all no-underline"
+                                                                                                className="w-full flex items-center gap-2.5 p-2 hover:bg-slate-50  text-left transition-all no-underline"
                                                                                                 onClick={() => setActiveMessageMenu(null)}
                                                                                             >
                                                                                                 <Share2 size={14} className="text-blue-500" />
@@ -1082,7 +1089,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                                             <a
                                                                                                 href={getFileUrl(msg.fileUrl, true)}
                                                                                                 download={msg.fileName || 'file'}
-                                                                                                className="w-full flex items-center gap-2.5 p-2 hover:bg-slate-50 rounded-xl text-left transition-all no-underline"
+                                                                                                className="w-full flex items-center gap-2.5 p-2 hover:bg-slate-50  text-left transition-all no-underline"
                                                                                                 onClick={() => setActiveMessageMenu(null)}
                                                                                             >
                                                                                                 <Download size={14} className="text-emerald-500" />
@@ -1091,11 +1098,11 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                                         </>
                                                                                     )}
                                                                                     {isMe && (
-                                                                                        <div className="mt-1 pt-1 border-t border-slate-50">
+                                                                                        <div className="mt-1 pt-1  ">
                                                                                             {msg.type === 'TEXT' && (
                                                                                                 <button
                                                                                                     onClick={() => { startEditing(msg); setActiveMessageMenu(null); }}
-                                                                                                    className="w-full flex items-center gap-2.5 p-2 hover:bg-slate-50 rounded-xl text-left transition-all"
+                                                                                                    className="w-full flex items-center gap-2.5 p-2 hover:bg-slate-50  text-left transition-all"
                                                                                                 >
                                                                                                     <Pencil size={14} className="text-indigo-500" />
                                                                                                     <span className="text-[10px] font-black uppercase tracking-tight text-slate-700">Modifier</span>
@@ -1103,7 +1110,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                                             )}
                                                                                             <button
                                                                                                 onClick={() => { setMessageToDelete(msg.id); setActiveMessageMenu(null); }}
-                                                                                                className="w-full flex items-center gap-2.5 p-2 hover:bg-rose-50 rounded-xl text-left transition-all"
+                                                                                                className="w-full flex items-center gap-2.5 p-2 hover:bg-rose-50  text-left transition-all"
                                                                                             >
                                                                                                 <Trash2 size={14} className="text-rose-500" />
                                                                                                 <span className="text-[10px] font-black uppercase tracking-tight text-rose-500">Supprimer</span>
@@ -1113,8 +1120,8 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                                 </>
                                                                             ) : (
                                                                                 <div className="flex flex-col gap-2">
-                                                                                    <div className="flex items-center gap-2 px-2 py-1 border-b border-slate-50">
-                                                                                        <button onClick={() => setShowReactionsMenu(false)} className="p-1 hover:bg-slate-50 rounded-lg"><ArrowLeft size={12} /></button>
+                                                                                    <div className="flex items-center gap-2 px-2 py-1  ">
+                                                                                        <button onClick={() => setShowReactionsMenu(false)} className="p-1 hover:bg-slate-50 "><ArrowLeft size={12} /></button>
                                                                                         <span className="text-[10px] font-black uppercase tracking-tight text-slate-400">Réactions</span>
                                                                                     </div>
                                                                                     <div className="grid grid-cols-4 gap-1 p-1">
@@ -1122,7 +1129,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                                                             <button
                                                                                                 key={emoji}
                                                                                                 onClick={() => handleReact(msg.id, emoji)}
-                                                                                                className={`w-9 h-9 flex items-center justify-center text-lg hover:bg-slate-50 rounded-xl transition-all ${messageReactions[msg.id]?.includes(emoji) ? 'bg-blue-50' : ''}`}
+                                                                                                className={`w-9 h-9 flex items-center justify-center text-lg hover:bg-slate-50  transition-all ${messageReactions[msg.id]?.includes(emoji) ? 'bg-blue-50' : ''}`}
                                                                                             >
                                                                                                 {emoji}
                                                                                             </button>
@@ -1136,7 +1143,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
 
                                                                 {/* Reactions Display */}
                                                                 {messageReactions[msg.id]?.length > 0 && (
-                                                                    <div className={`absolute -bottom-3 ${isMe ? 'right-2' : 'left-2'} flex gap-0.5 bg-white border border-slate-100 rounded-full px-1.5 py-0.5 shadow-sm z-20`}>
+                                                                    <div className={`absolute -bottom-3 ${isMe ? 'right-2' : 'left-2'} flex gap-0.5 bg-white    px-1.5 py-0.5 shadow-sm z-20`}>
                                                                         {messageReactions[msg.id].map(emoji => (
                                                                             <span key={emoji} className="text-[10px] animate-in zoom-in-50 duration-200">{emoji}</span>
                                                                         ))}
@@ -1145,7 +1152,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
 
                                                                 {/* Hover timestamp or reactions could go here */}
                                                                 <div className={`absolute bottom-0 ${isMe ? 'right-full mr-2' : 'left-full ml-2'} opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap`}>
-                                                                    <span className="text-[9px] font-black text-slate-400 bg-white px-2 py-1 rounded-full shadow-sm border border-slate-100 uppercase">{format(new Date(msg.sentAt), 'HH:mm')}</span>
+                                                                    <span className="text-[9px] font-black text-slate-400 bg-white px-2 py-1  shadow-sm   uppercase">{format(new Date(msg.sentAt), 'HH:mm')}</span>
                                                                 </div>
                                                             </div>
 
@@ -1170,11 +1177,11 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.5, y: 20 }}
                                             onClick={scrollToBottom}
-                                            className="fixed bottom-32 right-12 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-50 border-4 border-white group"
+                                            className="fixed bottom-32 right-12 w-12 h-12 bg-blue-600 text-white  flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-50   group"
                                             title="Retourner en bas"
                                         >
                                             <ChevronsDown size={24} className="group-hover:animate-bounce" />
-                                            <div className="absolute -top-12 right-0 bg-slate-900 text-white text-[10px] font-black px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl">
+                                            <div className="absolute -top-12 right-0 bg-slate-900 text-white text-[10px] font-black px-3 py-1.5  opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl">
                                                 Nouveaux messages
                                             </div>
                                         </motion.button>
@@ -1183,22 +1190,22 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                             </div>
 
                             {/* Chat Input */}
-                            <div className="p-8 border-t border-slate-100 bg-white">
+                            <div className="p-8   bg-white">
                                 {replyingTo && (
-                                    <div className="mb-4 p-4 bg-slate-50 border-l-4 border-blue-600 rounded-2xl flex items-center justify-between animate-in slide-in-from-bottom-2 duration-300">
+                                    <div className="mb-4 p-4 bg-slate-50    flex items-center justify-between animate-in slide-in-from-bottom-2 duration-300">
                                         <div className="flex-1 min-w-0">
                                             <p className="text-[10px] font-black uppercase text-blue-600 mb-1">En réponse à {replyingTo.sender.firstName}</p>
                                             <p className="text-xs text-slate-500 truncate">{replyingTo.content}</p>
                                         </div>
-                                        <button onClick={() => setReplyingTo(null)} className="p-2 hover:bg-white rounded-full transition-all">
+                                        <button onClick={() => setReplyingTo(null)} className="p-2 hover:bg-white  transition-all">
                                             <X size={16} className="text-slate-400" />
                                         </button>
                                     </div>
                                 )}
                                 {uploadingFile && (
-                                    <div className="mb-4 p-4 bg-blue-50 border border-blue-100 rounded-3xl flex items-center justify-between">
+                                    <div className="mb-4 p-4 bg-blue-50    flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center">
+                                            <div className="w-10 h-10 bg-blue-600 text-white  flex items-center justify-center">
                                                 {uploadingFile.type.startsWith('image/') ? <ImageIcon size={20} /> : <FileText size={20} />}
                                             </div>
                                             <div>
@@ -1206,18 +1213,18 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                 <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Pret pour envoi - {(uploadingFile.size / (1024 * 1024)).toFixed(2)}MB</p>
                                             </div>
                                         </div>
-                                        <button onClick={() => setUploadingFile(null)} className="p-2 hover:bg-white rounded-full transition-all">
+                                        <button onClick={() => setUploadingFile(null)} className="p-2 hover:bg-white  transition-all">
                                             <X size={20} className="text-slate-400" />
                                         </button>
                                     </div>
                                 )}
 
-                                <form onSubmit={sendMessage} className="flex items-center gap-5 bg-slate-50 p-3 rounded-[32px] border border-slate-200 focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-500 focus-within:bg-white transition-all">
+                                <form onSubmit={sendMessage} className="flex items-center gap-5 bg-slate-50 p-3 ]   focus-within:ring-4 focus-within:ring-blue-500/10 focus-within: focus-within:bg-white transition-all">
                                     <div className="flex items-center gap-1 pl-2 relative">
                                         <button
                                             type="button"
                                             onClick={() => fileInputRef.current?.click()}
-                                            className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-full transition-all shrink-0 shadow-sm"
+                                            className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white  transition-all shrink-0 shadow-sm"
                                         >
                                             <Paperclip size={18} />
                                         </button>
@@ -1230,7 +1237,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                         <button
                                             type="button"
                                             onClick={() => setShowStickers(!showStickers)}
-                                            className={`p-2.5 hover:bg-white rounded-full transition-all shadow-sm ${showStickers ? 'text-amber-500 bg-white' : 'text-slate-400'}`}
+                                            className={`p-2.5 hover:bg-white  transition-all shadow-sm ${showStickers ? 'text-amber-500 bg-white' : 'text-slate-400'}`}
                                         >
                                             <Smile size={18} />
                                         </button>
@@ -1242,14 +1249,14 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                     initial={{ opacity: 0, y: 10, scale: 0.9 }}
                                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                                     exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                                                    className="absolute bottom-20 left-0 bg-white border border-slate-100 rounded-3xl shadow-2xl p-4 grid grid-cols-4 gap-2 z-50 min-w-[200px]"
+                                                    className="absolute bottom-20 left-0 bg-white    shadow-2xl p-4 grid grid-cols-4 gap-2 z-50 min-w-[200px]"
                                                 >
                                                     {['👍', '❤️', '😂', '😮', '😢', '🔥', '🎓', '📚', '🚀', '⭐', '✅', '🎉', '😭', '🙏', '👋', ''].map(emoji => (
                                                         <button
                                                             key={emoji}
                                                             type="button"
                                                             onClick={() => { setNewMessage(prev => prev + emoji); setShowStickers(false); }}
-                                                            className="w-10 h-10 flex items-center justify-center text-xl hover:bg-slate-50 transition-all rounded-xl"
+                                                            className="w-10 h-10 flex items-center justify-center text-xl hover:bg-slate-50 transition-all "
                                                         >
                                                             {emoji}
                                                         </button>
@@ -1260,9 +1267,9 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                     </div>
 
                                     {isRecording ? (
-                                        <div className="flex-1 flex items-center justify-between px-6 py-2 bg-red-50 rounded-[24px] border border-red-100 animate-pulse">
+                                        <div className="flex-1 flex items-center justify-between px-6 py-2 bg-red-50 ]   animate-pulse">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-3 h-3 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
+                                                <div className="w-3 h-3 bg-red-500  shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
                                                 <span className="text-xs font-black text-red-600 uppercase tracking-widest">Enregistrement... {formatTime(recordingTime)}</span>
                                             </div>
                                             <div className="flex items-center gap-3">
@@ -1276,7 +1283,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                 <button
                                                     type="button"
                                                     onClick={stopRecording}
-                                                    className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-red-500/30 active:scale-95 transition-all"
+                                                    className="w-10 h-10 bg-red-500 text-white  flex items-center justify-center shadow-lg shadow-red-500/30 active:scale-95 transition-all"
                                                 >
                                                     <Square size={16} fill="currentColor" />
                                                 </button>
@@ -1302,14 +1309,14 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                                 <button
                                                     type="button"
                                                     onClick={startRecording}
-                                                    className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all shadow-sm"
+                                                    className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50  transition-all shadow-sm"
                                                     title="Message Vocal"
                                                 >
                                                     <Mic size={18} />
                                                 </button>
                                                 <button
                                                     type="submit"
-                                                    className={`p-3 rounded-full transition-all shadow-2xl ${newMessage.trim() || uploadingFile ? 'bg-slate-900 text-white shadow-slate-900/30 active:scale-95' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+                                                    className={`p-3  transition-all shadow-2xl ${newMessage.trim() || uploadingFile ? 'bg-slate-900 text-white shadow-slate-900/30 active:scale-95' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
                                                     disabled={!newMessage.trim() && !uploadingFile}
                                                 >
                                                     <Send size={18} />
@@ -1330,7 +1337,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                             <motion.div
                                 initial={{ scale: 0.8, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                className="w-24 h-24 bg-blue-600 text-white rounded-[32px] flex items-center justify-center shadow-3xl shadow-blue-600/30 mb-8"
+                                className="w-24 h-24 bg-blue-600 text-white ] flex items-center justify-center shadow-3xl shadow-blue-600/30 mb-8"
                             >
                                 <MessageCircle size={48} fill="currentColor" />
                             </motion.div>
@@ -1341,7 +1348,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                             </p>
                             <button
                                 onClick={() => setIsSearching(true)}
-                                className="px-8 py-4 bg-slate-900 text-white rounded-[24px] font-black uppercase text-xs tracking-widest hover:scale-105 transition-all shadow-2xl shadow-slate-900/20"
+                                className="px-8 py-4 bg-slate-900 text-white ] font-black uppercase text-xs tracking-widest hover:scale-105 transition-all shadow-2xl shadow-slate-900/20"
                             >
                                 Commencer une discussion
                             </button>
@@ -1365,22 +1372,22 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="relative w-full max-w-md bg-white rounded-[40px] shadow-3xl overflow-hidden"
+                            className="relative w-full max-w-md bg-white ] shadow-3xl overflow-hidden"
                         >
                             <div className="p-8">
                                 <h3 className="text-2xl font-black text-slate-900 mb-6">Créer un espace</h3>
 
                                 <div className="space-y-6">
-                                    <div className="flex gap-3 bg-slate-100 p-1.5 rounded-2xl">
+                                    <div className="flex gap-3 bg-slate-100 p-1.5 ">
                                         <button
                                             onClick={() => setGroupType('GROUP')}
-                                            className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${groupType === 'GROUP' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}
+                                            className={`flex-1 py-3  text-xs font-black transition-all ${groupType === 'GROUP' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}
                                         >
                                             Groupe
                                         </button>
                                         <button
                                             onClick={() => setGroupType('COMMUNITY')}
-                                            className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${groupType === 'COMMUNITY' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}
+                                            className={`flex-1 py-3  text-xs font-black transition-all ${groupType === 'COMMUNITY' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}
                                         >
                                             Communauté
                                         </button>
@@ -1393,12 +1400,12 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                             value={groupName}
                                             onChange={(e) => setGroupName(e.target.value)}
                                             placeholder="Ex: Club de Mathématiques"
-                                            className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-[24px] focus:ring-4 focus:ring-blue-500/10 focus:bg-white focus:border-blue-500 outline-none transition-all"
+                                            className="w-full px-6 py-4 bg-slate-50   ] focus:ring-4 focus:ring-blue-500/10 focus:bg-white focus: outline-none transition-all"
                                         />
                                     </div>
 
-                                    <div className="flex items-center gap-4 p-5 bg-blue-50 rounded-[32px] border border-blue-100">
-                                        <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center">
+                                    <div className="flex items-center gap-4 p-5 bg-blue-50 ]  ">
+                                        <div className="w-12 h-12 bg-blue-600 text-white  flex items-center justify-center">
                                             <Users size={24} />
                                         </div>
                                         <p className="text-xs text-blue-800 leading-relaxed font-medium">
@@ -1419,7 +1426,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                     <button
                                         onClick={createGroup}
                                         disabled={!groupName.trim()}
-                                        className="flex-1 py-4 bg-slate-900 text-white rounded-[24px] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-slate-900/20 disabled:opacity-50"
+                                        className="flex-1 py-4 bg-slate-900 text-white ] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-slate-900/20 disabled:opacity-50"
                                     >
                                         Créer
                                     </button>
@@ -1445,22 +1452,22 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="relative w-full max-w-sm bg-white rounded-[40px] shadow-3xl p-8"
+                            className="relative w-full max-w-sm bg-white ] shadow-3xl p-8"
                         >
                             <div className="text-center">
-                                <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/10">
+                                <div className="w-20 h-20 bg-emerald-100 text-emerald-600 ] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/10">
                                     <Share2 size={32} />
                                 </div>
                                 <h3 className="text-2xl font-black text-slate-900 mb-2">Lien d'invitation</h3>
                                 <p className="text-sm text-slate-500 mb-8">Partagez ce lien avec les personnes que vous souhaitez inviter dans ce groupe.</p>
 
                                 <div className="relative mb-8">
-                                    <div className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-mono text-slate-600 pr-12 truncate">
+                                    <div className="w-full px-5 py-4 bg-slate-50    text-xs font-mono text-slate-600 pr-12 truncate">
                                         {window.location.origin}/join/{selectedRoom?.inviteLink}
                                     </div>
                                     <button
                                         onClick={copyInviteLink}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white text-slate-400 hover:text-blue-600 rounded-xl shadow-sm border border-slate-100 transition-all"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white text-slate-400 hover:text-blue-600  shadow-sm   transition-all"
                                     >
                                         {copied ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />}
                                     </button>
@@ -1468,7 +1475,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
 
                                 <button
                                     onClick={() => setShowInviteLink(false)}
-                                    className="w-full py-4 bg-slate-900 text-white rounded-[24px] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-slate-900/20"
+                                    className="w-full py-4 bg-slate-900 text-white ] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-slate-900/20"
                                 >
                                     Fermer
                                 </button>
@@ -1489,7 +1496,7 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="relative w-full max-w-md bg-white rounded-[40px] shadow-3xl overflow-hidden p-8"
+                            className="relative w-full max-w-md bg-white ] shadow-3xl overflow-hidden p-8"
                         >
                             <h3 className="text-2xl font-black text-slate-900 mb-6">Paramètres de l'espace</h3>
 
@@ -1500,29 +1507,29 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                         type="text"
                                         value={editGroupName}
                                         onChange={(e) => setEditGroupName(e.target.value)}
-                                        className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-[24px] focus:ring-4 focus:ring-blue-500/10 focus:bg-white focus:border-blue-500 outline-none transition-all"
+                                        className="w-full px-6 py-4 bg-slate-50   ] focus:ring-4 focus:ring-blue-500/10 focus:bg-white focus: outline-none transition-all"
                                     />
                                 </div>
 
                                 <div className="flex gap-3">
                                     <button
                                         onClick={updateGroup}
-                                        className="flex-1 py-4 bg-blue-600 text-white rounded-[24px] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-blue-900/20"
+                                        className="flex-1 py-4 bg-blue-600 text-white ] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-blue-900/20"
                                     >
                                         Enregistrer
                                     </button>
                                     <button
                                         onClick={() => setShowEditGroup(false)}
-                                        className="px-6 py-4 bg-slate-100 text-slate-400 rounded-[24px] font-black uppercase text-[10px] tracking-widest"
+                                        className="px-6 py-4 bg-slate-100 text-slate-400 ] font-black uppercase text-[10px] tracking-widest"
                                     >
                                         Annuler
                                     </button>
                                 </div>
 
-                                <div className="pt-6 border-t border-slate-100 mt-6">
+                                <div className="pt-6   mt-6">
                                     <button
                                         onClick={() => setShowDeleteConfirm(true)}
-                                        className="w-full py-4 bg-rose-50 text-rose-600 rounded-[24px] font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+                                        className="w-full py-4 bg-rose-50 text-rose-600 ] font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-rose-600 hover:text-white transition-all shadow-sm"
                                     >
                                         <Trash2 size={16} /> Supprimer l'espace
                                     </button>
@@ -1545,9 +1552,9 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="relative w-full max-w-sm bg-white rounded-[40px] shadow-3xl overflow-hidden p-8 text-center"
+                            className="relative w-full max-w-sm bg-white ] shadow-3xl overflow-hidden p-8 text-center"
                         >
-                            <div className="w-20 h-20 bg-rose-100 text-rose-600 rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-rose-500/10">
+                            <div className="w-20 h-20 bg-rose-100 text-rose-600 ] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-rose-500/10">
                                 <Trash2 size={32} />
                             </div>
                             <h3 className="text-2xl font-black text-slate-900 mb-2">Supprimer l'espace ?</h3>
@@ -1562,13 +1569,13 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                         deleteGroup();
                                         setShowDeleteConfirm(false);
                                     }}
-                                    className="w-full py-4 bg-rose-600 text-white rounded-[24px] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-rose-900/20"
+                                    className="w-full py-4 bg-rose-600 text-white ] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-rose-900/20"
                                 >
                                     Oui, supprimer définitivement
                                 </button>
                                 <button
                                     onClick={() => setShowDeleteConfirm(false)}
-                                    className="w-full py-4 bg-slate-100 text-slate-400 rounded-[24px] font-black uppercase text-[10px] tracking-widest"
+                                    className="w-full py-4 bg-slate-100 text-slate-400 ] font-black uppercase text-[10px] tracking-widest"
                                 >
                                     Annuler
                                 </button>
@@ -1591,9 +1598,9 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                                 animate={{ scale: 1, opacity: 1, y: 0 }}
                                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                                className="relative bg-white rounded-[40px] p-10 max-w-sm w-full shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border border-white/20 text-center"
+                                className="relative bg-white ] p-10 max-w-sm w-full shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)]   text-center"
                             >
-                                <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-[30px] flex items-center justify-center mx-auto mb-8 shadow-inner">
+                                <div className="w-20 h-20 bg-rose-50 text-rose-500 ] flex items-center justify-center mx-auto mb-8 shadow-inner">
                                     <Trash2 size={36} />
                                 </div>
                                 <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight">Supprimer ?</h3>
@@ -1604,13 +1611,13 @@ const Messages: React.FC<{ role: string }> = ({ role }) => {
                                 <div className="flex flex-col gap-3">
                                     <button
                                         onClick={() => deleteMessage(messageToDelete)}
-                                        className="w-full py-5 bg-rose-600 text-white rounded-[24px] font-black uppercase text-[11px] tracking-widest shadow-xl shadow-rose-900/20 active:scale-95 transition-all hover:bg-rose-700"
+                                        className="w-full py-5 bg-rose-600 text-white ] font-black uppercase text-[11px] tracking-widest shadow-xl shadow-rose-900/20 active:scale-95 transition-all hover:bg-rose-700"
                                     >
                                         Oui, supprimer
                                     </button>
                                     <button
                                         onClick={() => setMessageToDelete(null)}
-                                        className="w-full py-5 bg-slate-50 text-slate-400 rounded-[24px] font-black uppercase text-[11px] tracking-widest hover:bg-slate-100 transition-all active:scale-95"
+                                        className="w-full py-5 bg-slate-50 text-slate-400 ] font-black uppercase text-[11px] tracking-widest hover:bg-slate-100 transition-all active:scale-95"
                                     >
                                         Annuler
                                     </button>

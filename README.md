@@ -1,4 +1,4 @@
-# Frontend Web - Projet École (NBMind School)
+# Frontend Web - Projet École (NB MIND School)
 
 ## À propos de NB MIND
 **NB MIND** est une entreprise visionnaire dédiée à l'innovation éducative. Nous concevons des interfaces modernes et fluides pour faciliter l'interaction entre tous les acteurs du monde scolaire. Le **Projet École** (interface Web) est une vitrine de notre savoir-faire en UX/UI.
@@ -40,3 +40,7 @@ Chez **NB MIND**, nous nous engageons à fournir des interfaces performantes, ac
 
 ---
 © 2026 **NB MIND**. Tous droits réservés.
+
+
+
+

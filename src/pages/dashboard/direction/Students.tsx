@@ -49,13 +49,13 @@ const Students: React.FC = () => {
                     <button
                         onClick={handleExport}
                         disabled={exporting}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
+                        className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
                     >
                         <Download size={18} /> {exporting ? 'Exportation...' : 'Exporter Liste'}
                     </button>
                     <button
                         onClick={() => navigate(ROUTES.DASHBOARD.DIRECTION.ENROLL)}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+                        className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
                     >
                         <Plus size={18} /> Ajouter Élève
                     </button>
@@ -75,8 +75,8 @@ const Students: React.FC = () => {
 };
 
 const KPICard = ({ label, count, icon: Icon, color, bg }: any) => (
-    <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 group transition-all duration-300">
-        <div className={`w-12 h-12 ${bg} ${color} rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
+    <div className="bg-white p-6 ] shadow-sm   group transition-all duration-300">
+        <div className={`w-12 h-12 ${bg} ${color}  flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
             <Icon size={24} />
         </div>
         <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">{label}</p>

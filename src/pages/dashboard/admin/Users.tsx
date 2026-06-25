@@ -6,7 +6,8 @@ import {
     UserCheck,
     UserX,
     MoreVertical,
-    Activity
+    Activity,
+    Trash2
 } from 'lucide-react';
 import api from '../../../api/axios';
 
@@ -15,6 +16,7 @@ const AdminUsers: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState('ALL');
+    const [userToDelete, setUserToDelete] = useState<number | null>(null);
 
     useEffect(() => {
         fetchUsers();
@@ -37,6 +39,22 @@ const AdminUsers: React.FC = () => {
             fetchUsers();
         } catch (err) {
             console.error(err);
+        }
+    };
+
+    const handleDeleteUser = (id: number) => {
+        setUserToDelete(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!userToDelete) return;
+        try {
+            await api.delete(`/admin/users/${userToDelete}`);
+            setUserToDelete(null);
+            fetchUsers();
+        } catch (err) {
+            console.error(err);
+            alert("Erreur lors de la suppression de l'utilisateur.");
         }
     };
 
@@ -79,13 +97,13 @@ const AdminUsers: React.FC = () => {
                             placeholder="Nom, Email..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="bg-white pl-12 pr-6 py-4 rounded-[20px] border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none w-full md:w-[250px] font-bold text-sm"
+                            className="bg-white pl-12 pr-6 py-4 ]   focus:ring-4 focus:ring-blue-500/10 focus: transition-all outline-none w-full md:w-[250px] font-bold text-sm"
                         />
                     </div>
                     <select
                         value={filterRole}
                         onChange={(e) => setFilterRole(e.target.value)}
-                        className="bg-white px-6 py-4 rounded-[20px] border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-sm text-slate-600"
+                        className="bg-white px-6 py-4 ]   focus:ring-4 focus:ring-blue-500/10 focus: transition-all outline-none font-bold text-sm text-slate-600"
                     >
                         <option value="ALL">Tous les Rôles</option>
                         <option value="PDG">PDG / Fondateurs</option>
@@ -101,13 +119,13 @@ const AdminUsers: React.FC = () => {
 
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <div className="w-12 h-12     animate-spin mb-4"></div>
                 </div>
             ) : (
-                <div className="bg-white rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden">
+                <div className="bg-white ] shadow-2xl   overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-slate-50/50 border-b border-slate-100 uppercase tracking-widest text-[10px] font-black text-slate-400">
+                            <thead className="bg-slate-50/50   uppercase tracking-widest text-[10px] font-black text-slate-400">
                                 <tr>
                                     <th className="px-8 py-6">Utilisateur</th>
                                     <th className="px-8 py-6">Rôle</th>
@@ -131,7 +149,7 @@ const AdminUsers: React.FC = () => {
                                         <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
                                             <td className="px-8 py-6">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center font-black text-slate-400 text-sm shadow-inner group-hover:scale-110 transition-transform">
+                                                    <div className="w-12 h-12  bg-slate-100 flex items-center justify-center font-black text-slate-400 text-sm shadow-inner group-hover:scale-110 transition-transform">
                                                         {user.firstName?.[0]}{user.lastName?.[0]}
                                                     </div>
                                                     <div>
@@ -141,7 +159,7 @@ const AdminUsers: React.FC = () => {
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">
-                                                <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${getRoleBadge(user.role)}`}>
+                                                <span className={`px-4 py-1.5  text-[9px] font-black uppercase tracking-widest ${getRoleBadge(user.role)}`}>
                                                     {user.role}
                                                 </span>
                                             </td>
@@ -161,7 +179,7 @@ const AdminUsers: React.FC = () => {
                                             </td>
                                             <td className="px-8 py-6">
                                                 <span className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${user.active ? 'text-emerald-500' : 'text-slate-400'}`}>
-                                                    <span className={`w-2 h-2 rounded-full ${user.active ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
+                                                    <span className={`w-2 h-2  ${user.active ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
                                                     {user.active ? 'Actif' : 'Désactivé'}
                                                 </span>
                                             </td>
@@ -169,12 +187,17 @@ const AdminUsers: React.FC = () => {
                                                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                                     <button
                                                         onClick={() => handleToggleStatus(user.id, user.active)}
-                                                        className={`p-2 rounded-xl transition-all ${user.active ? 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white'}`}
+                                                        title={user.active ? "Désactiver le compte" : "Activer le compte"}
+                                                        className={`p-2  transition-all ${user.active ? 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white'}`}
                                                     >
                                                         {user.active ? <UserX size={18} /> : <UserCheck size={18} />}
                                                     </button>
-                                                    <button className="p-2 text-slate-400 hover:bg-slate-100 rounded-xl transition-all">
-                                                        <MoreVertical size={18} />
+                                                    <button 
+                                                        onClick={() => handleDeleteUser(user.id)}
+                                                        title="Supprimer définitivement l'utilisateur"
+                                                        className="p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all"
+                                                    >
+                                                        <Trash2 size={18} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -183,6 +206,38 @@ const AdminUsers: React.FC = () => {
                                 )}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de confirmation de suppression */}
+            {userToDelete && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+                    <div className="bg-white shadow-2xl w-full max-w-md p-8 animate-in fade-in zoom-in duration-200">
+                        <div className="flex items-center justify-center w-16 h-16 bg-red-50 text-red-500 mb-6 mx-auto">
+                            <Trash2 size={32} />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-800 text-center uppercase tracking-tight mb-3">
+                            Supprimer l'utilisateur ?
+                        </h3>
+                        <p className="text-slate-500 text-center text-sm font-medium mb-8">
+                            Cette action est <span className="text-red-600 font-bold">irréversible</span>. 
+                            L'utilisateur sera définitivement effacé de la base de données.
+                        </p>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => setUserToDelete(null)}
+                                className="flex-1 py-4 px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold uppercase text-xs tracking-widest transition-colors"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="flex-1 py-4 px-4 bg-red-600 hover:bg-red-700 text-white font-bold uppercase text-xs tracking-widest shadow-lg shadow-red-600/30 transition-all hover:-translate-y-0.5"
+                            >
+                                Supprimer
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

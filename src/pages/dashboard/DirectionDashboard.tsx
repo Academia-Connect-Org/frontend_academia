@@ -42,9 +42,9 @@ const StatCard = ({ icon, label, value, color }: { icon: React.ReactNode, label:
     };
 
     return (
-        <div className="bg-white p-8 rounded-[40px] shadow-xl shadow-slate-200/40 border border-slate-100 hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 group">
+        <div className="bg-white p-8 ] shadow-xl shadow-slate-200/40   hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 group">
             <div className="flex items-center gap-6">
-                <div className={`w-16 h-16 ${colors[color] || colors.blue} rounded-[24px] flex items-center justify-center shrink-0 group-hover:rotate-6 transition-transform shadow-inner`}>
+                <div className={`w-16 h-16 ${colors[color] || colors.blue} ] flex items-center justify-center shrink-0 group-hover:rotate-6 transition-transform shadow-inner`}>
                     {icon}
                 </div>
                 <div>
@@ -58,7 +58,7 @@ const StatCard = ({ icon, label, value, color }: { icon: React.ReactNode, label:
 
 const LegendItem = ({ color, label }: { color: string, label: string }) => (
     <div className="flex items-center gap-2">
-        <div className={`w-3 h-3 rounded-full ${color}`} />
+        <div className={`w-3 h-3  ${color}`} />
         <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{label}</span>
     </div>
 );
@@ -107,7 +107,7 @@ const DirectionDashboard: React.FC = () => {
 
     if (loading) return (
         <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-9 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin  h-9 w-12  "></div>
         </div>
     );
 
@@ -145,11 +145,11 @@ const DirectionDashboard: React.FC = () => {
                 <div className="flex gap-4">
                     <button
                         onClick={() => setIsDemoModalOpen(true)}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+                        className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
                     >
                         <Users size={18} /> Rapport
                     </button>
-                    <button className="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-extrabold flex items-center gap-2 shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] transition-all">
+                    <button className="bg-indigo-600 text-white px-8 py-3  font-extrabold flex items-center gap-2 shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] transition-all">
                         <Download size={18} /> Exporter
                     </button>
                 </div>
@@ -197,7 +197,7 @@ const DirectionDashboard: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mb-10">
                 {/* Attendance & Performance Chart */}
-                <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100">
+                <div className="bg-white p-8 ] shadow-xl  ">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
                         <div>
                             <h3 className="text-xl font-black text-slate-800 tracking-tight">Analyse de l'Assiduité & Effectifs</h3>
@@ -210,7 +210,7 @@ const DirectionDashboard: React.FC = () => {
                                 <select
                                     value={selectedClasse}
                                     onChange={(e) => setSelectedClasse(e.target.value)}
-                                    className="pl-4 pr-10 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
+                                    className="pl-4 pr-10 py-3 bg-slate-50    text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
                                 >
                                     <option value="">Toutes les classes</option>
                                     {classes.map(c => (
@@ -221,7 +221,7 @@ const DirectionDashboard: React.FC = () => {
                             </div>
 
                             {/* Date Filter */}
-                            <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 p-1.5 rounded-2xl">
+                            <div className="flex items-center gap-2 bg-slate-50   p-1.5 ">
                                 <input
                                     type="date"
                                     value={startDate}
@@ -263,7 +263,7 @@ const DirectionDashboard: React.FC = () => {
                     </div>
 
                     {/* Chart Legend Context */}
-                    <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mt-8 pt-8 border-t border-slate-50">
+                    <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mt-8 pt-8  ">
                         <LegendItem color="bg-emerald-500" label="Présents" />
                         <LegendItem color="bg-red-500" label="Absents" />
                         <LegendItem color="bg-amber-500" label="Malades" />
@@ -275,7 +275,7 @@ const DirectionDashboard: React.FC = () => {
                 </div>
 
                 {/* Distribution Chart */}
-                <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100">
+                <div className="bg-white p-8 ] shadow-xl  ">
                     <h3 className="text-xl font-black text-slate-800 tracking-tight mb-8">Distribution des Élèves</h3>
                     <div className="h-[300px] flex flex-col md:flex-row items-center gap-8">
                         <div className="flex-1 w-full h-full min-w-0">
@@ -298,7 +298,7 @@ const DirectionDashboard: React.FC = () => {
                         <div className="space-y-4">
                             {studentDistribution.map((item: any) => (
                                 <div key={item.name} className="flex items-center gap-3">
-                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                                    <div className="w-3 h-3 " style={{ backgroundColor: item.color }}></div>
                                     <span className="text-sm font-bold text-slate-600">{item.name}</span>
                                     <span className="text-sm font-black text-slate-900 ml-auto">{item.value}</span>
                                 </div>
@@ -310,7 +310,7 @@ const DirectionDashboard: React.FC = () => {
 
             {/* Practical Section: Staff & Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 bg-white rounded-[40px] shadow-xl border border-slate-100 p-8">
+                <div className="lg:col-span-2 bg-white ] shadow-xl   p-8">
                     <div className="flex items-center justify-between mb-8">
                         <h3 className="text-xl font-black text-slate-800">Dernières Actions Administratives</h3>
                         <button className="text-blue-600 text-sm font-bold hover:underline">Voir l'historique</button>
@@ -353,7 +353,7 @@ const DirectionDashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[40px] p-8 text-white shadow-2xl">
+                <div className="bg-gradient-to-br from-indigo-600 to-blue-700 ] p-8 text-white shadow-2xl">
                     <h3 className="text-xl font-black mb-8 tracking-tight">Accès Rapide</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <QuickAction icon={Users} label="Profs" to={ROUTES.DASHBOARD.DIRECTION.TEACHERS} />
@@ -361,7 +361,7 @@ const DirectionDashboard: React.FC = () => {
                         <QuickAction icon={FileText} label="Bulletins" to="#" />
                         <QuickAction icon={PieChartIcon} label="Stats" to="#" />
                     </div>
-                    <div className="mt-12 p-6 bg-white/10 rounded-3xl border border-white/10">
+                    <div className="mt-12 p-6 bg-white/10   ">
                         <p className="text-xs font-black text-blue-200 uppercase tracking-widest mb-2">Conseil du jour</p>
                         <p className="text-sm text-white/80 leading-relaxed italic">"Pensez à valider les heures supplémentaires des enseignants avant vendredi soir."</p>
                     </div>
@@ -378,8 +378,8 @@ const DirectionDashboard: React.FC = () => {
 };
 
 const ActionItem = ({ icon: Icon, color, title, desc, time }: any) => (
-    <div className="flex gap-4 p-4 rounded-3xl hover:bg-slate-50 transition-all cursor-pointer group">
-        <div className={`w-12 h-12 ${color} rounded-2xl flex items-center justify-center shrink-0`}>
+    <div className="flex gap-4 p-4  hover:bg-slate-50 transition-all cursor-pointer group">
+        <div className={`w-12 h-12 ${color}  flex items-center justify-center shrink-0`}>
             <Icon size={22} />
         </div>
         <div>
@@ -393,8 +393,8 @@ const ActionItem = ({ icon: Icon, color, title, desc, time }: any) => (
 );
 
 const QuickAction = ({ icon: Icon, label, to }: any) => (
-    <Link to={to} className="flex flex-col items-center justify-center gap-3 p-6 bg-white/10 hover:bg-white/20 border border-white/5 rounded-[32px] transition-all group active:scale-95">
-        <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-blue-700 shadow-xl group-hover:rotate-6 transition-transform">
+    <Link to={to} className="flex flex-col items-center justify-center gap-3 p-6 bg-white/10 hover:bg-white/20   ] transition-all group active:scale-95">
+        <div className="w-10 h-10 bg-white  flex items-center justify-center text-blue-700 shadow-xl group-hover:rotate-6 transition-transform">
             <Icon size={20} />
         </div>
         <span className="text-xs font-black uppercase tracking-widest text-blue-50">{label}</span>

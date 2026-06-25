@@ -39,8 +39,8 @@ const AveragesView: React.FC<AveragesViewProps> = ({
 
     return (
         <div className="space-y-6 animate-in slide-in-from-bottom-10 duration-500">
-            <div className="bg-white rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden">
-                <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <div className="bg-white ] shadow-2xl   overflow-hidden">
+                <div className="p-8   bg-slate-50/50 flex items-center justify-between">
                     <div>
                         <h3 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-3">
                             <Calculator className="text-indigo-600" />
@@ -67,7 +67,7 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                                             points: r.moyenneTrimestrielle * val
                                         })));
                                     }}
-                                    className="w-20 bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-black text-indigo-600 focus:ring-2 focus:ring-indigo-500/20 outline-none text-center"
+                                    className="w-20 bg-white    px-3 py-2 text-sm font-black text-indigo-600 focus:ring-2 focus:ring-indigo-500/20 outline-none text-center"
                                     min="1"
                                     step="0.5"
                                 />
@@ -76,7 +76,7 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                     </div>
                 </div>
                 <div className="p-8 space-y-8">
-                    <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 space-y-4">
+                    <div className="bg-slate-50 p-6 ]   space-y-4">
                         <div className="flex items-center justify-between">
                             <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Choisir les evaluations à inclure</span>
                             <div className="flex gap-4">
@@ -104,9 +104,9 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                                         else next.add(ev.id);
                                         setSelectedEvalIds(next);
                                     }}
-                                    className={`px-4 py-2.5 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-2 ${selectedEvalIds.has(ev.id) ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'bg-white border-slate-200 text-slate-500 hover:border-indigo-200'}`}
+                                    className={`px-4 py-2.5  text-[10px] font-bold  transition-all flex items-center gap-2 ${selectedEvalIds.has(ev.id) ? 'bg-indigo-600  text-white shadow-lg shadow-indigo-600/20' : 'bg-white  text-slate-500 hover:'}`}
                                 >
-                                    <div className={`p-1 rounded-md ${selectedEvalIds.has(ev.id) ? 'bg-white/20' : 'bg-slate-100'}`}>
+                                    <div className={`p-1  ${selectedEvalIds.has(ev.id) ? 'bg-white/20' : 'bg-slate-100'}`}>
                                         {ev.isHomework ? <ClipboardList size={10} /> : <TrendingUp size={10} />}
                                     </div>
                                     <div className="text-left">
@@ -119,11 +119,11 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                                 </button>
                             ))}
                         </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-slate-200">
+                        <div className="flex justify-between items-center pt-2  ">
                             <p className="text-[9px] font-medium text-slate-400 italic">Incluez ou excluez des notes pour recalculer.</p>
                             <button
                                 onClick={handleCalculateAverages}
-                                className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/20"
+                                className="px-6 py-2.5 bg-indigo-600 text-white  text-[10px] font-black uppercase hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/20"
                             >
                                 <Calculator size={14} /> Recalculer
                             </button>
@@ -133,7 +133,7 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100">
+                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400  ">
                                 <th className="px-8 py-6">Élève</th>
                                 {user?.institution?.type === 'ECOLE' && <th className="px-8 py-6">Matière</th>}
                                 {user?.institution?.type !== 'ECOLE' && (
@@ -146,7 +146,7 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                                     {user?.institution?.type === 'ECOLE' ? 'Note /10' : 'Moy. Triméstrielle'}
                                 </th>
                                 <th className="px-8 py-6 text-center">Coeff</th>
-                                <th className="px-8 py-6 text-center border-r border-slate-100">Points</th>
+                                <th className="px-8 py-6 text-center  ">Points</th>
                                 <th className="px-8 py-6 text-right">Observation</th>
                             </tr>
                         </thead>
@@ -155,7 +155,7 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                                 <tr key={`${res.student.id}-${res.subject?.id || 'all'}`} className="hover:bg-slate-50/80 transition-all group">
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center font-black text-[10px]">
+                                            <div className="w-9 h-9  bg-slate-100 text-slate-400 flex items-center justify-center font-black text-[10px]">
                                                 {res.student.lastName[0]}{res.student.firstName[0]}
                                             </div>
                                             <p className="font-black text-slate-800 uppercase tracking-tight">{res.student.lastName} {res.student.firstName}</p>
@@ -163,7 +163,7 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                                     </td>
                                     {user?.institution?.type === 'ECOLE' && (
                                         <td className="px-8 py-5">
-                                            <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-3 py-1 bg-slate-100 rounded-lg">
+                                            <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-3 py-1 bg-slate-100 ">
                                                 {res.subject?.name}
                                             </span>
                                         </td>
@@ -175,12 +175,12 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                                         </>
                                     )}
                                     <td className="px-8 py-5 text-center bg-indigo-50/30">
-                                        <span className={`px-4 py-1.5 rounded-xl font-black text-sm ${res.moyenneTrimestrielle >= (user?.institution?.type === 'ECOLE' ? 5 : 10) ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                                        <span className={`px-4 py-1.5  font-black text-sm ${res.moyenneTrimestrielle >= (user?.institution?.type === 'ECOLE' ? 5 : 10) ? 'bg-emerald-50 text-emerald-600  ' : 'bg-red-50 text-red-600  '}`}>
                                             {res.moyenneTrimestrielle.toFixed(2)}
                                         </span>
                                     </td>
                                     <td className="px-8 py-5 text-center font-bold text-slate-400">×{res.coefficient}</td>
-                                    <td className="px-8 py-5 text-center font-black text-slate-800 border-r border-slate-100">{res.points.toFixed(2)}</td>
+                                    <td className="px-8 py-5 text-center font-black text-slate-800  ">{res.points.toFixed(2)}</td>
                                     <td className="px-8 py-5 text-right">
                                         <input
                                             type="text"
@@ -193,7 +193,7 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                                                     setCalculatedResults(newResults);
                                                 }
                                             }}
-                                            className="text-[10px] font-black uppercase text-slate-500 tracking-wider bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-right focus:bg-white outline-none w-full max-w-[150px]"
+                                            className="text-[10px] font-black uppercase text-slate-500 tracking-wider bg-slate-50    px-3 py-2 text-right focus:bg-white outline-none w-full max-w-[150px]"
                                         />
                                     </td>
                                 </tr>
@@ -203,7 +203,7 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                 </div>
 
                 {user?.institution?.type === 'ECOLE' && calculatedResults.length > 0 && (
-                    <div className="p-8 bg-slate-900 text-white rounded-b-[40px]">
+                    <div className="p-8 bg-slate-900 text-white ]">
                         <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-3">
                             <TrendingUp size={16} className="text-emerald-400" />
                             Récapitulatif des Moyennes Générales (Estimation)
@@ -218,7 +218,7 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                                 const generalAvg = totalPoints / (subjectsCount || 1);
 
                                 return (
-                                    <div key={studentId} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex justify-between items-center">
+                                    <div key={studentId} className="bg-white/5    p-4 flex justify-between items-center">
                                         <div>
                                             <p className="text-[10px] font-black uppercase text-slate-500 mb-1 truncate max-w-[150px]">{studentName}</p>
                                             <p className="text-[9px] font-medium text-slate-400 italic">{subjectsCount} matières saisies</p>
@@ -233,8 +233,8 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                                 );
                             })}
                         </div>
-                        <div className="mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                        <div className="mt-6 p-4 bg-emerald-500/10    flex items-center gap-3">
+                            <div className="w-8 h-8  bg-emerald-500/20 flex items-center justify-center text-emerald-400">
                                 <ClipboardList size={14} />
                             </div>
                             <p className="text-[10px] font-medium text-emerald-100 italic">
@@ -247,14 +247,14 @@ const AveragesView: React.FC<AveragesViewProps> = ({
             <div className="flex justify-end gap-4 p-8">
                 <button
                     onClick={handleSaveAverages}
-                    className="bg-blue-600 text-white px-12 py-5 rounded-[24px] font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+                    className="bg-blue-600 text-white px-12 py-5 ] font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
                 >
                     ENREGISTRER LES MOYENNES <Save size={18} />
                 </button>
             </div>
-            <div className="bg-emerald-600 rounded-[32px] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl shadow-emerald-600/20">
+            <div className="bg-emerald-600 ] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl shadow-emerald-600/20">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                    <div className="w-12 h-12 bg-white/20  flex items-center justify-center">
                         <Check size={24} />
                     </div>
                     <div>
@@ -264,7 +264,7 @@ const AveragesView: React.FC<AveragesViewProps> = ({
                 </div>
                 <button
                     onClick={handlePublishGrades}
-                    className="bg-white text-emerald-600 px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl"
+                    className="bg-white text-emerald-600 px-10 py-4  font-black uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl"
                 >
                     Finaliser et Envoyer {dest}
                 </button>

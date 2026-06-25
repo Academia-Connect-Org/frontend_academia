@@ -24,12 +24,20 @@ const Navbar: React.FC = () => {
         { name: 'Support', path: '/support' },
     ];
 
+    const isAuthPage = location.pathname === ROUTES.LOGIN || location.pathname === ROUTES.REGISTER || location.pathname === ROUTES.PAYMENT;
+    const isContactPage = location.pathname === ROUTES.CONTACT;
+
+    let navClasses = scrolled || isAuthPage ? 'bg-blue-900/95 backdrop-blur-lg shadow-xl py-3' : 'bg-transparent py-6';
+    if (isContactPage) {
+        navClasses = 'bg-emerald-600/95 backdrop-blur-lg shadow-xl py-3';
+    }
+
     return (
-        <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-blue-900/95 backdrop-blur-lg shadow-xl py-3 border-b border-white/10' : 'bg-transparent py-6'}`}>
+        <nav className={`fixed w-full z-50 transition-all duration-500 ${navClasses}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center">
                     <Link to="/" className="flex items-center gap-3 group">
-                        <div className="bg-white p-1.5 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <div className="bg-white p-1.5  shadow-lg group-hover:scale-110 transition-transform duration-300">
                             <img src={logo} alt="Logo" className="h-8 w-8 object-contain" />
                         </div>
                         <span className="text-2xl font-black text-white tracking-tight">NB-MIND School</span>
@@ -50,13 +58,13 @@ const Navbar: React.FC = () => {
 
                         {isAuthenticated ? (
                             <div className="flex items-center gap-4">
-                                <Link to="/dashboard" className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-500 text-white font-bold text-sm uppercase tracking-widest hover:bg-blue-400 shadow-lg shadow-blue-500/30 transition-all border border-blue-400/50">
+                                <Link to="/dashboard" className="flex items-center gap-2 px-6 py-2.5  bg-blue-500 text-white font-bold text-sm uppercase tracking-widest hover:bg-blue-400 shadow-lg shadow-blue-500/30 transition-all  ">
                                     <LayoutDashboard size={18} />
                                     {user ? user.firstName : 'Dashboard'}
                                 </Link>
                                 <button
                                     onClick={logout}
-                                    className="p-2.5 text-blue-100 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                                    className="p-2.5 text-blue-100 hover:text-white hover:bg-white/10  transition-all"
                                     title="Déconnexion"
                                 >
                                     <LogOut size={20} />
@@ -67,7 +75,7 @@ const Navbar: React.FC = () => {
                                 <Link to={ROUTES.LOGIN} className="text-white font-bold hover:text-blue-300 transition-colors text-sm uppercase tracking-widest">
                                     Connexion
                                 </Link>
-                                <Link to={ROUTES.REGISTER} className="px-6 py-2.5 rounded-xl bg-blue-500 text-white font-bold text-sm uppercase tracking-widest hover:bg-blue-400 shadow-lg shadow-blue-500/30 transition-all border border-blue-400/50">
+                                <Link to={ROUTES.REGISTER} className="px-6 py-2.5  bg-blue-500 text-white font-bold text-sm uppercase tracking-widest hover:bg-blue-400 shadow-lg shadow-blue-500/30 transition-all  ">
                                     S'inscrire
                                 </Link>
                             </>
@@ -76,7 +84,7 @@ const Navbar: React.FC = () => {
 
                     {/* Mobile Toggle */}
                     <div className="md:hidden">
-                        <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
+                        <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-white hover:bg-white/10  transition-colors">
                             {isOpen ? <X size={28} /> : <Menu size={28} />}
                         </button>
                     </div>
@@ -85,7 +93,7 @@ const Navbar: React.FC = () => {
 
             {/* Mobile Menu */}
             {isOpen && (
-                <div className="md:hidden bg-blue-900 border-t border-white/10 p-6 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
+                <div className="md:hidden bg-blue-900   p-6 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
                     {navLinks.map((link) => (
                         <Link
                             key={link.name}
@@ -96,24 +104,24 @@ const Navbar: React.FC = () => {
                             {link.name}
                         </Link>
                     ))}
-                    <div className="flex flex-col gap-4 pt-4 border-t border-white/10">
+                    <div className="flex flex-col gap-4 pt-4  ">
                         {isAuthenticated ? (
                             <>
-                                <Link to="/dashboard" onClick={() => setIsOpen(false)} className="flex items-center justify-center gap-3 py-4 rounded-xl bg-blue-500 text-white font-bold">
+                                <Link to="/dashboard" onClick={() => setIsOpen(false)} className="flex items-center justify-center gap-3 py-4  bg-blue-500 text-white font-bold">
                                     <LayoutDashboard size={20} />
                                     {user ? `Espace ${user.firstName}` : 'Accéder au Dashboard'}
                                 </Link>
-                                <button onClick={() => { logout(); setIsOpen(false); }} className="flex items-center justify-center gap-3 py-4 rounded-xl border border-red-400/30 text-red-400 font-bold">
+                                <button onClick={() => { logout(); setIsOpen(false); }} className="flex items-center justify-center gap-3 py-4    text-red-400 font-bold">
                                     <LogOut size={20} />
                                     Déconnexion
                                 </button>
                             </>
                         ) : (
                             <>
-                                <Link to={ROUTES.LOGIN} onClick={() => setIsOpen(false)} className="text-center py-4 rounded-xl border border-white/30 text-white font-bold">
+                                <Link to={ROUTES.LOGIN} onClick={() => setIsOpen(false)} className="text-center py-4    text-white font-bold">
                                     Connexion
                                 </Link>
-                                <Link to={ROUTES.REGISTER} onClick={() => setIsOpen(false)} className="text-center py-4 rounded-xl bg-blue-500 text-white font-bold">
+                                <Link to={ROUTES.REGISTER} onClick={() => setIsOpen(false)} className="text-center py-4  bg-blue-500 text-white font-bold">
                                     S'inscrire
                                 </Link>
                             </>

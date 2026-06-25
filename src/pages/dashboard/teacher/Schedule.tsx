@@ -250,27 +250,27 @@ const Schedule: React.FC = () => {
                 <div className="flex gap-4">
                     <button
                         onClick={generatePDF}
-                        className="bg-blue-600 border border-blue-500 px-6 py-3.5 rounded-3xl font-bold text-white flex items-center gap-2 hover:bg-blue-700 transition-all shadow-lg active:scale-95"
+                        className="bg-blue-600   px-6 py-3.5  font-bold text-white flex items-center gap-2 hover:bg-blue-700 transition-all shadow-lg active:scale-95"
                     >
                         <Download size={18} /> Télécharger PDF
                     </button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-[45px] shadow-2xl border border-blue-50 overflow-hidden relative mb-12">
+            <div className="bg-white ] shadow-2xl   overflow-hidden relative mb-12">
                 {loading && (
                     <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-50 flex items-center justify-center">
                         <Loader2 className="animate-spin text-blue-600" size={48} />
                     </div>
                 )}
 
-                <div className="h-14 bg-slate-50 border-b border-slate-100 flex items-center">
-                    <div className="w-20 border-r border-slate-100 h-full flex items-center justify-center">
+                <div className="h-14 bg-slate-50   flex items-center">
+                    <div className="w-20   h-full flex items-center justify-center">
                         <Clock size={16} className="text-slate-400" />
                     </div>
                     <div className="flex-1 grid grid-cols-6 h-full items-center text-center">
                         {DAYS.map(day => (
-                            <div key={day} className="py-2 font-black text-[10px] text-slate-400 uppercase tracking-widest border-l border-blue-50 first:border-0">
+                            <div key={day} className="py-2 font-black text-[10px] text-slate-400 uppercase tracking-widest   first:">
                                 {day}
                             </div>
                         ))}
@@ -278,12 +278,12 @@ const Schedule: React.FC = () => {
                 </div>
 
                 <div className="flex relative" style={{ height: `${timeSlots.length * 100}px` }}>
-                    <div className="w-20 flex-shrink-0 border-r border-blue-50 relative z-20 bg-slate-50/50">
+                    <div className="w-20 flex-shrink-0   relative z-20 bg-slate-50/50">
                         {timeSlots.map(time => {
                             const { top } = calculatePositionAndHeight(time, time);
                             return (
                                 <div key={time} style={{ top }} className="absolute inset-x-0 h-4 -mt-2 text-[10px] font-black text-slate-400 text-center">
-                                    <span className="bg-white px-2 py-0.5 rounded-full border border-blue-50 shadow-sm">{time}</span>
+                                    <span className="bg-white px-2 py-0.5    shadow-sm">{time}</span>
                                 </div>
                             );
                         })}
@@ -293,9 +293,9 @@ const Schedule: React.FC = () => {
                         <div className="w-20"></div>
                         <div className="grid grid-cols-6 flex-1">
                             {DAYS.map((_, i) => (
-                                <div key={i} className="border-l border-blue-50 h-full relative">
+                                <div key={i} className="  h-full relative">
                                     {timeSlots.slice(0, -1).map((time, j) => (
-                                        <div key={j} className="h-[100px] border-b border-blue-50/50"></div>
+                                        <div key={j} className="h-[100px]  "></div>
                                     ))}
                                 </div>
                             ))}
@@ -315,7 +315,7 @@ const Schedule: React.FC = () => {
                                         })()
                                     );
                                     return (
-                                        <div key={`break-${i}`} className="absolute inset-x-0 bg-slate-100/40 border-y border-slate-200/50 flex items-center justify-center z-0" style={{ top, height }}>
+                                        <div key={`break-${i}`} className="absolute inset-x-0 bg-slate-100/40   flex items-center justify-center z-0" style={{ top, height }}>
                                             <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Pause</span>
                                         </div>
                                     );
@@ -330,11 +330,11 @@ const Schedule: React.FC = () => {
                                                 layout
                                                 initial={{ opacity: 0, scale: 0.9 }}
                                                 animate={{ opacity: 1, scale: 1 }}
-                                                className="absolute inset-x-0 rounded-3xl p-4 shadow-xl border-l-4 overflow-hidden group hover:z-20 hover:scale-[1.03] transition-all cursor-pointer"
+                                                className="absolute inset-x-0  p-4 shadow-xl  overflow-hidden group hover:z-20 hover:scale-[1.03] transition-all cursor-pointer"
                                                 style={{ top, height, backgroundColor: `${entry.subjectColor}15`, borderColor: entry.subjectColor }}
                                             >
                                                 <div className="flex flex-col h-full uppercase tracking-tighter">
-                                                    <span className="text-[10px] font-black px-2 py-1 rounded-full bg-white/80 text-slate-600 shadow-sm w-fit mb-2">
+                                                    <span className="text-[10px] font-black px-2 py-1  bg-white/80 text-slate-600 shadow-sm w-fit mb-2">
                                                         {entry.startTime} - {entry.endTime}
                                                     </span>
                                                     <h5 className="font-black text-slate-800 text-xs leading-tight mb-2" style={{ color: entry.subjectColor }}>
@@ -347,7 +347,7 @@ const Schedule: React.FC = () => {
                                                     <div className="absolute inset-x-0 bottom-0 bg-white/90 backdrop-blur-md p-3 translate-y-full group-hover:translate-y-0 transition-transform">
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); setAttendanceEntry({ entry, date: getNearestDateForDay(entry.dayOfWeek) }); }}
-                                                            className="w-full py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black tracking-widest uppercase"
+                                                            className="w-full py-2 bg-blue-600 text-white  text-[10px] font-black tracking-widest uppercase"
                                                         >
                                                             Faire l'appel
                                                         </button>
@@ -364,28 +364,28 @@ const Schedule: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-slate-900 p-8 rounded-[40px] text-white shadow-2xl relative overflow-hidden">
+                <div className="bg-slate-900 p-8 ] text-white shadow-2xl relative overflow-hidden">
                     <h3 className="text-xl font-black mb-6 flex items-center gap-2">
                         <Briefcase size={22} className="text-blue-400" /> Stats
                     </h3>
                     <div className="grid grid-cols-2 gap-6">
-                        <div className="bg-white/5 p-5 rounded-3xl border border-white/5">
+                        <div className="bg-white/5 p-5   ">
                             <p className="text-blue-200 text-[10px] font-black uppercase mb-1">Volume</p>
                             <p className="text-2xl font-black">{entries.length * 2}h</p>
                         </div>
-                        <div className="bg-white/5 p-5 rounded-3xl border border-white/5">
+                        <div className="bg-white/5 p-5   ">
                             <p className="text-blue-200 text-[10px] font-black uppercase mb-1">Classes</p>
                             <p className="text-2xl font-black">{new Set(entries.map(e => e.classeId)).size}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-blue-600 p-8 rounded-[40px] text-white shadow-2xl relative overflow-hidden">
+                <div className="bg-blue-600 p-8 ] text-white shadow-2xl relative overflow-hidden">
                     <h3 className="text-xl font-black mb-4 flex items-center gap-2"><Info size={22} /> Outils</h3>
                     <p className="text-blue-100 text-sm font-medium mb-6 uppercase tracking-tighter">Accès rapide.</p>
                     <div className="flex gap-3">
-                        <button onClick={() => navigate('/dashboard/teacher/book')} className="flex-1 bg-white text-blue-600 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">Cahier</button>
-                        <button onClick={() => navigate('/dashboard/teacher/attendance')} className="flex-1 bg-blue-700 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">Appel</button>
+                        <button onClick={() => navigate('/dashboard/teacher/book')} className="flex-1 bg-white text-blue-600 px-6 py-3  font-black text-xs uppercase tracking-widest shadow-lg">Cahier</button>
+                        <button onClick={() => navigate('/dashboard/teacher/attendance')} className="flex-1 bg-blue-700 text-white px-6 py-3  font-black text-xs uppercase tracking-widest shadow-lg">Appel</button>
                     </div>
                 </div>
             </div>

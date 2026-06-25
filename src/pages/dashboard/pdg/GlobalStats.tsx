@@ -113,11 +113,11 @@ const GlobalStats: React.FC = () => {
                     <p className="text-slate-500">Données consolidées de l'ensemble du réseau Academia</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="flex bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="flex bg-white    shadow-sm overflow-hidden">
                         <select
                             value={month}
                             onChange={(e) => setMonth(parseInt(e.target.value))}
-                            className="px-3 py-2 text-sm font-bold text-slate-600 bg-transparent border-r border-slate-100 outline-none hover:bg-slate-50 transition-all"
+                            className="px-3 py-2 text-sm font-bold text-slate-600 bg-transparent   outline-none hover:bg-slate-50 transition-all"
                         >
                             {[...Array(12)].map((_, i) => (
                                 <option key={i + 1} value={i + 1}>{new Date(0, i).toLocaleString('fr-FR', { month: 'long' })}</option>
@@ -135,7 +135,7 @@ const GlobalStats: React.FC = () => {
                     </div>
                     <button
                         onClick={exportGlobalStatsToPDF}
-                        className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all"
+                        className="bg-blue-600 text-white px-6 py-2.5  font-bold flex items-center gap-2 shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all"
                     >
                         <Download size={18} />
                         Exporter Rapport
@@ -181,7 +181,7 @@ const GlobalStats: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
                 {/* Growth Chart */}
-                <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100">
+                <div className="lg:col-span-2 bg-white p-8 ] shadow-xl shadow-slate-200/50  ">
                     <div className="flex items-center justify-between mb-8">
                         <div>
                             <h3 className="text-xl font-black text-slate-800 tracking-tight">Expansion du Réseau</h3>
@@ -208,7 +208,7 @@ const GlobalStats: React.FC = () => {
                 </div>
 
                 {/* Distribution Chart */}
-                <div className="bg-white p-8 rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100">
+                <div className="bg-white p-8 ] shadow-xl shadow-slate-200/50  ">
                     <h3 className="text-xl font-black text-slate-800 tracking-tight mb-8">Répartition par Niveau</h3>
                     <div className="h-[250px] w-full mb-8 min-w-0">
                         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -243,7 +243,7 @@ const GlobalStats: React.FC = () => {
             </div>
 
             {/* Schools Distribution */}
-            <div className="bg-white p-8 rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100 mb-10">
+            <div className="bg-white p-8 ] shadow-xl shadow-slate-200/50   mb-10">
                 <h3 className="text-xl font-black text-slate-800 tracking-tight mb-8">Top 5 Établissements (Effectifs)</h3>
                 <div className="h-[300px] w-full min-w-0">
                     <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -260,7 +260,7 @@ const GlobalStats: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
                 {/* Gender Distribution */}
-                <div className="bg-white p-8 rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100">
+                <div className="bg-white p-8 ] shadow-xl shadow-slate-200/50  ">
                     <h3 className="text-xl font-black text-slate-800 tracking-tight mb-8 text-center">Répartition des Élèves par Genre</h3>
                     <div className="h-[300px] w-full min-w-0">
                         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -303,12 +303,12 @@ interface DistributionEntry {
 }
 
 const StatCard = ({ title, value, trend, icon: Icon, color, bg }: any) => (
-    <div className="bg-white p-6 rounded-[28px] shadow-lg shadow-slate-200/50 border border-slate-100 group hover:scale-[1.02] transition-all duration-300">
+    <div className="bg-white p-6 ] shadow-lg shadow-slate-200/50   group hover:scale-[1.02] transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
-            <div className={`w-14 h-14 ${bg} ${color} rounded-2xl flex items-center justify-center transition-transform group-hover:rotate-12`}>
+            <div className={`w-14 h-14 ${bg} ${color}  flex items-center justify-center transition-transform group-hover:rotate-12`}>
                 <Icon size={28} />
             </div>
-            <div className={`flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full ${trend === 'up' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+            <div className={`flex items-center gap-1 text-[10px] font-black px-2.5 py-1  ${trend === 'up' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
                 {trend === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                 {trend === 'up' ? 'HAUSSE' : 'BAISSE'}
             </div>
@@ -323,7 +323,7 @@ const StatCard = ({ title, value, trend, icon: Icon, color, bg }: any) => (
 const DistributionItem = ({ label, value, inlineColor }: any) => (
     <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: inlineColor }}></div>
+            <div className="w-3 h-3 " style={{ backgroundColor: inlineColor }}></div>
             <span className="text-sm font-bold text-slate-600">{label}</span>
         </div>
         <span className="text-sm font-black text-slate-900">{value}</span>
@@ -338,7 +338,7 @@ const KPICard = ({ title, value, detail, color }: any) => {
         emerald: 'bg-emerald-600'
     };
     return (
-        <div className={`${colors[color as keyof typeof colors]} p-8 rounded-[32px] text-white shadow-xl shadow-slate-200/50 flex flex-col justify-between`}>
+        <div className={`${colors[color as keyof typeof colors]} p-8 ] text-white shadow-xl shadow-slate-200/50 flex flex-col justify-between`}>
             <div>
                 <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mb-2">{title}</p>
                 <h3 className="text-3xl font-black mb-2">{value}</h3>

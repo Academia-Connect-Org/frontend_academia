@@ -24,7 +24,7 @@ const AdminSettings: React.FC = () => {
             <div className="max-w-6xl mx-auto">
                 {/* Contenu Principal */}
                 <div className="w-full">
-                    <div className="bg-white rounded-[48px] p-12 shadow-2xl shadow-slate-200/50 border border-slate-100">
+                    <div className="bg-white ] p-12 shadow-2xl shadow-slate-200/50  ">
                         {activeTab === 'system' && (
                             <div className="space-y-12">
                                 <div>
@@ -80,7 +80,7 @@ const AdminSettings: React.FC = () => {
                                     <p className="text-slate-500 font-medium italic">Gestion des services cloud et intégrations tierces.</p>
                                 </div>
                                 <div className="space-y-10">
-                                    <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100">
+                                    <div className="p-8 bg-slate-50 ]  ">
                                         <h4 className="text-xs font-black text-indigo-600 uppercase tracking-widest mb-6">AWS S3 Configuration</h4>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                             <InputField label="S3 Bucket Name" placeholder="academia-connect-assets" />
@@ -115,9 +115,9 @@ const AdminSettings: React.FC = () => {
                             </div>
                         )}
 
-                        <div className="pt-10 border-t border-slate-50 flex justify-end gap-6 items-center">
+                        <div className="pt-10   flex justify-end gap-6 items-center">
                             <button className="text-slate-400 font-black uppercase text-xs tracking-widest hover:text-slate-600 transition-all underline-offset-4 hover:underline">Restaurer défauts</button>
-                            <button className="px-12 py-5 bg-slate-900 text-white rounded-3xl font-black flex items-center gap-3 shadow-2xl shadow-slate-900/20 hover:bg-slate-800 transition-all uppercase text-xs tracking-widest group">
+                            <button className="px-12 py-5 bg-slate-900 text-white  font-black flex items-center gap-3 shadow-2xl shadow-slate-900/20 hover:bg-slate-800 transition-all uppercase text-xs tracking-widest group">
                                 <Save size={20} className="group-hover:scale-110 transition-transform" />
                                 Sauvegarder
                             </button>
@@ -137,16 +137,16 @@ const InputField = ({ label, placeholder, disabled }: any) => (
             type="text"
             defaultValue={placeholder}
             disabled={disabled}
-            className={`w-full bg-slate-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none font-bold text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none font-bold text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed`}
         />
     </div>
 );
 
 const ToggleOption = ({ label, active }: any) => (
-    <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-lg transition-all cursor-pointer group">
+    <div className="flex items-center justify-between p-5 bg-slate-50    hover:bg-white hover:shadow-lg transition-all cursor-pointer group">
         <span className="text-xs font-black text-slate-600 uppercase tracking-widest">{label}</span>
-        <div className={`w-12 h-6 rounded-full p-1 transition-all ${active ? 'bg-emerald-500' : 'bg-slate-300'}`}>
-            <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${active ? 'translate-x-6' : 'translate-x-0'}`}></div>
+        <div className={`w-12 h-6  p-1 transition-all ${active ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+            <div className={`w-4 h-4 bg-white  shadow-sm transition-transform ${active ? 'translate-x-6' : 'translate-x-0'}`}></div>
         </div>
     </div>
 );

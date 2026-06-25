@@ -35,11 +35,11 @@ const Finance: React.FC = () => {
                     <p className="text-slate-500">Mouvements de trésorerie et gestion budgétaire globale</p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+                    <button className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
                         <Download size={18} />
                         Relevés
                     </button>
-                    <button className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-extrabold flex items-center gap-2 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all">
+                    <button className="bg-blue-600 text-white px-8 py-3  font-extrabold flex items-center gap-2 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all">
                         <Wallet size={18} />
                         Gestion Budget
                     </button>
@@ -70,7 +70,7 @@ const Finance: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Revenue/Expense Chart */}
-                <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100">
+                <div className="lg:col-span-2 bg-white p-8 ] shadow-xl shadow-slate-200/50  ">
                     <div className="flex items-center justify-between mb-8">
                         <div>
                             <h3 className="text-xl font-black text-slate-800 tracking-tight">Flux de Trésorerie</h3>
@@ -78,11 +78,11 @@ const Finance: React.FC = () => {
                         </div>
                         <div className="flex gap-4">
                             <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                <div className="w-3 h-3 bg-blue-600 "></div>
                                 <span className="text-xs font-bold text-slate-400">Recettes</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-slate-200 rounded-full"></div>
+                                <div className="w-3 h-3 bg-slate-200 "></div>
                                 <span className="text-xs font-bold text-slate-400">Dépenses</span>
                             </div>
                         </div>
@@ -108,7 +108,7 @@ const Finance: React.FC = () => {
                 {/* Breakdown & Alerts */}
                 <div className="space-y-6">
                     {/* Budget Consumption */}
-                    <div className="bg-white p-8 rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100">
+                    <div className="bg-white p-8 ] shadow-xl shadow-slate-200/50  ">
                         <h3 className="text-lg font-black text-slate-800 mb-6">Utilisation Budget</h3>
                         <div className="space-y-6">
                             <ProgressItem label="Salaires & Personnel" percent={78} color="bg-blue-600" />
@@ -119,18 +119,18 @@ const Finance: React.FC = () => {
                     </div>
 
                     {/* Quick Alerts */}
-                    <div className="bg-slate-900 p-8 rounded-[32px] text-white overflow-hidden relative">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-2xl"></div>
+                    <div className="bg-slate-900 p-8 ] text-white overflow-hidden relative">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10  blur-2xl"></div>
                         <h3 className="text-lg font-black mb-6 flex items-center gap-2">
                             <AlertCircle size={20} className="text-red-400" />
                             Attention Budgétaire
                         </h3>
                         <div className="space-y-4">
-                            <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                            <div className="p-4 bg-white/5   ">
                                 <p className="text-xs font-bold text-red-400 uppercase mb-1">Dépassement</p>
                                 <p className="text-sm text-white/80 leading-snug">Lycée Excellence: Poste maintenance +12%</p>
                             </div>
-                            <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                            <div className="p-4 bg-white/5   ">
                                 <p className="text-xs font-bold text-emerald-400 uppercase mb-1">Optimisation</p>
                                 <p className="text-sm text-white/80 leading-snug">Réseau Mobile: Économie de 500k détectée</p>
                             </div>
@@ -145,10 +145,10 @@ const Finance: React.FC = () => {
 // Internal Components
 const FinanceCard = ({ title, value, trend, trendType }: any) => {
     return (
-        <div className={`p-8 bg-white rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100 hover:scale-[1.02] transition-all duration-300`}>
+        <div className={`p-8 bg-white ] shadow-xl shadow-slate-200/50   hover:scale-[1.02] transition-all duration-300`}>
             <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-2">{title}</p>
             <h3 className="text-3xl font-black text-slate-800 mb-4 tracking-tight">{value}</h3>
-            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1  text-[10px] font-black uppercase tracking-wider
                 ${trendType === 'up' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
                 {trendType === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                 {trend} vs mois dernier
@@ -163,8 +163,8 @@ const ProgressItem = ({ label, percent, color }: any) => (
             <span className="text-xs font-bold text-slate-500 uppercase">{label}</span>
             <span className="text-sm font-black text-slate-800">{percent}%</span>
         </div>
-        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-            <div className={`h-full ${color} rounded-full`} style={{ width: `${percent}%` }}></div>
+        <div className="h-2 w-full bg-slate-100  overflow-hidden">
+            <div className={`h-full ${color} `} style={{ width: `${percent}%` }}></div>
         </div>
     </div>
 );

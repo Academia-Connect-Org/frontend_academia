@@ -191,13 +191,13 @@ const Staff: React.FC = () => {
                     <button
                         onClick={handleExport}
                         disabled={exporting}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
+                        className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
                     >
                         <Download size={18} /> {exporting ? 'Exportation...' : 'Exporter Liste'}
                     </button>
                     <button
                         onClick={() => { resetForm(); setShowModal(true); }}
-                        className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-extrabold flex items-center gap-2 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="bg-blue-600 text-white px-8 py-3  font-extrabold flex items-center gap-2 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all"
                     >
                         <UserPlus size={18} /> Nouvel Enseignant
                     </button>
@@ -205,7 +205,7 @@ const Staff: React.FC = () => {
             </div>
 
             {message.text && (
-                <div className={`p-4 rounded-2xl mb-6 font-bold flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                <div className={`p-4  mb-6 font-bold flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600  ' : 'bg-red-50 text-red-600  '}`}>
                     <div className="flex items-center gap-3">
                         {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
                         {message.text}
@@ -214,13 +214,13 @@ const Staff: React.FC = () => {
                 </div>
             )}
 
-            <div className="bg-white rounded-[40px] shadow-xl border border-slate-100 overflow-hidden mb-10">
-                <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="bg-white ] shadow-xl   overflow-hidden mb-10">
+                <div className="p-8   flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex flex-wrap items-center gap-4">
                         <select
                             value={selectedCycle}
                             onChange={(e) => setSelectedCycle(e.target.value)}
-                            className="bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-600/5 transition-all"
+                            className="bg-slate-50 border-none  px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-600/5 transition-all"
                         >
                             <option value="">Tous les Cycles</option>
                             {cycles.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
@@ -228,7 +228,7 @@ const Staff: React.FC = () => {
                         <select
                             value={selectedSubject}
                             onChange={(e) => setSelectedSubject(e.target.value)}
-                            className="bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-600/5 transition-all"
+                            className="bg-slate-50 border-none  px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-600/5 transition-all"
                         >
                             <option value="">Toutes les Matières</option>
                             {subjects.map(s => <option key={s} value={s}>{s}</option>)}
@@ -242,7 +242,7 @@ const Staff: React.FC = () => {
                             placeholder="Rechercher (Nom, Email)..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-slate-50 border-none rounded-2xl pl-12 pr-6 py-3 text-sm focus:ring-4 focus:ring-blue-600/5 transition-all outline-none w-full md:w-[300px]"
+                            className="bg-slate-50 border-none  pl-12 pr-6 py-3 text-sm focus:ring-4 focus:ring-blue-600/5 transition-all outline-none w-full md:w-[300px]"
                         />
                     </div>
                 </div>
@@ -263,7 +263,7 @@ const Staff: React.FC = () => {
                                 <tr key={teacher.id} className="hover:bg-slate-50/30 transition-colors group">
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black">
+                                            <div className="w-10 h-10  bg-blue-50 text-blue-600 flex items-center justify-center font-black">
                                                 {teacher.firstName[0]}{teacher.lastName[0]}
                                             </div>
                                             <div>
@@ -275,7 +275,7 @@ const Staff: React.FC = () => {
                                     <td className="px-8 py-5">
                                         <div className="flex flex-wrap gap-1">
                                             {teacher.cycles && teacher.cycles.length > 0 ? teacher.cycles.map((c: any) => (
-                                                <span key={c.id} className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase">
+                                                <span key={c.id} className="px-3 py-1 bg-slate-100 text-slate-600  text-[10px] font-black uppercase">
                                                     {c.name}
                                                 </span>
                                             )) : <span className="text-[10px] text-slate-400 italic">N/A</span>}
@@ -284,7 +284,7 @@ const Staff: React.FC = () => {
                                     <td className="px-8 py-5">
                                         <div className="flex flex-wrap gap-1">
                                             {teacher.specialties?.map((s: string) => (
-                                                <span key={s} className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px] font-bold">
+                                                <span key={s} className="px-2 py-0.5 bg-blue-50 text-blue-600  text-[9px] font-bold">
                                                     {s}
                                                 </span>
                                             )) || <span className="text-slate-300 italic text-[10px]">Aucune</span>}
@@ -306,13 +306,13 @@ const Staff: React.FC = () => {
                                         <div className="flex items-center justify-end gap-2">
                                             <button
                                                 onClick={() => openEditModal(teacher)}
-                                                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all"
                                             >
                                                 <Edit size={18} />
                                             </button>
                                             <button
                                                 onClick={() => setConfirmDialog({ isOpen: true, id: teacher.id })}
-                                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50  transition-all"
                                             >
                                                 <Trash2 size={18} />
                                             </button>
@@ -334,7 +334,7 @@ const Staff: React.FC = () => {
             {/* MODAL TEACHER */}
             {showModal && (
                 <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-lg rounded-[40px] p-8 shadow-2xl animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
+                    <div className="bg-white w-full max-w-lg ] p-8 shadow-2xl animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-black text-slate-800">{isEditing ? "Modifier l'Enseignant" : "Inscrire un Enseignant"}</h3>
                             <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600"><X size={24} /></button>
@@ -344,7 +344,7 @@ const Staff: React.FC = () => {
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Prénom</label>
                                 <input
                                     type="text"
-                                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-200"
+                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
                                     value={formData.firstName}
                                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                 />
@@ -353,7 +353,7 @@ const Staff: React.FC = () => {
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nom</label>
                                 <input
                                     type="text"
-                                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-200"
+                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
                                     value={formData.lastName}
                                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                 />
@@ -362,7 +362,7 @@ const Staff: React.FC = () => {
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
                                 <input
                                     type="email"
-                                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-200"
+                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 />
@@ -371,7 +371,7 @@ const Staff: React.FC = () => {
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Téléphone</label>
                                 <input
                                     type="text"
-                                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-200"
+                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                 />
@@ -382,7 +382,7 @@ const Staff: React.FC = () => {
                                     <input
                                         type="password"
                                         placeholder="Optionnel"
-                                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-200"
+                                        className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     />
@@ -391,7 +391,7 @@ const Staff: React.FC = () => {
                             <div className="col-span-2 space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Cycle Principal</label>
                                 <select
-                                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-200"
+                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
                                     value={formData.cycle}
                                     onChange={(e) => setFormData({ ...formData, cycle: e.target.value })}
                                 >
@@ -401,7 +401,7 @@ const Staff: React.FC = () => {
                             </div>
                             <div className="col-span-2 space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Spécialités (Matières)</label>
-                                <div className="grid grid-cols-2 gap-2 p-4 bg-slate-50 rounded-xl max-h-40 overflow-y-auto">
+                                <div className="grid grid-cols-2 gap-2 p-4 bg-slate-50  max-h-40 overflow-y-auto">
                                     {subjects.map(subject => (
                                         <label key={subject} className="flex items-center gap-2 cursor-pointer group">
                                             <input
@@ -413,7 +413,7 @@ const Staff: React.FC = () => {
                                                         : formData.specialties.filter(s => s !== subject);
                                                     setFormData({ ...formData, specialties: updated });
                                                 }}
-                                                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                className="  text-blue-600 focus:ring-blue-500"
                                             />
                                             <span className="text-[11px] font-bold text-slate-700 group-hover:text-blue-600">{subject}</span>
                                         </label>
@@ -424,7 +424,7 @@ const Staff: React.FC = () => {
                         <button
                             onClick={handleCreateOrUpdate}
                             disabled={loading || !formData.firstName || !formData.lastName || !formData.email}
-                            className="w-full mt-8 py-4 bg-blue-600 text-white rounded-2xl font-black shadow-xl shadow-blue-600/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                            className="w-full mt-8 py-4 bg-blue-600 text-white  font-black shadow-xl shadow-blue-600/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                         >
                             {loading ? 'Traitement...' : isEditing ? 'Mettre à jour' : 'Inscrire l\'enseignant'}
                         </button>
@@ -435,13 +435,13 @@ const Staff: React.FC = () => {
             {/* CONFIRM DELETE */}
             {confirmDialog.isOpen && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-sm rounded-[40px] p-8 shadow-2xl animate-in zoom-in-95 duration-200 text-center">
-                        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6"><AlertCircle size={32} /></div>
+                    <div className="bg-white w-full max-w-sm ] p-8 shadow-2xl animate-in zoom-in-95 duration-200 text-center">
+                        <div className="w-16 h-16 bg-red-50 text-red-500  flex items-center justify-center mx-auto mb-6"><AlertCircle size={32} /></div>
                         <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2">Supprimer ?</h3>
                         <p className="text-slate-500 text-sm mb-8">Êtes-vous sûr de vouloir supprimer ce compte enseignant ? Cette action est irréversible.</p>
                         <div className="flex gap-4">
-                            <button onClick={() => setConfirmDialog({ isOpen: false, id: null })} className="flex-1 py-4 rounded-2xl font-bold bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">Annuler</button>
-                            <button onClick={handleDelete} className="flex-1 py-4 rounded-2xl font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all">Confirmer</button>
+                            <button onClick={() => setConfirmDialog({ isOpen: false, id: null })} className="flex-1 py-4  font-bold bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">Annuler</button>
+                            <button onClick={handleDelete} className="flex-1 py-4  font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all">Confirmer</button>
                         </div>
                     </div>
                 </div>

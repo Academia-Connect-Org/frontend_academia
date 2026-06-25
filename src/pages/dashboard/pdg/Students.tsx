@@ -6,10 +6,12 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
 import { exportToCSV } from '../../../utils/export';
 import api from '../../../api/axios';
+import { useAuth } from '../../../context/AuthContext';
 
 const Students: React.FC = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const institutionId = searchParams.get('institutionId') ? Number(searchParams.get('institutionId')) : undefined;
 
     const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
@@ -19,8 +21,12 @@ const Students: React.FC = () => {
         if (isExporting) return;
         setIsExporting(true);
         try {
-            const url = institutionId ? `/students?institutionId=${institutionId}` : '/students';
-            const res = await api.get(url);
+            const params = new URLSearchParams();
+            if (institutionId) params.append('institutionId', institutionId.toString());
+            if (user?.id) params.append('ceoId', user.id.toString());
+            const qs = params.toString() ? `?${params.toString()}` : '';
+
+            const res = await api.get(`/students${qs}`);
             const exportData = res.data.map((s: any) => ({
                 ID: s.id,
                 Nom: s.lastName,
@@ -46,7 +52,7 @@ const Students: React.FC = () => {
                     {institutionId && (
                         <button
                             onClick={() => navigate(ROUTES.DASHBOARD.PDG.SCHOOL_DETAILS.replace(':id', institutionId.toString()))}
-                            className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-sm"
+                            className="w-12 h-12 bg-white    flex items-center justify-center text-slate-400 hover:text-indigo-600 hover: transition-all shadow-sm"
                             title="Retour à l'établissement"
                         >
                             <ArrowLeft size={20} />
@@ -61,27 +67,27 @@ const Students: React.FC = () => {
                     <button
                         onClick={handleExport}
                         disabled={isExporting}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
+                        className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
                     >
                         {isExporting ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
                         Export Excel
                     </button>
                     <button
                         onClick={() => setIsDemoModalOpen(true)}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+                        className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
                     >
                         <Users size={18} /> Rapport
                     </button>
                     <button
                         onClick={() => navigate(`${ROUTES.DASHBOARD.PDG.ENROLL}${institutionId ? `?institutionId=${institutionId}` : ''}`)}
-                        className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-extrabold flex items-center gap-2 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="bg-blue-600 text-white px-8 py-3  font-extrabold flex items-center gap-2 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all"
                     >
                         <Plus size={18} /> Nouvelle Inscription
                     </button>
                 </div>
             </div>
 
-            <StudentList role="PDG" institutionId={institutionId} />
+            <StudentList role="PDG" institutionId={institutionId} ceoId={user?.id} />
 
             <DemographicsModal
                 isOpen={isDemoModalOpen}

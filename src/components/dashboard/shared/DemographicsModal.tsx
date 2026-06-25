@@ -51,11 +51,11 @@ const DemographicsModal: React.FC<DemographicsModalProps> = ({ isOpen, onClose, 
                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                    className="bg-white w-full max-w-4xl rounded-[40px] shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]"
+                    className="bg-white w-full max-w-4xl ] shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]"
                 >
-                    <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <div className="p-8   flex justify-between items-center bg-slate-50/50">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-600/20">
+                            <div className="w-12 h-12 bg-indigo-600  flex items-center justify-center text-white shadow-lg shadow-indigo-600/20">
                                 <BarChart2 size={24} />
                             </div>
                             <div>
@@ -63,7 +63,7 @@ const DemographicsModal: React.FC<DemographicsModalProps> = ({ isOpen, onClose, 
                                 <p className="text-slate-500 text-sm font-medium">Analyse de la répartition des élèves par genre et par cycle.</p>
                             </div>
                         </div>
-                        <button onClick={onClose} className="p-3 bg-white text-slate-400 rounded-2xl hover:text-rose-500 hover:shadow-md transition-all border border-slate-100">
+                        <button onClick={onClose} className="p-3 bg-white text-slate-400  hover:text-rose-500 hover:shadow-md transition-all  ">
                             <X size={20} />
                         </button>
                     </div>
@@ -71,22 +71,22 @@ const DemographicsModal: React.FC<DemographicsModalProps> = ({ isOpen, onClose, 
                     <div className="p-8 overflow-y-auto">
                         {loading ? (
                             <div className="py-20 text-center">
-                                <div className="w-12 h-12 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4"></div>
+                                <div className="w-12 h-12     animate-spin mx-auto mb-4"></div>
                                 <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Analyse des données en cours...</p>
                             </div>
                         ) : data ? (
                             <div className="space-y-10">
                                 {/* KPIs */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div className="bg-indigo-50/50 p-6 rounded-[32px] border border-indigo-100">
+                                    <div className="bg-indigo-50/50 p-6 ]  ">
                                         <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Total Élèves</p>
                                         <h4 className="text-3xl font-black text-indigo-600">{data.totalStudents}</h4>
                                     </div>
-                                    <div className="bg-blue-50/50 p-6 rounded-[32px] border border-blue-100">
+                                    <div className="bg-blue-50/50 p-6 ]  ">
                                         <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Garçons</p>
                                         <h4 className="text-3xl font-black text-blue-600">{data.genderDistribution.GARÇONS}</h4>
                                     </div>
-                                    <div className="bg-pink-50/50 p-6 rounded-[32px] border border-pink-100">
+                                    <div className="bg-pink-50/50 p-6 ]  ">
                                         <p className="text-[10px] font-black text-pink-400 uppercase tracking-widest mb-1">Filles</p>
                                         <h4 className="text-3xl font-black text-pink-600">{data.genderDistribution.FILLES}</h4>
                                     </div>
@@ -94,7 +94,7 @@ const DemographicsModal: React.FC<DemographicsModalProps> = ({ isOpen, onClose, 
 
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                                     {/* Gender Pie Chart */}
-                                    <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm">
+                                    <div className="bg-white p-8 ]   shadow-sm">
                                         <div className="flex items-center gap-3 mb-8">
                                             <PieChart size={20} className="text-indigo-600" />
                                             <h4 className="font-black text-slate-800 uppercase text-xs tracking-widest">Répartition par Genre</h4>
@@ -125,7 +125,7 @@ const DemographicsModal: React.FC<DemographicsModalProps> = ({ isOpen, onClose, 
                                     </div>
 
                                     {/* Cycle Bar Chart */}
-                                    <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm">
+                                    <div className="bg-white p-8 ]   shadow-sm">
                                         <div className="flex items-center gap-3 mb-8">
                                             <BarChart2 size={20} className="text-indigo-600" />
                                             <h4 className="font-black text-slate-800 uppercase text-xs tracking-widest">Répartition par Cycle</h4>
@@ -148,7 +148,7 @@ const DemographicsModal: React.FC<DemographicsModalProps> = ({ isOpen, onClose, 
                                 </div>
                             </div>
                         ) : (
-                            <div className="py-20 text-center bg-slate-50 rounded-[40px] border border-dashed border-slate-200">
+                            <div className="py-20 text-center bg-slate-50 ]   ">
                                 <Info size={40} className="mx-auto text-slate-300 mb-4" />
                                 <p className="text-slate-400 font-bold">Aucune donnée démographique disponible pour cet établissement.</p>
                             </div>

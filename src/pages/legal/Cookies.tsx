@@ -15,9 +15,9 @@ const Cookies: React.FC = () => {
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-[48px] p-12 md:p-20 shadow-2xl shadow-slate-200 border border-slate-100"
+                    className="bg-white ] p-12 md:p-20 shadow-2xl shadow-slate-200  "
                 >
-                    <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mb-10">
+                    <div className="w-20 h-20 bg-amber-50 text-amber-600  flex items-center justify-center mb-10">
                         <Cookie size={40} />
                     </div>
 
@@ -43,11 +43,11 @@ const Cookies: React.FC = () => {
                                 <ShieldCheck className="text-amber-500" size={24} /> Types de Cookies Utilisés
                             </h2>
                             <div className="grid md:grid-cols-2 gap-6">
-                                <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100">
+                                <div className="p-8 bg-slate-50 ]  ">
                                     <h4 className="font-black text-slate-900 mb-2 uppercase tracking-wide">Indispensables</h4>
                                     <p className="text-sm text-slate-500 italic">Essentiels pour l'authentification et l'accès au Dashboard sécurisé.</p>
                                 </div>
-                                <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 opacity-60">
+                                <div className="p-8 bg-slate-50 ]   opacity-60">
                                     <h4 className="font-black text-slate-900 mb-2 uppercase tracking-wide">Analytiques</h4>
                                     <p className="text-sm text-slate-500 italic">Pour comprendre comment vous utilisez notre outil et l'améliorer (anonyme).</p>
                                 </div>

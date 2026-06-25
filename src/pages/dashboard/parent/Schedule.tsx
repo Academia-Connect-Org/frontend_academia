@@ -222,7 +222,7 @@ const ParentSchedule: React.FC = () => {
                             <select
                                 value={selectedClassId}
                                 onChange={(e) => setSelectedClassId(e.target.value)}
-                                className="bg-white border-2 border-slate-100 px-6 py-3.5 rounded-2xl font-bold text-slate-600 outline-none focus:border-purple-500 transition-all shadow-sm"
+                                className="bg-white   px-6 py-3.5  font-bold text-slate-600 outline-none focus: transition-all shadow-sm"
                             >
                                 <option value="all">Toutes les classes</option>
                                 {classes.map(c => (
@@ -233,7 +233,7 @@ const ParentSchedule: React.FC = () => {
                     )}
                     <button
                         onClick={downloadPDF}
-                        className="bg-white border-2 border-slate-100 hover:border-purple-200 px-8 py-4 rounded-[28px] font-black text-slate-700 flex items-center gap-3 hover:bg-purple-50 transition-all shadow-sm uppercase text-[10px] tracking-widest self-end"
+                        className="bg-white   hover: px-8 py-4 ] font-black text-slate-700 flex items-center gap-3 hover:bg-purple-50 transition-all shadow-sm uppercase text-[10px] tracking-widest self-end"
                     >
                         <Download size={18} className="text-purple-600" /> Exporter PDF
                     </button>
@@ -241,21 +241,21 @@ const ParentSchedule: React.FC = () => {
             </div>
 
             {/* Child Toggle Bar */}
-            <div className="bg-white p-2.5 rounded-[36px] shadow-xl border border-slate-50 flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <div className="bg-white p-2.5 ] shadow-xl   flex items-center gap-2 overflow-x-auto no-scrollbar">
                 {filteredChildren.map((child: any) => (
                     <button
                         key={child.id}
                         onClick={() => setSelectedChildId(String(child.id))}
-                        className={`px-8 py-4.5 rounded-[28px] font-black text-[11px] uppercase tracking-[0.15em] transition-all flex items-center gap-4 whitespace-nowrap
+                        className={`px-8 py-4.5 ] font-black text-[11px] uppercase tracking-[0.15em] transition-all flex items-center gap-4 whitespace-nowrap
                             ${selectedChildId === String(child.id)
                                 ? 'bg-purple-600 text-white shadow-2xl shadow-purple-600/30 scale-105 active:scale-95'
                                 : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[10px] ${selectedChildId === String(child.id) ? 'bg-white/20' : 'bg-slate-100'}`}>
+                        <div className={`w-8 h-8  flex items-center justify-center text-[10px] ${selectedChildId === String(child.id) ? 'bg-white/20' : 'bg-slate-100'}`}>
                             {child.firstName[0]}
                         </div>
                         {child.firstName} {child.lastName}
-                        <span className={`ml-2 px-3 py-1 rounded-lg text-[9px] font-bold ${selectedChildId === String(child.id) ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                        <span className={`ml-2 px-3 py-1  text-[9px] font-bold ${selectedChildId === String(child.id) ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-400'}`}>
                             {child.classe?.name}
                         </span>
                     </button>
@@ -263,7 +263,7 @@ const ParentSchedule: React.FC = () => {
             </div>
 
             {/* Main Schedule Visualizer */}
-            <div className="bg-white rounded-[56px] shadow-2xl border border-slate-50 overflow-x-auto relative mb-12 custom-scrollbar">
+            <div className="bg-white ] shadow-2xl   overflow-x-auto relative mb-12 custom-scrollbar">
                 <div className="min-w-[1200px]">
                     {loading && (
                         <div className="absolute inset-0 bg-white/60 backdrop-blur-[4px] z-50 flex flex-col items-center justify-center gap-4">
@@ -274,7 +274,7 @@ const ParentSchedule: React.FC = () => {
 
                     {!selectedChildId && !loading && (
                         <div className="p-32 text-center">
-                            <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 border-2 border-dashed border-slate-200">
+                            <div className="w-24 h-24 bg-slate-50  flex items-center justify-center mx-auto mb-8   ">
                                 <UserIcon className="text-slate-300" size={40} />
                             </div>
                             <h3 className="text-2xl font-black text-slate-400 uppercase tracking-widest">Sélectionnez un enfant</h3>
@@ -285,11 +285,11 @@ const ParentSchedule: React.FC = () => {
                     {selectedChildId && (
                         <>
                             {/* Days Header */}
-                            <div className="bg-slate-50/50 border-b border-slate-100 p-2 flex">
+                            <div className="bg-slate-50/50   p-2 flex">
                                 <div className="w-24 flex-shrink-0"></div>
                                 <div className="grid grid-cols-6 flex-1 text-center">
                                     {DAYS.map(day => (
-                                        <div key={day} className="py-6 font-black text-[12px] text-slate-400 uppercase tracking-[0.2em] border-l border-slate-100 first:border-0 border-dashed">
+                                        <div key={day} className="py-6 font-black text-[12px] text-slate-400 uppercase tracking-[0.2em]   first: ">
                                             {day}
                                         </div>
                                     ))}
@@ -299,12 +299,12 @@ const ParentSchedule: React.FC = () => {
                             {/* Main Body */}
                             <div className="flex relative" style={{ height: `${timeSlots.length * 120}px` }}>
                                 {/* Hour markers */}
-                                <div className="w-24 flex-shrink-0 border-r border-slate-100 border-dashed relative z-20">
+                                <div className="w-24 flex-shrink-0    relative z-20">
                                     {timeSlots.map(time => {
                                         const { top } = calculatePositionAndHeight(time, time);
                                         return (
                                             <div key={time} style={{ top: `calc(${top} * 1.2)` }} className="absolute inset-x-0 h-6 -mt-3 text-[11px] font-black text-slate-500 text-center flex items-center justify-center">
-                                                <span className="bg-white px-3 py-1.5 rounded-xl border border-slate-100 shadow-sm">{time}</span>
+                                                <span className="bg-white px-3 py-1.5    shadow-sm">{time}</span>
                                             </div>
                                         );
                                     })}
@@ -313,7 +313,7 @@ const ParentSchedule: React.FC = () => {
                                 {/* Columns */}
                                 <div className="flex-1 grid grid-cols-6 relative z-10">
                                     {DAYS.map((day) => (
-                                        <div key={day} className="relative h-full mx-1.5 border-l border-slate-100/50 first:border-0 border-dashed">
+                                        <div key={day} className="relative h-full mx-1.5   first: ">
                                             {/* Breaks BG */}
                                             {timetableConfig.breaks.map((b, i) => {
                                                 const { top, height } = calculatePositionAndHeight(
@@ -327,7 +327,7 @@ const ParentSchedule: React.FC = () => {
                                                 return (
                                                     <div
                                                         key={`break-${i}`}
-                                                        className="absolute inset-x-0 bg-slate-50/80 backdrop-blur-[1px] border-y border-slate-200/40 flex flex-col items-center justify-center pointer-events-none z-0"
+                                                        className="absolute inset-x-0 bg-slate-50/80 backdrop-blur-[1px]   flex flex-col items-center justify-center pointer-events-none z-0"
                                                         style={{ top: `calc(${top} * 1.2)`, height: `calc(${height} * 1.2)` }}
                                                     >
                                                         <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Pause</span>
@@ -344,7 +344,7 @@ const ParentSchedule: React.FC = () => {
                                                             initial={{ opacity: 0, scale: 0.95 }}
                                                             animate={{ opacity: 1, scale: 1 }}
                                                             whileHover={{ scale: 1.02, zIndex: 30 }}
-                                                            className="absolute inset-x-0 rounded-[32px] p-6 shadow-2xl border-l-[6px] overflow-hidden group transition-all cursor-default backdrop-blur-xl"
+                                                            className="absolute inset-x-0 ] p-6 shadow-2xl ] overflow-hidden group transition-all cursor-default backdrop-blur-xl"
                                                             style={{
                                                                 top: `calc(${top} * 1.2)`,
                                                                 height: `calc(${height} * 1.2)`,
@@ -354,10 +354,10 @@ const ParentSchedule: React.FC = () => {
                                                         >
                                                             <div className="flex flex-col h-full uppercase gap-1">
                                                                 <div className="flex items-center justify-between mb-3">
-                                                                    <span className="text-[10px] font-black px-3 py-1.5 rounded-xl bg-white text-slate-500 shadow-sm tracking-tighter">
+                                                                    <span className="text-[10px] font-black px-3 py-1.5  bg-white text-slate-500 shadow-sm tracking-tighter">
                                                                         {entry.startTime} - {entry.endTime}
                                                                     </span>
-                                                                    <div className="w-8 h-8 rounded-full bg-white/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <div className="w-8 h-8  bg-white/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                                         <Info size={14} className="text-slate-400" />
                                                                     </div>
                                                                 </div>
@@ -366,13 +366,13 @@ const ParentSchedule: React.FC = () => {
                                                                 </h5>
                                                                 <div className="space-y-2 mt-auto">
                                                                     <div className="flex items-center gap-3">
-                                                                        <div className="w-7 h-7 rounded-xl bg-white/60 flex items-center justify-center shadow-sm">
+                                                                        <div className="w-7 h-7  bg-white/60 flex items-center justify-center shadow-sm">
                                                                             <UserIcon size={12} className="text-purple-600" />
                                                                         </div>
                                                                         <p className="text-[10px] font-bold text-slate-600 truncate">{entry.teacherName}</p>
                                                                     </div>
                                                                     <div className="flex items-center gap-3">
-                                                                        <div className="w-7 h-7 rounded-xl bg-white/60 flex items-center justify-center shadow-sm">
+                                                                        <div className="w-7 h-7  bg-white/60 flex items-center justify-center shadow-sm">
                                                                             <MapPin size={12} className="text-emerald-500" />
                                                                         </div>
                                                                         <p className="text-[10px] font-bold text-slate-600 italic">Salle: {entry.room}</p>
@@ -394,8 +394,8 @@ const ParentSchedule: React.FC = () => {
 
             {/* Matrix Footer */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <div className="bg-slate-950 p-12 rounded-[56px] text-white shadow-3xl relative overflow-hidden group min-h-[300px] flex flex-col justify-center">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 rounded-full blur-[120px] group-hover:scale-125 transition-transform duration-1000"></div>
+                <div className="bg-slate-950 p-12 ] text-white shadow-3xl relative overflow-hidden group min-h-[300px] flex flex-col justify-center">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10  blur-[120px] group-hover:scale-125 transition-transform duration-1000"></div>
                     <div className="relative z-10">
                         <h4 className="text-2xl font-black mb-8 flex items-center gap-4">
                             <BookOpen size={36} className="text-purple-500" /> Synthèse Hebdomadaire
@@ -417,18 +417,18 @@ const ParentSchedule: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="bg-white p-12 rounded-[56px] shadow-2xl border-2 border-slate-50 relative overflow-hidden flex flex-col justify-center items-start group min-h-[300px]">
-                    <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-50 rounded-full blur-3xl opacity-60 group-hover:scale-150 transition-transform duration-1000"></div>
-                    <div className="w-20 h-20 bg-purple-50 rounded-[28px] flex items-center justify-center mb-8 border border-purple-100/50">
+                <div className="bg-white p-12 ] shadow-2xl   relative overflow-hidden flex flex-col justify-center items-start group min-h-[300px]">
+                    <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-50  blur-3xl opacity-60 group-hover:scale-150 transition-transform duration-1000"></div>
+                    <div className="w-20 h-20 bg-purple-50 ] flex items-center justify-center mb-8  ">
                         <Clock className="text-purple-600" size={32} />
                     </div>
                     <h4 className="text-2xl font-black text-slate-900 mb-4 flex items-center gap-4">
-                        Suivi en temps réel <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/20"></div>
+                        Suivi en temps réel <div className="w-3 h-3 bg-emerald-500  animate-pulse shadow-lg shadow-emerald-500/20"></div>
                     </h4>
                     <p className="text-slate-500 font-bold leading-relaxed max-w-sm uppercase tracking-tighter text-sm mb-10">
                         L'emploi du temps est mis à jour instantanément par la direction. Tout changement de salle ou de professeur apparaîtra ici.
                     </p>
-                    <button className="bg-slate-900 text-white px-10 py-5 rounded-[24px] font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-slate-900/30 hover:bg-purple-700 transition-all flex items-center gap-4">
+                    <button className="bg-slate-900 text-white px-10 py-5 ] font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-slate-900/30 hover:bg-purple-700 transition-all flex items-center gap-4">
                         Synchroniser <ChevronRight size={18} />
                     </button>
                 </div>
@@ -439,8 +439,8 @@ const ParentSchedule: React.FC = () => {
                     .no-scrollbar::-webkit-scrollbar { display: none; }
                     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
                     .custom-scrollbar::-webkit-scrollbar { height: 8px; }
-                    .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 10px; }
-                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+                    .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; -radius: 10px; }
+                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; -radius: 10px; }
                     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
                 `}
             </style>

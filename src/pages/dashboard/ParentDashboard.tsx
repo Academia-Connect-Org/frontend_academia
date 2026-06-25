@@ -35,16 +35,16 @@ const ParentDashboard: React.FC = () => {
     return (
         <>
             {/* Header: Student Selection / Welcome */}
-            <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100 mb-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="bg-white p-8 ] shadow-xl   mb-10 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-6">
                     <div className="flex -space-x-4">
                         {stats?.children?.map((child: any, idx: number) => (
-                            <div key={child.id} className={`w-16 h-16 rounded-full border-4 border-white ${idx % 2 === 0 ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'} flex items-center justify-center font-black text-xl shadow-lg ring-1 ring-slate-200`}>
+                            <div key={child.id} className={`w-16 h-16    ${idx % 2 === 0 ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'} flex items-center justify-center font-black text-xl shadow-lg ring-1 ring-slate-200`}>
                                 {child.firstName.charAt(0)}{child.lastName.charAt(0)}
                             </div>
                         ))}
                         {(!stats?.children || stats.children.length === 0) && (
-                            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                            <div className="w-16 h-16  bg-slate-100 flex items-center justify-center text-slate-400">
                                 <UsersIcon size={24} />
                             </div>
                         )}
@@ -55,7 +55,7 @@ const ParentDashboard: React.FC = () => {
                     </div>
                 </div>
                 <div className="flex gap-4 w-full md:w-auto">
-                    <button className="px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">
+                    <button className="px-6 py-4 bg-slate-100 text-slate-600  font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">
                         Prendre RDV
                     </button>
                 </div>
@@ -64,7 +64,7 @@ const ParentDashboard: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* School Results & Progress */}
                 <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100">
+                    <div className="bg-white p-8 ] shadow-xl  ">
                         <h3 className="text-xl font-black text-slate-800 mb-8 tracking-tight cursor-pointer" onClick={() => navigate('/dashboard/parent/results')}>Performance Académique</h3>
                         <div className="space-y-6">
                             {stats?.childrenDetails?.map((child: any, idx: number) => (
@@ -83,7 +83,7 @@ const ParentDashboard: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100">
+                    <div className="bg-white p-8 ] shadow-xl  ">
                         <h3 className="text-xl font-black text-slate-800 mb-8 tracking-tight cursor-pointer" onClick={() => navigate('/dashboard/parent/schedule')}>Calendrier & Événements</h3>
                         <div className="space-y-4">
                             <EventItem title="Réunion Parents-Profs" date="12 Mars" type="Important" />
@@ -95,28 +95,28 @@ const ParentDashboard: React.FC = () => {
 
                 {/* Sidebar: Payments & Messages */}
                 <div className="space-y-8">
-                    <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100">
+                    <div className="bg-white p-8 ] shadow-xl  ">
                         <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
                             <MessageCircle size={20} className="text-blue-600" /> Notifications
                         </h3>
                         <div className="space-y-4 mb-8">
                             {stats?.recentNotifications && stats.recentNotifications.length > 0 ? (
                                 stats.recentNotifications.map((notif: any, idx: number) => (
-                                    <div key={idx} className={`p-4 rounded-2xl border border-slate-100 ${notif.type === 'warning' ? 'bg-amber-50' : 'bg-slate-50'}`}>
+                                    <div key={idx} className={`p-4    ${notif.type === 'warning' ? 'bg-amber-50' : 'bg-slate-50'}`}>
                                         <p className="text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">{notif.time}</p>
                                         <h5 className="text-sm font-bold text-slate-800">{notif.title}</h5>
                                         <p className="text-xs text-slate-500 font-medium">{notif.desc}</p>
                                     </div>
                                 ))
                             ) : (
-                                <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                <div className="p-8 text-center bg-slate-50    ">
                                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Aucune nouvelle notification.</p>
                                 </div>
                             )}
                         </div>
                         <button
                             onClick={() => navigate('/dashboard/parent/messages')}
-                            className="w-full py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all border border-slate-100"
+                            className="w-full py-4 bg-slate-50 text-slate-500  font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all  "
                         >
                             Ouvrir la messagerie
                         </button>
@@ -130,9 +130,9 @@ const ParentDashboard: React.FC = () => {
 const StudentProgress = ({ name, grade, average, trend, color }: { name: string, grade: string, average: string, trend: string, color: string }) => {
     const isUp = trend.startsWith('+');
     return (
-        <div className="p-6 rounded-[32px] bg-slate-50 border border-slate-100 flex items-center justify-between group cursor-pointer hover:bg-white hover:shadow-xl hover:border-blue-100 transition-all duration-300">
+        <div className="p-6 ] bg-slate-50   flex items-center justify-between group cursor-pointer hover:bg-white hover:shadow-xl hover: transition-all duration-300">
             <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-2xl bg-${color}-100 text-${color}-600 flex items-center justify-center font-black`}>
+                <div className={`w-12 h-12  bg-${color}-100 text-${color}-600 flex items-center justify-center font-black`}>
                     {name.charAt(0)}
                 </div>
                 <div>
@@ -147,7 +147,7 @@ const StudentProgress = ({ name, grade, average, trend, color }: { name: string,
                 </div>
             </div>
             <div className="pl-4">
-                <div className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-slate-300 group-hover:text-blue-600 transition-colors">
+                <div className="w-10 h-10  bg-white shadow-md flex items-center justify-center text-slate-300 group-hover:text-blue-600 transition-colors">
                     <ArrowRight size={18} />
                 </div>
             </div>
@@ -156,9 +156,9 @@ const StudentProgress = ({ name, grade, average, trend, color }: { name: string,
 };
 
 const EventItem = ({ title, date, type }: { title: string, date: string, type: string }) => (
-    <div className="flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 transition-all cursor-pointer border border-transparent hover:border-slate-100">
+    <div className="flex items-center justify-between p-4  hover:bg-slate-50 transition-all cursor-pointer   hover:">
         <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black text-xs text-center leading-none">
+            <div className="w-10 h-10 bg-blue-50 text-blue-600  flex items-center justify-center font-black text-xs text-center leading-none">
                 {date.split(' ')[0]}<br />{date.split(' ')[1]}
             </div>
             <div>

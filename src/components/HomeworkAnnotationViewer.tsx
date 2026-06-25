@@ -224,10 +224,10 @@ const PdfPageWithAnnotations = ({
         <div ref={containerRef} className="relative bg-white shadow-2xl mb-8 mx-auto w-fit custom-pdf-page">
             {!readOnly && (
                 <div className="absolute top-2 right-2 flex gap-2 z-20 opacity-60 hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleUndo(pageKey)} className="p-1.5 bg-white rounded-md shadow text-slate-600 hover:text-blue-600" title="Annuler le dernier trait">
+                    <button onClick={() => handleUndo(pageKey)} className="p-1.5 bg-white  shadow text-slate-600 hover:text-blue-600" title="Annuler le dernier trait">
                         <Undo size={14} />
                     </button>
-                    <button onClick={() => handleClear(pageKey)} className="p-1.5 bg-white rounded-md shadow text-slate-600 hover:text-red-600" title="Tout effacer">
+                    <button onClick={() => handleClear(pageKey)} className="p-1.5 bg-white  shadow text-slate-600 hover:text-red-600" title="Tout effacer">
                         <Trash size={14} />
                     </button>
                 </div>
@@ -352,7 +352,7 @@ const HomeworkAnnotationViewer: React.FC<HomeworkAnnotationViewerProps> = ({ fil
     return (
         <div className="fixed inset-0 z-[200] bg-slate-900/95 flex flex-col h-screen w-screen animate-in fade-in duration-200">
             {/* Header Toolbar */}
-            <div className="bg-white px-8 py-4 flex justify-between items-center shadow-2xl shrink-0 border-b border-slate-100">
+            <div className="bg-white px-8 py-4 flex justify-between items-center shadow-2xl shrink-0  ">
                 <div className="flex items-center gap-6">
                     <div>
                         <h3 className="font-black text-slate-800 text-lg uppercase tracking-tight truncate max-w-sm">
@@ -361,14 +361,14 @@ const HomeworkAnnotationViewer: React.FC<HomeworkAnnotationViewerProps> = ({ fil
                         {!readOnly ? (
                             <div className="flex items-center gap-4 mt-1">
                                 <div className="flex items-center gap-2">
-                                    <span className="flex h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+                                    <span className="flex h-2 w-2  bg-red-500 animate-pulse"></span>
                                     <span className="text-[10px] font-black uppercase tracking-[0.1em] text-red-600">Correction Active</span>
                                 </div>
                                 <div className="h-3 w-px bg-slate-200"></div>
                                 <div className="flex items-center gap-2">
-                                    <button onClick={() => setScale(prev => Math.max(prev - 0.5, 0.5))} className="p-1 hover:bg-slate-100 rounded text-slate-400 transition-colors cursor-pointer"><Minus size={14} /></button>
+                                    <button onClick={() => setScale(prev => Math.max(prev - 0.5, 0.5))} className="p-1 hover:bg-slate-100  text-slate-400 transition-colors cursor-pointer"><Minus size={14} /></button>
                                     <span className="text-[9px] font-black text-slate-500 min-w-[28px] text-center">{Math.round(scale * 100)}%</span>
-                                    <button onClick={() => setScale(prev => Math.min(prev + 0.5, 3.0))} className="p-1 hover:bg-slate-100 rounded text-blue-500 transition-colors cursor-pointer"><Plus size={14} /></button>
+                                    <button onClick={() => setScale(prev => Math.min(prev + 0.5, 3.0))} className="p-1 hover:bg-slate-100  text-blue-500 transition-colors cursor-pointer"><Plus size={14} /></button>
                                 </div>
                             </div>
                         ) : (
@@ -376,9 +376,9 @@ const HomeworkAnnotationViewer: React.FC<HomeworkAnnotationViewerProps> = ({ fil
                                 <span className="text-[10px] font-black uppercase tracking-[0.1em] text-blue-600">Consultation des Traces</span>
                                 <div className="h-3 w-px bg-slate-200"></div>
                                 <div className="flex items-center gap-2">
-                                    <button onClick={() => setScale(prev => Math.max(prev - 0.5, 0.5))} className="p-1 hover:bg-slate-100 rounded text-slate-400 transition-colors cursor-pointer"><Minus size={14} /></button>
+                                    <button onClick={() => setScale(prev => Math.max(prev - 0.5, 0.5))} className="p-1 hover:bg-slate-100  text-slate-400 transition-colors cursor-pointer"><Minus size={14} /></button>
                                     <span className="text-[9px] font-black text-slate-500 min-w-[28px] text-center">{Math.round(scale * 100)}%</span>
-                                    <button onClick={() => setScale(prev => Math.min(prev + 0.5, 3.0))} className="p-1 hover:bg-slate-100 rounded text-blue-500 transition-colors cursor-pointer"><Plus size={14} /></button>
+                                    <button onClick={() => setScale(prev => Math.min(prev + 0.5, 3.0))} className="p-1 hover:bg-slate-100  text-blue-500 transition-colors cursor-pointer"><Plus size={14} /></button>
                                 </div>
                             </div>
                         )}
@@ -387,20 +387,20 @@ const HomeworkAnnotationViewer: React.FC<HomeworkAnnotationViewerProps> = ({ fil
 
                 <div className="flex items-center gap-6">
                     {!readOnly && (
-                        <div className="flex items-center gap-3 bg-slate-100 p-1.5 rounded-2xl mr-4">
-                            <div className="px-4 py-2 bg-white rounded-xl shadow-sm flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full bg-red-500 shadow-sm shadow-red-500/50"></div>
+                        <div className="flex items-center gap-3 bg-slate-100 p-1.5  mr-4">
+                            <div className="px-4 py-2 bg-white  shadow-sm flex items-center gap-2">
+                                <div className="w-3 h-3  bg-red-500 shadow-sm shadow-red-500/50"></div>
                                 <span className="text-[10px] font-black uppercase text-slate-700">Stylo</span>
                             </div>
                         </div>
                     )}
 
                     {!readOnly && (
-                        <button onClick={handleSaveClick} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-[0.15em] transition-all flex items-center gap-3 shadow-xl shadow-emerald-500/30 active:scale-95">
+                        <button onClick={handleSaveClick} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3.5  font-black text-xs uppercase tracking-[0.15em] transition-all flex items-center gap-3 shadow-xl shadow-emerald-500/30 active:scale-95">
                             <Save size={18} /> Enregistrer
                         </button>
                     )}
-                    <button onClick={handleClose} className="p-3.5 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 text-slate-400 rounded-2xl transition-all border border-slate-100 active:scale-90">
+                    <button onClick={handleClose} className="p-3.5 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 text-slate-400  transition-all   active:scale-90">
                         <X size={24} />
                     </button>
                 </div>
@@ -414,8 +414,8 @@ const HomeworkAnnotationViewer: React.FC<HomeworkAnnotationViewerProps> = ({ fil
                             <Document
                                 file={fileUrl}
                                 onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                                loading={<div className="text-white font-black animate-pulse flex flex-col items-center gap-4 mt-20"><div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>Chargement du document...</div>}
-                                error={<div className="text-white font-black bg-rose-500/10 p-10 rounded-3xl border border-rose-500/20">Oups ! Erreur lors du chargement du PDF.</div>}
+                                loading={<div className="text-white font-black animate-pulse flex flex-col items-center gap-4 mt-20"><div className="w-12 h-12     animate-spin"></div>Chargement du document...</div>}
+                                error={<div className="text-white font-black bg-rose-500/10 p-10   ">Oups ! Erreur lors du chargement du PDF.</div>}
                             >
                                 {Array.from(new Array(numPages), (_, index) => {
                                     const pageKey = `page-${index + 1}`;
@@ -437,15 +437,15 @@ const HomeworkAnnotationViewer: React.FC<HomeworkAnnotationViewerProps> = ({ fil
                         </div>
                     ) : (
                         <div
-                            className="bg-white shadow-3xl inline-block rounded-sm overflow-hidden min-w-max relative"
+                            className="bg-white shadow-3xl inline-block  overflow-hidden min-w-max relative"
                             style={{ width: imageSize ? `${imageSize.width * scale}px` : 'auto', height: 'fit-content' }}
                         >
                             {!readOnly && (
-                                <div className="absolute top-6 right-6 flex gap-3 z-10 opacity-70 hover:opacity-100 transition-opacity bg-white/90 p-2.5 rounded-2xl shadow-2xl backdrop-blur-md border border-white/50">
-                                    <button onClick={() => handleUndo('image')} className="p-2.5 bg-white rounded-xl shadow-sm text-slate-700 hover:text-blue-600 transition-all font-black text-[10px] uppercase gap-2 flex items-center">
+                                <div className="absolute top-6 right-6 flex gap-3 z-10 opacity-70 hover:opacity-100 transition-opacity bg-white/90 p-2.5  shadow-2xl backdrop-blur-md  ">
+                                    <button onClick={() => handleUndo('image')} className="p-2.5 bg-white  shadow-sm text-slate-700 hover:text-blue-600 transition-all font-black text-[10px] uppercase gap-2 flex items-center">
                                         <Undo size={16} /> Annuler
                                     </button>
-                                    <button onClick={() => handleClear('image')} className="p-2.5 bg-white rounded-xl shadow-sm text-slate-700 hover:text-red-600 transition-all font-black text-[10px] uppercase gap-2 flex items-center border border-slate-50">
+                                    <button onClick={() => handleClear('image')} className="p-2.5 bg-white  shadow-sm text-slate-700 hover:text-red-600 transition-all font-black text-[10px] uppercase gap-2 flex items-center  ">
                                         <Trash size={16} /> Effacer tout
                                     </button>
                                 </div>

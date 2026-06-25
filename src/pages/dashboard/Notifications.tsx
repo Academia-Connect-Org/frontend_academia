@@ -66,19 +66,19 @@ const Notifications: React.FC<{ role: string }> = ({ role }) => {
                     <p className="text-slate-500 font-medium">Restez informé des derniers événements liés à votre profil.</p>
                 </div>
                 <div className="flex gap-4">
-                    <button className="bg-white dark:bg-slate-800 dark:border-slate-700 border border-slate-200 px-6 py-3.5 rounded-3xl font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+                    <button className="bg-white dark:bg-slate-800 dark:   px-6 py-3.5  font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
                         <CheckCircle2 size={18} /> Tout marquer lu
                     </button>
-                    <button className="bg-red-50 text-red-600 px-6 py-3.5 rounded-3xl font-bold flex items-center gap-2 hover:bg-red-100 transition-all">
+                    <button className="bg-red-50 text-red-600 px-6 py-3.5  font-bold flex items-center gap-2 hover:bg-red-100 transition-all">
                         <Trash2 size={18} /> Tout supprimer
                     </button>
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-[48px] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-                <div className="p-8 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between bg-slate-50/20 dark:bg-slate-800/20">
+            <div className="bg-white dark:bg-slate-900 ] shadow-2xl   dark: overflow-hidden">
+                <div className="p-8   dark: flex items-center justify-between bg-slate-50/20 dark:bg-slate-800/20">
                     <div className="flex gap-4">
-                        <button className="px-5 py-2.5 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-600/30">Tout</button>
+                        <button className="px-5 py-2.5 bg-blue-600 text-white  font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-600/30">Tout</button>
                         <button className="px-5 py-2.5 text-slate-400 dark:text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-blue-600 transition-colors">Non lus</button>
                         <button className="px-5 py-2.5 text-slate-400 dark:text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-blue-600 transition-colors">Académique</button>
                     </div>
@@ -93,7 +93,7 @@ const Notifications: React.FC<{ role: string }> = ({ role }) => {
                             animate={{ opacity: 1 }}
                             className={`p-8 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-all group relative flex gap-6 items-start ${notif.unread ? 'before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1.5 before:bg-blue-600' : ''}`}
                         >
-                            <div className={`w-14 h-14 shrink-0 rounded-[24px] ${notif.color} text-white flex items-center justify-center shadow-lg transition-transform group-hover:scale-110`}>
+                            <div className={`w-14 h-14 shrink-0 ] ${notif.color} text-white flex items-center justify-center shadow-lg transition-transform group-hover:scale-110`}>
                                 <notif.icon size={28} />
                             </div>
                             <div className="flex-1">
@@ -113,7 +113,7 @@ const Notifications: React.FC<{ role: string }> = ({ role }) => {
                     ))}
                 </div>
 
-                <div className="p-8 border-t border-slate-50 dark:border-slate-800 flex justify-center bg-slate-50/10 dark:bg-slate-800/10">
+                <div className="p-8   dark: flex justify-center bg-slate-50/10 dark:bg-slate-800/10">
                     <button className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-blue-600 transition-all flex items-center gap-2">
                         <AlertCircle size={16} /> Vous avez atteint la fin de vos notifications
                     </button>

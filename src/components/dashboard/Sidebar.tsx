@@ -206,8 +206,8 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
                 }}
                 className={`h-screen bg-slate-900 text-slate-300 flex flex-col fixed lg:sticky top-0 left-0 z-50 shadow-2xl overflow-hidden transition-all duration-300`}
             >
-                <div className="p-6 flex items-center gap-3 border-b border-white/5">
-                    <div className="bg-white p-1 rounded-xl shadow-lg shrink-0 overflow-hidden flex items-center justify-center text-slate-900">
+                <div className="p-6 flex items-center gap-3  ">
+                    <div className="bg-white p-1  shadow-lg shrink-0 overflow-hidden flex items-center justify-center text-slate-900">
                         {user?.institution?.logoUrl ? (
                             <img src={getFileUrl(user.institution.logoUrl)} alt="Logo" className="w-8 h-8 object-contain" />
                         ) : (
@@ -243,9 +243,9 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
                                                 }
                                                 setExpandedItem(isExpanded ? null : item.name);
                                             }}
-                                            className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200 group relative ${isActive || item.subItems.some((s: any) => location.pathname + location.search === s.path)
+                                            className={`w-full flex items-center gap-4 px-4 py-3.5  transition-all duration-200 group relative ${isActive || item.subItems.some((s: any) => location.pathname + location.search === s.path)
                                                 ? 'bg-white/10 text-white'
-                                                : 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent hover:border-white/5'
+                                                : 'hover:bg-white/5 text-slate-400 hover:text-white   hover:'
                                                 }`}
                                         >
                                             <item.icon size={22} className={`${isActive ? 'text-blue-400' : 'text-slate-400 group-hover:text-blue-400'} shrink-0`} />
@@ -260,9 +260,9 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
                                         <Link
                                             to={item.path}
                                             onClick={() => { if (window.innerWidth < 1024) setMobileOpen?.(false); }}
-                                            className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200 group relative ${isActive
-                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25 border border-white/10'
-                                                : 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent hover:border-white/5'
+                                            className={`flex items-center gap-4 px-4 py-3.5  transition-all duration-200 group relative ${isActive
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25  '
+                                                : 'hover:bg-white/5 text-slate-400 hover:text-white   hover:'
                                                 }`}
                                         >
                                             <item.icon size={22} className={`${isActive ? 'text-white' : 'text-slate-400 group-hover:text-blue-400'} shrink-0`} />
@@ -270,7 +270,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
                                                 <span className="font-medium whitespace-nowrap flex-1">{item.name}</span>
                                             )}
                                             {item.badge && (!collapsed || (typeof window !== 'undefined' && window.innerWidth < 1024)) && (
-                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-black shrink-0 bg-red-500 text-white shadow-lg">
+                                                <span className="px-2 py-0.5  text-[10px] font-black shrink-0 bg-red-500 text-white shadow-lg">
                                                     {item.badge}
                                                 </span>
                                             )}
@@ -284,7 +284,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
                                                 initial={{ height: 0, opacity: 0 }}
                                                 animate={{ height: 'auto', opacity: 1 }}
                                                 exit={{ height: 0, opacity: 0 }}
-                                                className="overflow-hidden bg-white/5 rounded-2xl mx-1"
+                                                className="overflow-hidden bg-white/5  mx-1"
                                             >
                                                 {item.subItems.map((sub: any, subIndex: number) => {
                                                     const isSubActive = location.pathname + location.search === sub.path;
@@ -299,8 +299,8 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
                                                                 : 'text-slate-500 hover:text-slate-300'
                                                                 }`}
                                                         >
-                                                            {isSubActive && <motion.div layoutId="subactive" className="absolute left-0 w-1 h-6 bg-blue-500 rounded-r-full" />}
-                                                            {SubIcon ? <SubIcon size={16} className={`${isSubActive ? 'text-blue-400' : 'text-slate-600'} shrink-0`} /> : <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isSubActive ? 'bg-blue-500' : 'bg-slate-700'}`} />}
+                                                            {isSubActive && <motion.div layoutId="subactive" className="absolute left-0 w-1 h-6 bg-blue-500 " />}
+                                                            {SubIcon ? <SubIcon size={16} className={`${isSubActive ? 'text-blue-400' : 'text-slate-600'} shrink-0`} /> : <div className={`w-1.5 h-1.5  shrink-0 ${isSubActive ? 'bg-blue-500' : 'bg-slate-700'}`} />}
                                                             <span className={isSubActive ? 'font-black' : 'font-medium'}>{sub.name}</span>
                                                         </Link>
                                                     );
@@ -314,14 +314,14 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
                     </div>
                 </nav>
 
-                <div className="p-4 border-t border-white/5 space-y-2">
-                    <button onClick={logout} className="w-full flex items-center gap-4 px-4 py-3.5 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-2xl transition-all group">
+                <div className="p-4   space-y-2">
+                    <button onClick={logout} className="w-full flex items-center gap-4 px-4 py-3.5 text-slate-400 hover:text-red-400 hover:bg-red-400/10  transition-all group">
                         <LogOut size={22} className="group-hover:rotate-12 transition-transform shrink-0" />
                         {(!collapsed || (typeof window !== 'undefined' && window.innerWidth < 1024)) && <span className="font-bold">Déconnexion</span>}
                     </button>
                     <button
                         onClick={() => setCollapsed(!collapsed)}
-                        className="w-full lg:flex hidden items-center justify-center p-3 text-slate-500 hover:text-white bg-white/5 hover:bg-white/10 rounded-2xl transition-all group"
+                        className="w-full lg:flex hidden items-center justify-center p-3 text-slate-500 hover:text-white bg-white/5 hover:bg-white/10  transition-all group"
                     >
                         {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                     </button>

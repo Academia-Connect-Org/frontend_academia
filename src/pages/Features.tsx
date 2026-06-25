@@ -95,13 +95,13 @@ const Features: React.FC = () => {
             {/* Hero Section */}
             <header className="relative bg-[#0A192F] pt-40 pb-32">
                 <div className="absolute inset-0">
-                    <div className="absolute top-20 left-20 w-72 h-72 bg-blue-600/20 rounded-full blur-[100px] animate-pulse"></div>
-                    <div className="absolute bottom-20 right-20 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] animate-pulse"></div>
+                    <div className="absolute top-20 left-20 w-72 h-72 bg-blue-600/20  blur-[100px] animate-pulse"></div>
+                    <div className="absolute bottom-20 right-20 w-96 h-96 bg-indigo-600/20  blur-[120px] animate-pulse"></div>
                 </div>
 
                 <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
                     <motion.div {...fadeIn}>
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs font-black uppercase tracking-widest mb-10">
+                        <div className="inline-flex items-center gap-2 px-4 py-2  bg-blue-500/10   text-blue-300 text-xs font-black uppercase tracking-widest mb-10">
                             <Zap size={14} /> Ecosysteme Complet
                         </div>
                         <h1 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter">
@@ -123,10 +123,10 @@ const Features: React.FC = () => {
                             initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="bg-white rounded-[40px] p-10 shadow-2xl shadow-slate-200 border border-slate-100 group hover:border-blue-500/30 transition-all duration-500"
+                            className="bg-white ] p-10 shadow-2xl shadow-slate-200   group hover: transition-all duration-500"
                         >
                             <div className="flex items-start gap-6 mb-10">
-                                <div className={`w-20 h-20 rounded-[28px] bg-${module.color}-50 text-${module.color}-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500`}>
+                                <div className={`w-20 h-20 ] bg-${module.color}-50 text-${module.color}-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500`}>
                                     <module.icon size={36} />
                                 </div>
                                 <div className="pt-2">
@@ -138,7 +138,7 @@ const Features: React.FC = () => {
                             <div className="space-y-4">
                                 {module.features.map((feature, fIdx) => (
                                     <div key={fIdx} className="flex items-start gap-4">
-                                        <div className={`mt-1.5 w-5 h-5 rounded-full bg-${module.color}-50 text-${module.color}-500 flex items-center justify-center shrink-0`}>
+                                        <div className={`mt-1.5 w-5 h-5  bg-${module.color}-50 text-${module.color}-500 flex items-center justify-center shrink-0`}>
                                             <CheckCircle2 size={12} strokeWidth={3} />
                                         </div>
                                         <span className="text-slate-600 font-bold leading-tight">{feature}</span>
@@ -149,11 +149,11 @@ const Features: React.FC = () => {
                     ))}
 
                     {/* Infrastructure Card (Double Width or Highlighted) */}
-                    <div className="lg:col-span-2 bg-gradient-to-br from-slate-900 to-blue-900 rounded-[48px] p-12 text-white relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] group-hover:bg-blue-500/20 transition-all duration-700"></div>
+                    <div className="lg:col-span-2 bg-gradient-to-br from-slate-900 to-blue-900 ] p-12 text-white relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10  blur-[100px] group-hover:bg-blue-500/20 transition-all duration-700"></div>
                         <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
                             <div>
-                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-blue-300 text-[10px] font-black uppercase tracking-widest mb-8">
+                                <div className="inline-flex items-center gap-2 px-4 py-2  bg-white/10   text-blue-300 text-[10px] font-black uppercase tracking-widest mb-8">
                                     <Shield size={14} /> Sécurité & Performance
                                 </div>
                                 <h3 className="text-4xl font-black mb-6 uppercase tracking-tight">Infrastructure Cloud Mondiale</h3>
@@ -161,12 +161,12 @@ const Features: React.FC = () => {
                                     Notre plateforme repose sur une architecture Cloud résiliente, garantissant une disponibilité de 99.9% et une sécurité des données de niveau bancaire.
                                 </p>
                                 <div className="grid grid-cols-2 gap-6">
-                                    <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-3xl">
+                                    <div className="bg-white/5 backdrop-blur-sm   p-6 ">
                                         <BarChart3 className="text-blue-400 mb-4" />
                                         <h4 className="font-bold text-sm mb-1 uppercase tracking-wider">Temps Réel</h4>
                                         <p className="text-xs text-blue-200/50">Synchronisation instantanée sur tous vos terminaux.</p>
                                     </div>
-                                    <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-3xl">
+                                    <div className="bg-white/5 backdrop-blur-sm   p-6 ">
                                         <Layout className="text-blue-400 mb-4" />
                                         <h4 className="font-bold text-sm mb-1 uppercase tracking-wider">Multi-Plateforme</h4>
                                         <p className="text-xs text-blue-200/50">Disponible sur Web, Desktop (Linux/Win/Mac) et Mobile.</p>
@@ -191,13 +191,13 @@ const Features: React.FC = () => {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                         <Link 
                             to={ROUTES.REGISTER} 
-                            className="px-10 py-5 bg-blue-600 text-white rounded-[24px] font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+                            className="px-10 py-5 bg-blue-600 text-white ] font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
                         >
                             Créer un compte <ArrowRight size={18} />
                         </Link>
                         <Link 
                             to={ROUTES.PRICING} 
-                            className="px-10 py-5 bg-slate-100 text-slate-900 rounded-[24px] font-black uppercase text-xs tracking-[0.2em] hover:bg-slate-200 transition-all"
+                            className="px-10 py-5 bg-slate-100 text-slate-900 ] font-black uppercase text-xs tracking-[0.2em] hover:bg-slate-200 transition-all"
                         >
                             Voir les Tarifs
                         </Link>

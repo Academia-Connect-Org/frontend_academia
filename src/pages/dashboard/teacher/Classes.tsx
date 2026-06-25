@@ -38,7 +38,7 @@ const BroadcastModal: React.FC<{
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-            <div className="bg-white rounded-[40px] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="bg-white ] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
                 <div className="p-8 bg-slate-900 text-white flex justify-between items-center">
                     <div>
                         <h3 className="text-xl font-black">Diffuser une Alerte</h3>
@@ -52,19 +52,19 @@ const BroadcastModal: React.FC<{
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         placeholder="Tapez votre message ici..."
-                        className="w-full h-40 bg-slate-50 border border-slate-100 rounded-3xl p-6 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all resize-none"
+                        className="w-full h-40 bg-slate-50    p-6 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus: transition-all resize-none"
                     />
                     <div className="flex gap-4 mt-8">
                         <button
                             onClick={onClose}
-                            className="flex-1 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all"
+                            className="flex-1 py-4 bg-slate-50 text-slate-500  font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all"
                         >
                             Annuler
                         </button>
                         <button
                             onClick={handleSend}
                             disabled={sending || !message.trim()}
-                            className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                            className="flex-1 py-4 bg-blue-600 text-white  font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
                         >
                             {sending ? 'Envoi...' : 'Envoyer'}
                         </button>
@@ -148,7 +148,7 @@ const Classes: React.FC = () => {
         return (
             <>
                 <div className="min-h-[60vh] flex flex-col items-center justify-center">
-                    <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <div className="w-16 h-16     animate-spin mb-4"></div>
                 </div>
             </>
         );
@@ -173,13 +173,13 @@ const Classes: React.FC = () => {
                 <div className="flex gap-4">
                     <button
                         onClick={handleDownloadList}
-                        className="bg-white border border-slate-200 px-6 py-3.5 rounded-3xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 hover:scale-105 active:scale-95 transition-all shadow-sm"
+                        className="bg-white   px-6 py-3.5  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 hover:scale-105 active:scale-95 transition-all shadow-sm"
                     >
                         <Download size={18} /> Télécharger Listes
                     </button>
                     <button
                         onClick={() => setIsBroadcastOpen(true)}
-                        className="bg-slate-900 text-white px-8 py-3.5 rounded-3xl font-extrabold flex items-center gap-3 shadow-xl shadow-slate-900/30 hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all"
+                        className="bg-slate-900 text-white px-8 py-3.5  font-extrabold flex items-center gap-3 shadow-xl shadow-slate-900/30 hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all"
                     >
                         <MessageCircle size={20} /> Diffuser Alerte
                     </button>
@@ -209,22 +209,22 @@ const Classes: React.FC = () => {
                         <div
                             key={cls.id}
                             onClick={() => handleClassSelect(cls)}
-                            className={`group relative p-8 rounded-[48px] cursor-pointer transition-all duration-500 hover:-translate-y-3 overflow-hidden ${isSelected
+                            className={`group relative p-8 ] cursor-pointer transition-all duration-500 hover:-translate-y-3 overflow-hidden ${isSelected
                                 ? 'bg-white shadow-2xl shadow-blue-500/20 ring-4 ring-blue-500/10'
-                                : 'bg-slate-50/50 hover:bg-white border border-transparent hover:border-slate-100 hover:shadow-xl'
+                                : 'bg-slate-50/50 hover:bg-white   hover: hover:shadow-xl'
                                 }`}
                         >
                             {/* Decorative background gradient for selected or hover */}
-                            <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-10 transition-all duration-700 ${isSelected ? 'bg-blue-600 opacity-20 scale-150' : 'bg-slate-400 group-hover:bg-blue-400 group-hover:opacity-20'}`}></div>
+                            <div className={`absolute -top-10 -right-10 w-32 h-32  blur-3xl opacity-10 transition-all duration-700 ${isSelected ? 'bg-blue-600 opacity-20 scale-150' : 'bg-slate-400 group-hover:bg-blue-400 group-hover:opacity-20'}`}></div>
 
                             <div className="flex justify-between items-start mb-8 relative z-10">
-                                <div className={`w-16 h-16 rounded-[28px] flex items-center justify-center font-black text-2xl shadow-2xl transition-all duration-500 group-hover:rotate-6 ${isSelected
+                                <div className={`w-16 h-16 ] flex items-center justify-center font-black text-2xl shadow-2xl transition-all duration-500 group-hover:rotate-6 ${isSelected
                                     ? `bg-gradient-to-br ${currentColor} text-white shadow-blue-500/40`
                                     : 'bg-white text-slate-400 group-hover:text-blue-600 shadow-slate-200'
                                     }`}>
                                     {cls.name.substring(0, 2)}
                                 </div>
-                                <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isSelected ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity'}`}>
+                                <div className={`px-4 py-1.5  text-[10px] font-black uppercase tracking-widest ${isSelected ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity'}`}>
                                     {isSelected ? 'Actif' : 'Sélectionner'}
                                 </div>
                             </div>
@@ -236,20 +236,20 @@ const Classes: React.FC = () => {
                                 <div className="grid grid-cols-1 gap-3 mb-8">
                                     <StatLine label="Effectif Total" value={cls.boysCount + cls.girlsCount} icon={Users} highlight={isSelected} />
                                     <div className="flex gap-3">
-                                        <div className="flex-1 bg-blue-50/50 p-3 rounded-2xl border border-blue-100/50">
+                                        <div className="flex-1 bg-blue-50/50 p-3   ">
                                             <p className="text-[8px] font-black text-blue-400 uppercase tracking-tighter mb-1">Garçons</p>
                                             <p className="text-sm font-black text-blue-700">{cls.boysCount}</p>
                                         </div>
-                                        <div className="flex-1 bg-pink-50/50 p-3 rounded-2xl border border-pink-100/50">
+                                        <div className="flex-1 bg-pink-50/50 p-3   ">
                                             <p className="text-[8px] font-black text-pink-400 uppercase tracking-tighter mb-1">Filles</p>
                                             <p className="text-sm font-black text-pink-700">{cls.girlsCount}</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <button className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 ${isSelected
+                                <button className={`w-full py-4  font-black text-[10px] uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 ${isSelected
                                     ? `bg-gradient-to-r ${currentColor} text-white shadow-lg`
-                                    : 'bg-white border border-slate-100 text-slate-400 group-hover:border-blue-200 group-hover:text-blue-600 group-hover:shadow-md'
+                                    : 'bg-white   text-slate-400 group-hover: group-hover:text-blue-600 group-hover:shadow-md'
                                     }`}>
                                     {isSelected ? 'En Edition' : 'Voir Effectif'} <ChevronRight size={14} className={isSelected ? 'translate-x-1' : 'group-hover:translate-x-1 transition-transform'} />
                                 </button>
@@ -259,14 +259,14 @@ const Classes: React.FC = () => {
                 })}
             </div>
 
-            <div className="bg-white rounded-[48px] shadow-2xl border border-blue-50 overflow-hidden">
-                <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="bg-white ] shadow-2xl   overflow-hidden">
+                <div className="p-8   flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
                         <h3 className="text-xl font-black text-slate-800">Liste des élèves - {selectedClass?.name}</h3>
-                        <div className="px-3 py-1 bg-slate-50 rounded-lg text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{students.length} Élèves</div>
+                        <div className="px-3 py-1 bg-slate-50  text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{students.length} Élèves</div>
                     </div>
                     <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                        <div className="flex items-center gap-2 bg-slate-50 px-4 py-2   ">
                             <span className="text-[9px] font-black uppercase text-slate-400">Période:</span>
                             <select
                                 value={selectedTrimester}
@@ -278,7 +278,7 @@ const Classes: React.FC = () => {
                                 <option value="3ème Trimestre">3ème Trimestre</option>
                             </select>
                         </div>
-                        <div className="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                        <div className="flex items-center gap-2 bg-slate-50 px-4 py-2   ">
                             <span className="text-[9px] font-black uppercase text-slate-400">Année:</span>
                             <select
                                 value={selectedAcademicYear}
@@ -296,7 +296,7 @@ const Classes: React.FC = () => {
                                 placeholder="Chercher un élève..."
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
-                                className="bg-slate-50 border-none rounded-2xl pl-11 pr-4 py-2.5 text-xs font-bold outline-none ring-2 ring-transparent focus:ring-blue-500/10 transition-all w-40"
+                                className="bg-slate-50 border-none  pl-11 pr-4 py-2.5 text-xs font-bold outline-none ring-2 ring-transparent focus:ring-blue-500/10 transition-all w-40"
                             />
                         </div>
                     </div>
@@ -305,7 +305,7 @@ const Classes: React.FC = () => {
                 <div className="p-4 overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-50">
+                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400  ">
                                 <th className="px-6 py-4">Élève</th>
                                 <th className="px-6 py-4">Matricule</th>
                                 <th className="px-6 py-4">Genre</th>
@@ -318,7 +318,7 @@ const Classes: React.FC = () => {
                                 <tr key={s.id} className="hover:bg-slate-50/50 group transition-all cursor-pointer">
                                     <td className="px-6 py-5">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-black text-xs text-slate-400 group-hover:scale-110 group-hover:rotate-6 transition-all shadow-sm">
+                                            <div className="w-10 h-10  bg-slate-100 flex items-center justify-center font-black text-xs text-slate-400 group-hover:scale-110 group-hover:rotate-6 transition-all shadow-sm">
                                                 {s.firstName[0]}{s.lastName[0]}
                                             </div>
                                             <div>
@@ -329,7 +329,7 @@ const Classes: React.FC = () => {
                                     </td>
                                     <td className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.studentIdNumber || 'N/A'}</td>
                                     <td className="px-6 py-5">
-                                        <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${s.gender === 'Masculin' ? 'bg-blue-50 text-blue-600' : 'bg-pink-50 text-pink-600'}`}>
+                                        <span className={`px-3 py-1  text-[9px] font-black uppercase tracking-widest ${s.gender === 'Masculin' ? 'bg-blue-50 text-blue-600' : 'bg-pink-50 text-pink-600'}`}>
                                             {s.gender}
                                         </span>
                                     </td>
@@ -337,14 +337,14 @@ const Classes: React.FC = () => {
                                         <div className="flex flex-col gap-1.5">
                                             {(s.fatherFirstName || s.fatherLastName) && (
                                                 <div className="flex items-center gap-2">
-                                                    <span className="w-4 h-4 rounded bg-blue-50 text-blue-500 flex items-center justify-center text-[8px] font-black shrink-0">P</span>
+                                                    <span className="w-4 h-4  bg-blue-50 text-blue-500 flex items-center justify-center text-[8px] font-black shrink-0">P</span>
                                                     <span className="text-xs font-bold text-slate-700 truncate max-w-[120px]">{s.fatherLastName} {s.fatherFirstName}</span>
                                                     <span className="text-[10px] font-medium text-slate-400">{s.fatherPhone}</span>
                                                 </div>
                                             )}
                                             {(s.motherFirstName || s.motherLastName) && (
                                                 <div className="flex items-center gap-2">
-                                                    <span className="w-4 h-4 rounded bg-pink-50 text-pink-500 flex items-center justify-center text-[8px] font-black shrink-0">M</span>
+                                                    <span className="w-4 h-4  bg-pink-50 text-pink-500 flex items-center justify-center text-[8px] font-black shrink-0">M</span>
                                                     <span className="text-xs font-bold text-slate-700 truncate max-w-[120px]">{s.motherLastName} {s.motherFirstName}</span>
                                                     <span className="text-[10px] font-medium text-slate-400">{s.motherPhone}</span>
                                                 </div>
@@ -361,13 +361,13 @@ const Classes: React.FC = () => {
                                                     setViewingStudent(s.id);
                                                     setIsBulletinOpen(true);
                                                 }}
-                                                className="p-2 bg-blue-50 rounded-xl text-blue-600 hover:bg-blue-600 hover:text-white transition-all border border-blue-50 hover:border-blue-600 opacity-0 group-hover:opacity-100 duration-500 shadow-sm"
+                                                className="p-2 bg-blue-50  text-blue-600 hover:bg-blue-600 hover:text-white transition-all   hover: opacity-0 group-hover:opacity-100 duration-500 shadow-sm"
                                                 title="Voir Bulletin"
                                             >
                                                 <FileText size={14} />
                                             </button>
-                                            <button className="p-2 bg-slate-50 rounded-xl text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition-all border border-slate-50 hover:border-blue-100 opacity-0 group-hover:opacity-100 duration-500"><Phone size={14} /></button>
-                                            <button className="p-2 bg-slate-50 rounded-xl text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 transition-all border border-slate-50 hover:border-indigo-100 opacity-0 group-hover:opacity-100 duration-500"><Mail size={14} /></button>
+                                            <button className="p-2 bg-slate-50  text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition-all   hover: opacity-0 group-hover:opacity-100 duration-500"><Phone size={14} /></button>
+                                            <button className="p-2 bg-slate-50  text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 transition-all   hover: opacity-0 group-hover:opacity-100 duration-500"><Mail size={14} /></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -380,9 +380,9 @@ const Classes: React.FC = () => {
                     </table>
                 </div>
 
-                <div className="p-8 border-t border-slate-50 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between">
+                <div className="p-8   bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Affichage de {filteredStudents.length} sur {students.length} élèves</p>
-                    <button className="px-6 py-3 bg-white border border-slate-200 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-900 shadow-sm hover:bg-slate-50 active:scale-95 transition-all outline-none">
+                    <button className="px-6 py-3 bg-white    font-black text-xs uppercase tracking-widest text-slate-900 shadow-sm hover:bg-slate-50 active:scale-95 transition-all outline-none">
                         Exporter Rapport de Classe
                     </button>
                 </div>
@@ -393,9 +393,9 @@ const Classes: React.FC = () => {
 
 // Sub-components
 const StatLine = ({ label, value, icon: Icon, highlight }: { label: string, value: string | number, icon: any, highlight?: boolean }) => (
-    <div className={`flex justify-between items-center p-3 rounded-2xl border transition-all duration-300 ${highlight ? 'bg-blue-50/20 border-blue-500/10' : 'bg-white border-slate-50 shadow-sm'}`}>
+    <div className={`flex justify-between items-center p-3   transition-all duration-300 ${highlight ? 'bg-blue-50/20 ' : 'bg-white  shadow-sm'}`}>
         <div className="flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${highlight ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-slate-50 text-slate-400'}`}>
+            <div className={`w-9 h-9  flex items-center justify-center transition-colors ${highlight ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-slate-50 text-slate-400'}`}>
                 <Icon size={16} />
             </div>
             <span className={`text-[10px] font-black uppercase tracking-widest ${highlight ? 'text-blue-600' : 'text-slate-400'}`}>{label}</span>

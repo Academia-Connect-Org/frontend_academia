@@ -41,13 +41,13 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                 <MatrixCard label="Taux de réussite" value="84%" trend="+3%" icon={CheckCircle2} color="bg-emerald-600" />
             </div>
 
-            <div className="bg-white rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden">
-                <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+            <div className="bg-white ] shadow-2xl   overflow-hidden">
+                <div className="p-8   flex items-center justify-between bg-slate-50/50">
                     <div className="flex items-center gap-8">
                         <h3 className="text-xl font-black text-slate-800 tracking-tight">Historique des Evaluations</h3>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 bg-white border border-slate-100 rounded-xl px-3 py-1.5 shadow-sm">
+                        <div className="flex items-center gap-2 bg-white    px-3 py-1.5 shadow-sm">
                             <Filter size={14} className="text-slate-400" />
                             <select
                                 className="text-xs font-black text-slate-600 outline-none bg-transparent"
@@ -60,7 +60,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                                 ))}
                             </select>
                         </div>
-                        <div className="flex items-center gap-2 bg-white border border-slate-100 rounded-xl px-3 py-1.5 shadow-sm">
+                        <div className="flex items-center gap-2 bg-white    px-3 py-1.5 shadow-sm">
                             <Filter size={14} className="text-slate-400" />
                             <select
                                 className="text-xs font-black text-slate-600 outline-none bg-transparent"
@@ -76,13 +76,13 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                         <div className="relative">
                             <button
                                 onClick={() => setShowExportMenu(!showExportMenu)}
-                                className="p-4 bg-white rounded-2xl text-slate-400 hover:text-blue-600 shadow-sm border border-slate-100 transition-all flex items-center gap-2 font-black text-xs uppercase tracking-widest"
+                                className="p-4 bg-white  text-slate-400 hover:text-blue-600 shadow-sm   transition-all flex items-center gap-2 font-black text-xs uppercase tracking-widest"
                             >
                                 <Download size={18} /> Exporter <ChevronDown size={14} />
                             </button>
 
                             {showExportMenu && (
-                                <div className="absolute right-0 mt-3 w-56 bg-white rounded-3xl shadow-2xl border border-slate-100 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="absolute right-0 mt-3 w-56 bg-white  shadow-2xl   py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
                                     <button
                                         onClick={() => handleExport('PDF')}
                                         className="w-full px-6 py-3.5 text-left text-xs font-black text-slate-600 hover:bg-slate-50 flex items-center gap-3 transition-colors"
@@ -110,7 +110,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-50">
+                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400  ">
                                 <th className="px-8 py-6">Évaluation</th>
                                 <th className="px-8 py-6">Classe & Matière</th>
                                 <th className="px-8 py-6">Période</th>
@@ -145,7 +145,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                                 return sessions.length > 0 ? sessions.map((s) => (
                                     <tr key={s.key} className="hover:bg-slate-50 transition-colors group">
                                         <td className="px-8 py-5">
-                                            <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-2">
+                                            <div className="w-12 h-12  bg-blue-50 flex items-center justify-center text-blue-600 mb-2">
                                                 <ClipboardList size={20} />
                                             </div>
                                             <p className="font-black text-slate-800 uppercase text-[10px] tracking-widest">{s.type}</p>
@@ -168,7 +168,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                                 <button
                                                     onClick={() => handleEditGrade(s.grades[0])}
-                                                    className="p-2.5 bg-white rounded-xl text-blue-400 hover:text-blue-600 hover:shadow-md border border-slate-100 transition-all"
+                                                    className="p-2.5 bg-white  text-blue-400 hover:text-blue-600 hover:shadow-md   transition-all"
                                                     title="Voir / Modifier la session"
                                                 >
                                                     <Edit2 size={16} />
@@ -178,7 +178,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                                                         // Direct deletion of all grades in session is tricky, delete first one as sample or implement batch delete
                                                         handleDeleteGrade(s.grades[0].id);
                                                     }}
-                                                    className="p-2.5 bg-white rounded-xl text-red-400 hover:text-red-600 hover:shadow-md border border-slate-100 transition-all"
+                                                    className="p-2.5 bg-white  text-red-400 hover:text-red-600 hover:shadow-md   transition-all"
                                                     title="Supprimer la session"
                                                 >
                                                     <Trash2 size={16} />

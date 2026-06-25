@@ -17,12 +17,12 @@ const SubscriptionExpired = () => {
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="max-w-2xl w-full bg-white rounded-[64px] p-16 shadow-2xl shadow-indigo-200 border border-slate-100 text-center relative overflow-hidden"
+                className="max-w-2xl w-full bg-white ] p-16 shadow-2xl shadow-indigo-200   text-center relative overflow-hidden"
             >
                 {/* Background Decor */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-red-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-red-50  blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
 
-                <div className="w-24 h-24 bg-red-50 text-red-600 rounded-[40px] flex items-center justify-center mx-auto mb-10 shadow-2xl shadow-red-200 rotate-12">
+                <div className="w-24 h-24 bg-red-50 text-red-600 ] flex items-center justify-center mx-auto mb-10 shadow-2xl shadow-red-200 rotate-12">
                     <ShieldAlert size={48} strokeWidth={2.5} />
                 </div>
 
@@ -37,15 +37,15 @@ const SubscriptionExpired = () => {
                 {!isRestrictedRole ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                            <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 flex flex-col items-center gap-4 hover:shadow-xl transition-all cursor-pointer group" onClick={() => navigate('/pricing')}>
-                                <div className="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-600/20 group-hover:scale-110 transition-transform">
+                            <div className="p-8 bg-slate-50 ]   flex flex-col items-center gap-4 hover:shadow-xl transition-all cursor-pointer group" onClick={() => navigate('/pricing')}>
+                                <div className="w-12 h-12 bg-indigo-600 text-white  flex items-center justify-center shadow-lg shadow-indigo-600/20 group-hover:scale-110 transition-transform">
                                     <CreditCard size={24} />
                                 </div>
                                 <span className="text-xs font-black text-slate-800 uppercase tracking-widest">Renouveler</span>
                             </div>
 
-                            <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 flex flex-col items-center gap-4 hover:shadow-xl transition-all cursor-pointer group">
-                                <div className="w-12 h-12 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
+                            <div className="p-8 bg-slate-50 ]   flex flex-col items-center gap-4 hover:shadow-xl transition-all cursor-pointer group">
+                                <div className="w-12 h-12 bg-emerald-500 text-white  flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
                                     <Phone size={24} />
                                 </div>
                                 <span className="text-xs font-black text-slate-800 uppercase tracking-widest">Support VIP</span>
@@ -54,7 +54,7 @@ const SubscriptionExpired = () => {
 
                         <button
                             onClick={() => navigate('/pricing')}
-                            className="w-full py-6 bg-slate-900 text-white rounded-[32px] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-4 shadow-2xl shadow-slate-900/20 hover:bg-slate-800 transition-all group"
+                            className="w-full py-6 bg-slate-900 text-white ] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-4 shadow-2xl shadow-slate-900/20 hover:bg-slate-800 transition-all group"
                         >
                             Voir les Tarifs Academia
                             <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
@@ -63,7 +63,7 @@ const SubscriptionExpired = () => {
                 ) : (
                     <button
                         onClick={logout}
-                        className="w-full py-6 bg-slate-100 text-slate-600 rounded-[32px] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-4 hover:bg-slate-200 transition-all group"
+                        className="w-full py-6 bg-slate-100 text-slate-600 ] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-4 hover:bg-slate-200 transition-all group"
                     >
                         Se Déconnecter
                         <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />

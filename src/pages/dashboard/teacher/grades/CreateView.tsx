@@ -56,13 +56,13 @@ const CreateView: React.FC<CreateViewProps> = ({
     isSaving
 }) => {
     return (
-        <div className="bg-white rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in duration-300">
-            <div className="p-10 border-b border-slate-100 bg-slate-50/30">
+        <div className="bg-white ] shadow-2xl   overflow-hidden animate-in zoom-in duration-300">
+            <div className="p-10   bg-slate-50/30">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Classe</label>
                         <select
-                            className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                            className="w-full bg-white    px-5 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                             value={selectedClass?.id || ''}
                             onChange={(e) => handleClassChange(e.target.value)}
                         >
@@ -80,7 +80,7 @@ const CreateView: React.FC<CreateViewProps> = ({
                     <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Matière</label>
                         <select
-                            className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                            className="w-full bg-white    px-5 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                             value={selectedSubject && typeof selectedSubject === 'object' ? selectedSubject.id : (selectedSubject || '')}
                             onChange={(e) => {
                                 const selected = subjects.find(s => String(typeof s === 'object' ? s?.id : s) === e.target.value);
@@ -101,7 +101,7 @@ const CreateView: React.FC<CreateViewProps> = ({
                     <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Evaluation</label>
                         <select
-                            className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                            className="w-full bg-white    px-5 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                             value={evalType}
                             onChange={(e) => setEvalType(e.target.value)}
                         >
@@ -118,7 +118,7 @@ const CreateView: React.FC<CreateViewProps> = ({
                     <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Période</label>
                         <select
-                            className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                            className="w-full bg-white    px-5 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                             value={trimester}
                             onChange={(e) => setTrimester(e.target.value)}
                         >
@@ -130,7 +130,7 @@ const CreateView: React.FC<CreateViewProps> = ({
                     <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Année Scolaire</label>
                         <select
-                            className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                            className="w-full bg-white    px-5 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                             value={academicYear}
                             onChange={(e) => setAcademicYear(e.target.value)}
                         >
@@ -143,7 +143,7 @@ const CreateView: React.FC<CreateViewProps> = ({
                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Note Max</label>
                         <input
                             type="number"
-                            className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-sm font-black text-slate-700"
+                            className="w-full bg-white    px-5 py-4 text-sm font-black text-slate-700"
                             value={maxPoints}
                             onChange={e => setMaxPoints(parseInt(e.target.value))}
                         />
@@ -154,7 +154,7 @@ const CreateView: React.FC<CreateViewProps> = ({
             <div className="p-10 overflow-x-auto min-h-[400px]">
                 <table className="w-full text-left">
                     <thead>
-                        <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-50">
+                        <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400  ">
                             <th className="px-6 py-4">Élève</th>
                             <th className="px-6 py-4">Note / {maxPoints}</th>
                             <th className="px-6 py-4">Observation</th>
@@ -166,7 +166,7 @@ const CreateView: React.FC<CreateViewProps> = ({
                             <tr key={s.id} className="hover:bg-slate-50 group transition-all">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-black text-[10px] text-slate-400">{s.lastName[0]}{s.firstName[0]}</div>
+                                        <div className="w-10 h-10  bg-slate-100 flex items-center justify-center font-black text-[10px] text-slate-400">{s.lastName[0]}{s.firstName[0]}</div>
                                         <p className="font-bold text-slate-800 uppercase text-sm tracking-tight">{s.lastName} {s.firstName}</p>
                                     </div>
                                 </td>
@@ -175,7 +175,7 @@ const CreateView: React.FC<CreateViewProps> = ({
                                         type="text"
                                         inputMode="decimal"
                                         placeholder="---"
-                                        className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 w-32 font-black text-lg text-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                        className="bg-slate-50    px-4 py-3 w-32 font-black text-lg text-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus: transition-all outline-none"
                                         value={studentGrades[s.id] || ''}
                                         onChange={(e) => {
                                             const val = e.target.value.replace(',', '.');
@@ -189,7 +189,7 @@ const CreateView: React.FC<CreateViewProps> = ({
                                     <input
                                         type="text"
                                         placeholder="Observation..."
-                                        className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 w-full max-w-[200px] text-xs font-semibold text-slate-600 focus:bg-white transition-all outline-none"
+                                        className="bg-slate-50    px-4 py-3 w-full max-w-[200px] text-xs font-semibold text-slate-600 focus:bg-white transition-all outline-none"
                                         value={studentComments[s.id] || ''}
                                         onChange={(e) => setStudentComments({ ...studentComments, [s.id]: e.target.value })}
                                     />
@@ -198,7 +198,7 @@ const CreateView: React.FC<CreateViewProps> = ({
                                     {studentGrades[s.id] !== '' ? (
                                         <div className="flex items-center gap-3">
                                             <span className="flex items-center gap-1.5 text-xs font-black text-emerald-500 uppercase tracking-widest"><CheckCircle2 size={14} /> Ok</span>
-                                            <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase text-white animate-in zoom-in duration-300 ${getGradeMention(parseFloat(studentGrades[s.id]), maxPoints)?.color || 'bg-slate-400'}`}>
+                                            <span className={`px-2 py-1  text-[9px] font-black uppercase text-white animate-in zoom-in duration-300 ${getGradeMention(parseFloat(studentGrades[s.id]), maxPoints)?.color || 'bg-slate-400'}`}>
                                                 {getGradeMention(parseFloat(studentGrades[s.id]), maxPoints)?.label}
                                             </span>
                                         </div>
@@ -212,17 +212,17 @@ const CreateView: React.FC<CreateViewProps> = ({
                 </table>
             </div>
 
-            <div className="p-10 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="p-10 bg-slate-50   flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="flex flex-col md:flex-row items-center gap-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></div>
+                        <div className="w-2.5 h-2.5 bg-blue-500  animate-pulse"></div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{Object.values(studentGrades).filter(v => v !== '').length} / {students.length} Notes saisies</p>
                     </div>
 
                     <button
                         onClick={handlePublishGrades}
                         disabled={isPublished || isSaving || !selectedClass || !selectedSubject}
-                        className={`flex items-center gap-3 px-8 py-4 rounded-[20px] font-black uppercase text-[10px] tracking-widest transition-all ${isPublished ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-900 hover:text-white hover:border-slate-900 shadow-sm'} disabled:opacity-50`}
+                        className={`flex items-center gap-3 px-8 py-4 ] font-black uppercase text-[10px] tracking-widest transition-all ${isPublished ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-white   text-slate-600 hover:bg-slate-900 hover:text-white hover: shadow-sm'} disabled:opacity-50`}
                     >
                         {isPublished ? <><CheckCircle2 size={16} /> TRANSMIS AU PP</> : <><Send size={16} /> ENVOYER AU PP</>}
                     </button>
@@ -231,7 +231,7 @@ const CreateView: React.FC<CreateViewProps> = ({
                 <button
                     onClick={handleSaveGrades}
                     disabled={isSaving || Object.values(studentGrades).filter(v => v !== '').length === 0}
-                    className="bg-blue-600 text-white px-12 py-5 rounded-[24px] font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-100 flex items-center gap-3"
+                    className="bg-blue-600 text-white px-12 py-5 ] font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-100 flex items-center gap-3"
                 >
                     {isSaving ? 'Enregistrement...' : <>VALIDER TOUTES LES NOTES <Save size={18} /></>}
                 </button>

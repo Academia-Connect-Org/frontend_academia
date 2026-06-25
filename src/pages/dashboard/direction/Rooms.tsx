@@ -129,7 +129,7 @@ const RoomManagement: React.FC = () => {
                 </div>
                 <button
                     onClick={() => openModal()}
-                    className="bg-blue-600 text-white px-8 py-4 rounded-[32px] font-black flex items-center gap-2 hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/20 active:scale-95"
+                    className="bg-blue-600 text-white px-8 py-4 ] font-black flex items-center gap-2 hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/20 active:scale-95"
                 >
                     <Plus size={20} /> Ajouter une Salle
                 </button>
@@ -137,8 +137,8 @@ const RoomManagement: React.FC = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div className="bg-white p-6 rounded-[35px] shadow-sm border border-slate-100 flex items-center gap-5">
-                    <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
+                <div className="bg-white p-6 ] shadow-sm   flex items-center gap-5">
+                    <div className="w-14 h-14 bg-blue-50 text-blue-600  flex items-center justify-center">
                         <DoorOpen size={28} />
                     </div>
                     <div>
@@ -146,8 +146,8 @@ const RoomManagement: React.FC = () => {
                         <p className="text-2xl font-black text-slate-800">{rooms.length}</p>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-[35px] shadow-sm border border-slate-100 flex items-center gap-5">
-                    <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
+                <div className="bg-white p-6 ] shadow-sm   flex items-center gap-5">
+                    <div className="w-14 h-14 bg-emerald-50 text-emerald-600  flex items-center justify-center">
                         <Users size={28} />
                     </div>
                     <div>
@@ -157,8 +157,8 @@ const RoomManagement: React.FC = () => {
                         </p>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-[35px] shadow-sm border border-slate-100 flex items-center gap-5">
-                    <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center">
+                <div className="bg-white p-6 ] shadow-sm   flex items-center gap-5">
+                    <div className="w-14 h-14 bg-amber-50 text-amber-600  flex items-center justify-center">
                         <Building2 size={28} />
                     </div>
                     <div>
@@ -171,7 +171,7 @@ const RoomManagement: React.FC = () => {
             </div>
 
             {/* Filter Bar */}
-            <div className="bg-white p-4 rounded-[30px] shadow-sm border border-slate-100 mb-8 flex items-center gap-4">
+            <div className="bg-white p-4 ] shadow-sm   mb-8 flex items-center gap-4">
                 <Search size={20} className="text-slate-400 ml-2" />
                 <input
                     type="text"
@@ -189,8 +189,8 @@ const RoomManagement: React.FC = () => {
                     <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement des salles...</p>
                 </div>
             ) : filteredRooms.length === 0 ? (
-                <div className="bg-white rounded-[45px] p-20 text-center border-2 border-dashed border-slate-100">
-                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="bg-white ] p-20 text-center   ">
+                    <div className="w-20 h-20 bg-slate-50  flex items-center justify-center mx-auto mb-6">
                         <MapPin size={40} className="text-slate-200" />
                     </div>
                     <h3 className="text-xl font-black text-slate-800 mb-2">Aucune salle trouvée</h3>
@@ -206,25 +206,25 @@ const RoomManagement: React.FC = () => {
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
-                                className="bg-white rounded-[40px] p-8 shadow-xl shadow-slate-200/50 border border-slate-50 group hover:scale-[1.02] transition-all duration-300 relative overflow-hidden"
+                                className="bg-white ] p-8 shadow-xl shadow-slate-200/50   group hover:scale-[1.02] transition-all duration-300 relative overflow-hidden"
                             >
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-blue-100/50 transition-colors"></div>
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50  blur-3xl -mr-16 -mt-16 group-hover:bg-blue-100/50 transition-colors"></div>
 
                                 <div className="relative z-10">
                                     <div className="flex items-start justify-between mb-6">
-                                        <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+                                        <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white  flex items-center justify-center shadow-lg shadow-blue-200">
                                             <DoorOpen size={24} />
                                         </div>
                                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button
                                                 onClick={() => openModal(room)}
-                                                className="p-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                                                className="p-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all"
                                             >
                                                 <Edit2 size={16} />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(room.id)}
-                                                className="p-2 bg-slate-50 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                                                className="p-2 bg-slate-50 text-slate-400 hover:text-red-600 hover:bg-red-50  transition-all"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
@@ -236,7 +236,7 @@ const RoomManagement: React.FC = () => {
 
                                     <div className="flex items-center gap-6">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400">
+                                            <div className="w-8 h-8 bg-slate-50  flex items-center justify-center text-slate-400">
                                                 <Users size={16} />
                                             </div>
                                             <div>
@@ -269,14 +269,14 @@ const RoomManagement: React.FC = () => {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-white rounded-[50px] w-full max-w-lg shadow-2xl relative z-10 overflow-hidden"
+                            className="bg-white ] w-full max-w-lg shadow-2xl relative z-10 overflow-hidden"
                         >
                             <div className="p-10">
                                 <div className="flex items-center justify-between mb-8">
                                     <h3 className="text-2xl font-black text-slate-800">
                                         {editingRoom ? 'Modifier la Salle' : 'Nouvelle Salle'}
                                     </h3>
-                                    <button onClick={closeModal} className="p-3 bg-slate-50 text-slate-400 hover:text-slate-600 rounded-2xl transition-all">
+                                    <button onClick={closeModal} className="p-3 bg-slate-50 text-slate-400 hover:text-slate-600  transition-all">
                                         <X size={20} />
                                     </button>
                                 </div>
@@ -290,7 +290,7 @@ const RoomManagement: React.FC = () => {
                                             value={form.name}
                                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                                             placeholder="Ex: Salle 204, Laboratoire A..."
-                                            className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 font-bold text-slate-600 focus:ring-2 focus:ring-blue-600 transition-all"
+                                            className="w-full bg-slate-50 border-none  px-6 py-4 font-bold text-slate-600 focus:ring-2 focus:ring-blue-600 transition-all"
                                         />
                                     </div>
 
@@ -302,7 +302,7 @@ const RoomManagement: React.FC = () => {
                                                 type="number"
                                                 value={form.capacity}
                                                 onChange={(e) => setForm({ ...form, capacity: parseInt(e.target.value) })}
-                                                className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 font-bold text-slate-600 focus:ring-2 focus:ring-blue-600 transition-all"
+                                                className="w-full bg-slate-50 border-none  px-6 py-4 font-bold text-slate-600 focus:ring-2 focus:ring-blue-600 transition-all"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -311,7 +311,7 @@ const RoomManagement: React.FC = () => {
                                                 required
                                                 value={form.type}
                                                 onChange={(e) => setForm({ ...form, type: e.target.value })}
-                                                className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 font-bold text-slate-600 focus:ring-2 focus:ring-blue-600 transition-all appearance-none"
+                                                className="w-full bg-slate-50 border-none  px-6 py-4 font-bold text-slate-600 focus:ring-2 focus:ring-blue-600 transition-all appearance-none"
                                             >
                                                 <option>Salle de classe</option>
                                                 <option>Laboratoire</option>
@@ -325,7 +325,7 @@ const RoomManagement: React.FC = () => {
 
                                     <button
                                         type="submit"
-                                        className="w-full bg-blue-600 text-white py-5 rounded-[25px] font-black text-lg shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all mt-6 flex items-center justify-center gap-2"
+                                        className="w-full bg-blue-600 text-white py-5 ] font-black text-lg shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all mt-6 flex items-center justify-center gap-2"
                                     >
                                         {editingRoom ? <Check size={20} /> : <Plus size={20} />}
                                         {editingRoom ? 'Mettre à jour' : 'Enregistrer la Salle'}

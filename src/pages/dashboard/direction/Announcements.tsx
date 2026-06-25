@@ -41,7 +41,12 @@ const Announcements: React.FC = () => {
     const fetchAnnouncements = async () => {
         setLoading(true);
         try {
-            const params = user?.institution?.id ? { params: { institutionId: user.institution.id } } : {};
+            const params: any = { params: {} };
+            if (user?.role === 'PDG' && user?.id) {
+                params.params.ceoId = user.id;
+            } else if (user?.institution?.id) {
+                params.params.institutionId = user.institution.id;
+            }
             const res = await api.get('/announcements', params);
             setAnnouncements(res.data);
         } catch (error) {
@@ -87,17 +92,17 @@ const Announcements: React.FC = () => {
                     <p className="text-slate-500">Diffusez des messages avec signature automatique de l'administration.</p>
                 </div>
                 <div className="flex gap-4">
-                    <button className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+                    <button className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
                         <MessageSquare size={18} /> Historique
                     </button>
-                    <button className="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-extrabold flex items-center gap-2 shadow-xl shadow-emerald-600/30 hover:bg-emerald-700 hover:scale-[1.02] transition-all">
+                    <button className="bg-emerald-600 text-white px-8 py-3  font-extrabold flex items-center gap-2 shadow-xl shadow-emerald-600/30 hover:bg-emerald-700 hover:scale-[1.02] transition-all">
                         <Megaphone size={18} /> Nouvelle Annonce
                     </button>
                 </div>
             </div>
 
             {message.text && (
-                <div className={`p-4 rounded-2xl mb-8 font-bold flex items-center justify-between gap-3 animate-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                <div className={`p-4  mb-8 font-bold flex items-center justify-between gap-3 animate-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600  ' : 'bg-red-50 text-red-600  '}`}>
                     <div className="flex items-center gap-3">
                         {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
                         {message.text}
@@ -112,26 +117,26 @@ const Announcements: React.FC = () => {
                     <div className="flex items-center justify-between mb-4 px-4">
                         <div className="flex items-center gap-2">
                             <h3 className="text-xl font-black text-slate-800 tracking-tight">Annonces Actives</h3>
-                            <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest shrink-0">{announcements.length} Total</span>
+                            <span className="bg-emerald-50 text-emerald-600 px-3 py-1  text-xs font-black uppercase tracking-widest shrink-0">{announcements.length} Total</span>
                         </div>
                         <div className="flex gap-2">
-                            <button className="p-2.5 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-emerald-600 transition-all shadow-sm"><Search size={18} /></button>
-                            <button className="p-2.5 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-emerald-600 transition-all shadow-sm"><Filter size={18} /></button>
+                            <button className="p-2.5 bg-white    text-slate-400 hover:text-emerald-600 transition-all shadow-sm"><Search size={18} /></button>
+                            <button className="p-2.5 bg-white    text-slate-400 hover:text-emerald-600 transition-all shadow-sm"><Filter size={18} /></button>
                         </div>
                     </div>
 
                     <div className="space-y-6">
                         {announcements.map((ann) => (
-                            <div key={ann.id} className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-500 group relative">
+                            <div key={ann.id} className="bg-white p-8 ] shadow-xl   hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-500 group relative">
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="flex gap-4 items-center">
-                                        <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0 group-hover:rotate-6 transition-transform shadow-sm shadow-emerald-500/10">
+                                        <div className="w-12 h-12 bg-emerald-50 text-emerald-600  flex items-center justify-center shrink-0 group-hover:rotate-6 transition-transform shadow-sm shadow-emerald-500/10">
                                             <Bell size={24} />
                                         </div>
                                         <div>
                                             <div className="flex flex-wrap items-center gap-2 mb-1">
-                                                <span className="px-3 py-1 bg-slate-100 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-400">ADMINISTRATIF</span>
-                                                <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 font-black">
+                                                <span className="px-3 py-1 bg-slate-100  text-[10px] font-black uppercase tracking-widest text-slate-400">ADMINISTRATIF</span>
+                                                <span className="px-3 py-1 bg-indigo-50 text-indigo-600  text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 font-black">
                                                     <Globe size={10} /> {ann.targetRole === 'ALL' ? 'PUBLIC' : ann.targetRole}
                                                 </span>
                                             </div>
@@ -143,14 +148,14 @@ const Announcements: React.FC = () => {
                                     </button>
                                 </div>
 
-                                <div className="text-slate-600 text-sm leading-relaxed mb-8 whitespace-pre-wrap border-l-4 border-slate-50 pl-6 py-2">
+                                <div className="text-slate-600 text-sm leading-relaxed mb-8 whitespace-pre-wrap   pl-6 py-2">
                                     {ann.content}
                                 </div>
 
-                                <div className="pt-6 border-t border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                <div className="pt-6   flex flex-col md:flex-row md:items-center justify-between gap-6">
                                     <div className="flex items-center gap-6">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                            <div className="w-8 h-8  bg-slate-100 flex items-center justify-center text-slate-400">
                                                 <User size={14} />
                                             </div>
                                             <div className="flex flex-col">
@@ -163,7 +168,7 @@ const Announcements: React.FC = () => {
                                             <span className="text-xs font-bold text-slate-400">{new Date(ann.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 ">
                                         <Eye size={12} className="text-slate-300" />
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Diffusé sur le réseau</span>
                                     </div>
@@ -172,7 +177,7 @@ const Announcements: React.FC = () => {
                         ))}
 
                         {announcements.length === 0 && !loading && (
-                            <div className="py-20 text-center bg-white rounded-[40px] border border-dashed border-slate-200">
+                            <div className="py-20 text-center bg-white ]   ">
                                 <Megaphone size={48} className="mx-auto text-slate-100 mb-4" />
                                 <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Aucune annonce actuellement</p>
                             </div>
@@ -182,11 +187,11 @@ const Announcements: React.FC = () => {
 
                 {/* Quick Compose Sidebar */}
                 <div className="space-y-8">
-                    <form onSubmit={handleCreateAnnouncement} className="bg-emerald-900 p-8 rounded-[48px] text-white overflow-hidden relative shadow-2xl border border-emerald-800">
-                        <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                    <form onSubmit={handleCreateAnnouncement} className="bg-emerald-900 p-8 ] text-white overflow-hidden relative shadow-2xl  ">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/20  blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
                         <div className="relative z-10">
                             <div className="flex items-center gap-3 mb-8">
-                                <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                                <div className="w-10 h-10 bg-emerald-500/20  flex items-center justify-center">
                                     <FileText size={20} className="text-emerald-400" />
                                 </div>
                                 <h3 className="text-xl font-black tracking-tight uppercase">Diffusion</h3>
@@ -198,7 +203,7 @@ const Announcements: React.FC = () => {
                                     <input
                                         type="text"
                                         placeholder="Ex: Avis de vacances..."
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold text-white outline-none focus:bg-white/10 focus:border-emerald-500/50 transition-all"
+                                        className="w-full bg-white/5    py-4 px-5 text-sm font-bold text-white outline-none focus:bg-white/10 focus: transition-all"
                                         value={newAnnouncement.title}
                                         onChange={(e) => setNewAnnouncement({ ...newAnnouncement, title: e.target.value })}
                                     />
@@ -206,7 +211,7 @@ const Announcements: React.FC = () => {
                                 <div>
                                     <label className="text-[10px] font-black text-emerald-400/60 uppercase tracking-widest block mb-2 px-1">Cible de diffusion</label>
                                     <select
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold text-white outline-none appearance-none cursor-pointer focus:bg-white/10"
+                                        className="w-full bg-white/5    py-4 px-5 text-sm font-bold text-white outline-none appearance-none cursor-pointer focus:bg-white/10"
                                         value={newAnnouncement.targetRole}
                                         onChange={(e) => setNewAnnouncement({ ...newAnnouncement, targetRole: e.target.value })}
                                     >
@@ -219,14 +224,14 @@ const Announcements: React.FC = () => {
                                     <label className="text-[10px] font-black text-emerald-400/60 uppercase tracking-widest block mb-2 px-1">Corps du message</label>
                                     <textarea
                                         placeholder="Rédigez votre message officiel ici..."
-                                        className="w-full bg-white/5 border border-white/10 rounded-3xl p-6 text-sm font-medium text-white placeholder-white/20 outline-none h-48 resize-none focus:bg-white/10 focus:border-emerald-500/50 transition-all scrollbar-hide"
+                                        className="w-full bg-white/5    p-6 text-sm font-medium text-white placeholder-white/20 outline-none h-48 resize-none focus:bg-white/10 focus: transition-all scrollbar-hide"
                                         value={newAnnouncement.content}
                                         onChange={(e) => setNewAnnouncement({ ...newAnnouncement, content: e.target.value })}
                                     ></textarea>
                                 </div>
                             </div>
 
-                            <div className="bg-emerald-800/50 rounded-2xl p-4 mb-8 border border-emerald-700/50">
+                            <div className="bg-emerald-800/50  p-4 mb-8  ">
                                 <div className="flex gap-3">
                                     <Lock size={14} className="text-emerald-400 shrink-0 mt-0.5" />
                                     <div>
@@ -243,7 +248,7 @@ const Announcements: React.FC = () => {
 
                             <button
                                 disabled={loading || !newAnnouncement.title || !newAnnouncement.content}
-                                className="w-full py-5 bg-white text-emerald-900 rounded-3xl font-black flex items-center justify-center gap-3 shadow-2xl hover:scale-[1.02] active:scale-95 transition-all group disabled:opacity-50"
+                                className="w-full py-5 bg-white text-emerald-900  font-black flex items-center justify-center gap-3 shadow-2xl hover:scale-[1.02] active:scale-95 transition-all group disabled:opacity-50"
                             >
                                 <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                                 DIFFUSER L'ANNONCE
@@ -251,9 +256,9 @@ const Announcements: React.FC = () => {
                         </div>
                     </form>
 
-                    <div className="bg-white p-8 rounded-[40px] shadow-xl border border-slate-100">
+                    <div className="bg-white p-8 ] shadow-xl  ">
                         <h4 className="text-sm font-black text-slate-800 mb-6 uppercase tracking-widest flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                            <div className="w-1.5 h-1.5 bg-emerald-500  animate-pulse"></div>
                             Impact Statistique
                         </h4>
                         <div className="space-y-6">
@@ -275,8 +280,8 @@ const StatProgress = ({ label, percent, color }: any) => (
             <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{label}</span>
             <span className="text-xs font-black text-slate-800">{percent}%</span>
         </div>
-        <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
-            <div className={`h-full ${color} rounded-full shadow-sm`} style={{ width: `${percent}%` }}></div>
+        <div className="h-1.5 w-full bg-slate-50  overflow-hidden">
+            <div className={`h-full ${color}  shadow-sm`} style={{ width: `${percent}%` }}></div>
         </div>
     </div>
 );

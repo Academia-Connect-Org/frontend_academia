@@ -15,12 +15,14 @@ import Terms from './pages/legal/Terms';
 import Cookies from './pages/legal/Cookies';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
+import ScrollToTop from './components/ScrollToTop';
 
 // Admin
 import AdminDashboard from './pages/dashboard/AdminDashboard';
 import AdminUsers from './pages/dashboard/admin/Users';
 import AdminSettings from './pages/dashboard/admin/Settings';
 import Pricing from './pages/Pricing';
+import Contact from './pages/Contact';
 import SubscriptionExpired from './pages/SubscriptionExpired';
 import Payment from './pages/Payment';
 
@@ -28,11 +30,11 @@ import Payment from './pages/Payment';
 import PDGDashboard from './pages/dashboard/PDGDashboard';
 import GlobalStats from './pages/dashboard/pdg/GlobalStats';
 import Schools from './pages/dashboard/pdg/Schools';
-
+import SchoolDetails from './pages/dashboard/pdg/SchoolDetails';
+import SelectPlan from './pages/dashboard/pdg/SelectPlan';
 import PDGStudents from './pages/dashboard/pdg/Students';
 import PDGTeachers from './pages/dashboard/pdg/Teachers';
 import Settings from './pages/dashboard/pdg/Settings';
-import SchoolDetails from './pages/dashboard/pdg/SchoolDetails';
 
 // Direction
 import DirectionDashboard from './pages/dashboard/DirectionDashboard';
@@ -112,8 +114,11 @@ const App: React.FC = () => {
   const isDashboard = location.pathname.startsWith('/dashboard');
   const isMobileViewer = location.pathname === '/mobile-viewer';
 
+  const isHome = location.pathname === '/';
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className={`flex flex-col min-h-screen w-full ${isHome ? 'overflow-x-hidden' : ''}`}>
+      <ScrollToTop />
       {!isDashboard && !isMobileViewer && <Navbar />}
       <main className="flex-grow">
         <Routes>
@@ -125,6 +130,7 @@ const App: React.FC = () => {
           <Route path={ROUTES.TERMS} element={<Terms />} />
           <Route path={ROUTES.COOKIES} element={<Cookies />} />
           <Route path={ROUTES.PRICING} element={<Pricing />} />
+          <Route path={ROUTES.CONTACT} element={<Contact />} />
           <Route path={ROUTES.PAYMENT} element={<Payment />} />
           <Route path={ROUTES.SUBSCRIPTION_EXPIRED} element={<SubscriptionExpired />} />
           <Route path={ROUTES.LOGIN} element={<PublicRoute><Login /></PublicRoute>} />
@@ -150,6 +156,7 @@ const App: React.FC = () => {
             <Route path="pdg/stats" element={<ProtectedRoute allowedRoles={['PDG']}><GlobalStats /></ProtectedRoute>} />
             <Route path="pdg/schools" element={<ProtectedRoute allowedRoles={['PDG']}><Schools /></ProtectedRoute>} />
             <Route path="pdg/schools/:id" element={<ProtectedRoute allowedRoles={['PDG']}><SchoolDetails /></ProtectedRoute>} />
+            <Route path="pdg/select-plan/:institutionId" element={<ProtectedRoute allowedRoles={['PDG']}><SelectPlan /></ProtectedRoute>} />
             <Route path="pdg/students" element={<ProtectedRoute allowedRoles={['PDG']}><PDGStudents /></ProtectedRoute>} />
             <Route path="pdg/teachers" element={<ProtectedRoute allowedRoles={['PDG']}><PDGTeachers /></ProtectedRoute>} />
             <Route path="pdg/cycles" element={<ProtectedRoute allowedRoles={['PDG']}><DirectionCycles /></ProtectedRoute>} />

@@ -15,9 +15,9 @@ const Privacy: React.FC = () => {
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-[48px] p-12 md:p-20 shadow-2xl shadow-slate-200 border border-slate-100"
+                    className="bg-white ] p-12 md:p-20 shadow-2xl shadow-slate-200  "
                 >
-                    <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-10">
+                    <div className="w-20 h-20 bg-blue-50 text-blue-600  flex items-center justify-center mb-10">
                         <Shield size={40} />
                     </div>
 
@@ -67,7 +67,7 @@ const Privacy: React.FC = () => {
                             </p>
                         </section>
 
-                        <section className="p-10 bg-slate-50 rounded-[32px] border border-slate-100 italic font-medium">
+                        <section className="p-10 bg-slate-50 ]   italic font-medium">
                             Pour toute question concernant vos données personnelles, contactez notre délégué à la protection des données (DPO) à l'adresse : <a href="mailto:privacy@nb-mind.com" className="text-blue-600 font-bold underline">privacy@nb-mind.com</a>
                         </section>
                     </div>

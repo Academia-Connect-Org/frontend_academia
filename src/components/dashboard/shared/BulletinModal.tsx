@@ -36,8 +36,8 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
     if (loading) {
         return (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-                <div className="bg-white rounded-[40px] p-20 flex flex-col items-center">
-                    <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6"></div>
+                <div className="bg-white ] p-20 flex flex-col items-center">
+                    <div className="w-16 h-16     animate-spin mb-6"></div>
                     <p className="text-slate-500 font-black uppercase tracking-widest text-xs">Génération du bulletin...</p>
                 </div>
             </div>
@@ -50,32 +50,32 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 overflow-y-auto">
-            <div className="bg-slate-50 w-full max-w-5xl rounded-[48px] shadow-2xl relative animate-in zoom-in duration-300 overflow-hidden my-auto">
+            <div className="bg-slate-50 w-full max-w-5xl ] shadow-2xl relative animate-in zoom-in duration-300 overflow-hidden my-auto">
 
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-8 right-8 p-3 bg-white hover:bg-rose-50 hover:text-rose-500 rounded-2xl transition-all shadow-sm z-50 text-slate-400"
+                    className="absolute top-8 right-8 p-3 bg-white hover:bg-rose-50 hover:text-rose-500  transition-all shadow-sm z-50 text-slate-400"
                 >
                     <X size={24} />
                 </button>
 
                 {/* Print/Download Actions */}
                 <div className="absolute top-8 right-24 flex gap-3 z-50 no-print">
-                    <button onClick={() => window.print()} className="p-3 bg-white hover:bg-slate-50 rounded-2xl transition-all shadow-sm text-slate-600 flex items-center gap-2 font-black text-[10px] uppercase tracking-widest px-6">
+                    <button onClick={() => window.print()} className="p-3 bg-white hover:bg-slate-50  transition-all shadow-sm text-slate-600 flex items-center gap-2 font-black text-[10px] uppercase tracking-widest px-6">
                         <Printer size={18} /> Imprimer
                     </button>
-                    <button className="p-3 bg-blue-600 hover:bg-blue-700 rounded-2xl transition-all shadow-lg text-white flex items-center gap-2 font-black text-[10px] uppercase tracking-widest px-6 shadow-blue-500/30">
+                    <button className="p-3 bg-blue-600 hover:bg-blue-700  transition-all shadow-lg text-white flex items-center gap-2 font-black text-[10px] uppercase tracking-widest px-6 shadow-blue-500/30">
                         <Download size={18} /> PDF
                     </button>
                 </div>
 
                 <div className="relative p-12 lg:p-16">
                     {/* Header: School Info & Student Profile */}
-                    <div className="flex flex-col lg:flex-row justify-between gap-10 mb-16 border-b border-slate-200 pb-16">
+                    <div className="flex flex-col lg:flex-row justify-between gap-10 mb-16   pb-16">
                         <div className="space-y-6">
                             <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 bg-blue-600 rounded-[28px] flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
+                                <div className="w-16 h-16 bg-blue-600 ] flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
                                     <School size={32} />
                                 </div>
                                 <div>
@@ -91,10 +91,10 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
                             </div>
                         </div>
 
-                        <div className="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100 flex items-center gap-8 pr-12">
-                            <div className="w-24 h-24 bg-slate-100 rounded-[32px] flex items-center justify-center font-black text-2xl text-slate-300 shadow-inner">
+                        <div className="bg-white p-8 ] shadow-sm   flex items-center gap-8 pr-12">
+                            <div className="w-24 h-24 bg-slate-100 ] flex items-center justify-center font-black text-2xl text-slate-300 shadow-inner">
                                 {data.student?.profileImage ? (
-                                    <img src={data.student.profileImage} alt="" className="w-full h-full object-cover rounded-[32px]" />
+                                    <img src={data.student.profileImage} alt="" className="w-full h-full object-cover ]" />
                                 ) : (
                                     <GraduationCap size={44} />
                                 )}
@@ -105,7 +105,7 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
                                     {data.student?.lastName} {data.student?.firstName}
                                 </h3>
                                 <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                    <span className="px-2 py-0.5 bg-slate-50 rounded-lg">{data.student?.classe?.name || "N/A"}</span>
+                                    <span className="px-2 py-0.5 bg-slate-50 ">{data.student?.classe?.name || "N/A"}</span>
                                     <span>Mle: {data.student?.studentIdNumber || "---"}</span>
                                 </div>
                             </div>
@@ -120,7 +120,7 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
                     </div>
 
                     {/* Results Table */}
-                    <div className="bg-white rounded-[40px] shadow-xl border border-slate-100 overflow-hidden mb-16">
+                    <div className="bg-white ] shadow-xl   overflow-hidden mb-16">
                         <table className="w-full text-left">
                             <thead>
                                 <tr className="bg-slate-900 text-white">
@@ -169,7 +169,7 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
                                 ))}
                             </tbody>
                             <tfoot>
-                                <tr className="bg-slate-50 border-t-2 border-slate-900">
+                                <tr className="bg-slate-50  ">
                                     <td colSpan={isEcole ? 1 : 2} className="px-10 py-8 text-sm font-black text-slate-900 uppercase tracking-widest">Total Général / Moyenne</td>
                                     <td colSpan={isEcole ? 2 : 4} className="px-10 py-8 text-right">
                                         <span className="text-3xl font-black text-slate-900 tracking-tighter">{data.generalAverage.toFixed(2)} <span className="text-lg text-slate-400">/ 20</span></span>
@@ -180,16 +180,16 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
                     </div>
 
                     {/* Footer Signs */}
-                    <div className="flex flex-col md:flex-row justify-between gap-10 mt-16 pt-16 border-t border-dashed border-slate-200">
+                    <div className="flex flex-col md:flex-row justify-between gap-10 mt-16 pt-16   ">
                         <div className="space-y-4">
                             <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Observation de la Direction</p>
-                            <div className="w-64 h-24 border-2 border-slate-100 rounded-3xl p-4 italic text-slate-400 text-xs">
+                            <div className="w-64 h-24    p-4 italic text-slate-400 text-xs">
                                 {data.generalAverage >= 10 ? "Félicitations, passage admis pour le prochain cycle." : "Travail insuffisant, redoublement à envisager."}
                             </div>
                         </div>
                         <div className="text-right space-y-2">
                             <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Signatures & Cachet</p>
-                            <div className="w-64 h-32 ml-auto border-2 border-slate-100 rounded-[32px] bg-slate-50/50 flex items-center justify-center italic text-[10px] text-slate-300">
+                            <div className="w-64 h-32 ml-auto   ] bg-slate-50/50 flex items-center justify-center italic text-[10px] text-slate-300">
                                 {isEcole ? "Signature du Directeur / de la Directrice" : "Signature du Chef d'Établissement"}
                             </div>
                         </div>
@@ -201,8 +201,8 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
 };
 
 const MatrixTile = ({ label, value, icon: Icon, color, bg }: { label: string, value: string, icon: any, color: string, bg: string }) => (
-    <div className="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100 flex items-center gap-6">
-        <div className={`w-14 h-14 ${bg} ${color} rounded-3xl flex items-center justify-center shadow-inner`}>
+    <div className="bg-white p-8 ] shadow-sm   flex items-center gap-6">
+        <div className={`w-14 h-14 ${bg} ${color}  flex items-center justify-center shadow-inner`}>
             <Icon size={24} />
         </div>
         <div>
