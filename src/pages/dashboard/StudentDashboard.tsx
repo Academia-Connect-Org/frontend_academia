@@ -22,6 +22,8 @@ const StudentDashboard: React.FC = () => {
     const [homeworks, setHomeworks] = React.useState<any[]>([]);
     const [results, setResults] = React.useState<any[]>([]);
     const [classmates, setClassmates] = React.useState<any[]>([]);
+    const [installments, setInstallments] = React.useState<any[]>([]);
+    const [subjects, setSubjects] = React.useState<any[]>([]);
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
@@ -33,14 +35,18 @@ const StudentDashboard: React.FC = () => {
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
-            const [homeworksRes, resultsRes, scheduleRes, classmatesRes] = await Promise.all([
+            const [homeworksRes, resultsRes, scheduleRes, classmatesRes, installmentsRes, subjectsRes] = await Promise.all([
                 api.get(`/homeworks/classe/${user?.classe?.id}`),
                 api.get(`/submissions/student/${user?.id}/results`),
                 api.get(`/timetable/classe/${user?.classe?.id}`),
-                api.get(`/students/classe/${user?.classe?.id}`)
+                api.get(`/students/classe/${user?.classe?.id}`),
+                api.get('/finance/my-installments').catch(() => ({ data: [] })),
+                user?.classe?.cycle?.id ? api.get(`/subjects/cycle/${user?.classe?.cycle?.id}`).catch(() => ({ data: [] })) : Promise.resolve({ data: [] })
             ]);
 
             setClassmates(classmatesRes.data.filter((s: any) => s.id !== user?.id).slice(0, 10));
+            setInstallments(installmentsRes.data || []);
+            setSubjects(subjectsRes.data || []);
 
             const publishedResults = resultsRes.data.filter((r: any) => r.homework?.gradesPublished);
 
@@ -78,6 +84,25 @@ const StudentDashboard: React.FC = () => {
         }
     };
 
+    const financialStatus = React.useMemo(() => {
+        if (!installments || installments.length === 0) return { label: 'Aucun Frais', color: 'blue' };
+        let hasOverdue = false;
+        let allPaid = true;
+        const now = new Date();
+        
+        for (const inst of installments) {
+            const isPaid = inst.paidAmount >= inst.dueAmount;
+            if (!isPaid) allPaid = false;
+            if (!isPaid && inst.dueDate && new Date(inst.dueDate) < now) {
+                hasOverdue = true;
+            }
+        }
+        
+        if (allPaid) return { label: 'À Jour', color: 'emerald' };
+        if (hasOverdue) return { label: 'En Retard', color: 'rose' };
+        return { label: 'En Cours', color: 'amber' };
+    }, [installments]);
+
     if (loading) {
         return (
             <>
@@ -113,6 +138,20 @@ const StudentDashboard: React.FC = () => {
                             <div className="bg-white/10 px-4 py-2  backdrop-blur-md  ">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-blue-200">Ma Classe</p>
                                 <p className="text-xl font-black">{user?.classe?.name || 'N/A'}</p>
+                            </div>
+                            <div className="bg-white/10 px-4 py-2 backdrop-blur-md">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-blue-200">Statut Financier</p>
+                                <p className="text-sm font-black mt-1">
+                                    {financialStatus.label === 'À Jour' ? (
+                                        <span className="px-2 py-1 bg-emerald-500/20 text-emerald-200 uppercase tracking-widest text-[10px]">{financialStatus.label}</span>
+                                    ) : financialStatus.label === 'En Retard' ? (
+                                        <span className="px-2 py-1 bg-rose-500/20 text-rose-200 uppercase tracking-widest text-[10px]">{financialStatus.label}</span>
+                                    ) : financialStatus.label === 'En Cours' ? (
+                                        <span className="px-2 py-1 bg-amber-500/20 text-amber-200 uppercase tracking-widest text-[10px]">{financialStatus.label}</span>
+                                    ) : (
+                                        <span className="px-2 py-1 bg-blue-500/20 text-blue-200 uppercase tracking-widest text-[10px]">{financialStatus.label}</span>
+                                    )}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -183,6 +222,20 @@ const StudentDashboard: React.FC = () => {
                             )}
                         </div>
                     </div>
+
+                    <div className="bg-white dark:bg-slate-900 p-8 shadow-xl">
+                        <h3 className="text-xl font-black text-slate-800 dark:text-blue-400 mb-8 tracking-tight">Mes Matières ({subjects.length})</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {subjects.length > 0 ? subjects.map((subj, i) => (
+                                <div key={i} className="p-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer group">
+                                    <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm group-hover:text-blue-600 transition-colors">{subj.name}</h4>
+                                    {subj.teacher && <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-widest">{subj.teacher.lastName}</p>}
+                                </div>
+                            )) : (
+                                <p className="col-span-full text-center py-4 text-slate-400 font-bold italic">Aucune matière trouvée.</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Sidebar: Results & Resources */}
@@ -223,7 +276,49 @@ const StudentDashboard: React.FC = () => {
                             <ResourceItem title="Exercices Corrigés - Anglais" type="LINK" />
                         </div>
                     </div>
+
+                    {/* Mes Tranches de Paiement */}
+                    <div className="bg-white p-8 ] shadow-xl  mt-8">
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-xl font-black text-slate-800 tracking-tight">Mes Frais Scolaires</h3>
+                            <button onClick={() => navigate('/dashboard/student/payments')} className="text-xs font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest flex items-center gap-1">
+                                Tout voir <TrendingUp size={14} className="rotate-45" />
+                            </button>
+                        </div>
+                        <div className="space-y-4">
+                            {installments && installments.length > 0 ? (
+                                installments.slice(0, 3).map((inst: any, idx: number) => {
+                                    const isPaid = inst.paidAmount >= inst.dueAmount;
+                                    const remaining = inst.dueAmount - inst.paidAmount;
+                                    const progress = Math.min(100, (inst.paidAmount / inst.dueAmount) * 100) || 0;
+                                    
+                                    return (
+                                        <div key={idx} className="bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-700/50 hover:border-blue-500/30 transition-all group">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm group-hover:text-blue-600 transition-colors truncate max-w-[65%]">{inst.name || 'Tranche'}</h4>
+                                                <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${isPaid ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400'}`}>
+                                                    {isPaid ? 'Payé' : 'À payer'}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between mt-3 mb-2">
+                                                <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1">Échéance: {inst.dueDate || 'N/A'}</span>
+                                                <span className={`text-sm font-black tracking-tight ${isPaid ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                                                    {remaining} FCFA
+                                                </span>
+                                            </div>
+                                            <div className="w-full bg-slate-200 dark:bg-slate-700 h-1 overflow-hidden">
+                                                <div className={`h-full transition-all duration-1000 ${isPaid ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${progress}%` }}></div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <p className="text-center text-slate-400 font-bold italic py-4">Aucun plan de paiement actif.</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
+
                 {/* Sidebar: Classmates & Performance */}
                 <div className="space-y-8">
                     {/* Performance Widget */}
@@ -242,7 +337,10 @@ const StudentDashboard: React.FC = () => {
                             <div className="h-full bg-blue-500 " style={{ width: `${(stats.average / 20) * 100}%` }}></div>
                         </div>
 
-                        <button className="w-full py-4 bg-white/10 hover:bg-white/20    font-black text-[10px] uppercase tracking-widest transition-all">Consulter le bulletin</button>
+                        <div className="flex flex-col gap-2">
+                            <button onClick={() => navigate('/dashboard/student/results')} className="w-full py-4 bg-white/10 hover:bg-white/20    font-black text-[10px] uppercase tracking-widest transition-all">Consulter le bulletin</button>
+                            <button onClick={() => navigate('/dashboard/student/payments')} className="w-full py-4 bg-blue-600 hover:bg-blue-700 font-black text-[10px] uppercase tracking-widest transition-all">Paiements & Reçus</button>
+                        </div>
                     </div>
 
                     {/* Classmates Widget */}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../api/axios';
-import { Clock, UserX, AlertCircle, Calendar, Users as UsersIcon, ChevronRight, Plus, Download } from 'lucide-react';
+import { Clock, UserX, AlertCircle, Calendar, Users as UsersIcon, ChevronRight, Plus, Download, User as UserIcon } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -164,12 +164,12 @@ const ParentAttendance: React.FC = () => {
                 </div>
 
                 {classes.length > 1 && (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 w-full md:w-auto">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Filtrer par Classe</label>
                         <select
                             value={selectedClassId}
                             onChange={(e) => setSelectedClassId(e.target.value)}
-                            className="bg-white   px-6 py-3  font-bold text-slate-600 outline-none focus: transition-all shadow-sm"
+                            className="bg-white px-6 py-3 font-bold text-slate-600 outline-none transition-all shadow-sm w-full md:w-auto"
                         >
                             <option value="all">Toutes les classes</option>
                             {classes.map(c => (
@@ -200,47 +200,43 @@ const ParentAttendance: React.FC = () => {
                 </div>
             ) : (
                 <>
-                    <div className="bg-white p-2 ] shadow-lg   flex items-center gap-2 overflow-x-auto no-scrollbar">
-                        {filteredChildren.map((child: any) => (
-                            <button
-                                key={child.id}
-                                onClick={() => setSelectedChildId(String(child.id))}
-                                className={`px-8 py-4 ] font-black text-xs uppercase tracking-widest transition-all flex items-center gap-3 whitespace-nowrap
-                                    ${selectedChildId === String(child.id)
-                                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20 scale-105 active:scale-95'
-                                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
-                            >
-                                <div className={`w-6 h-6  flex items-center justify-center text-[10px] ${selectedChildId === String(child.id) ? 'bg-white/20' : 'bg-slate-100'}`}>
-                                    {child.firstName[0]}
-                                </div>
-                                {child.firstName} {child.lastName}
-                                <span className={`ml-2 px-2 py-0.5  text-[8px] font-bold ${selectedChildId === String(child.id) ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                                    {child.classe?.name}
-                                </span>
-                            </button>
-                        ))}
+                    <div className="bg-white p-2 shadow-xl flex items-center w-full lg:w-auto max-w-md mb-6">
+                        <div className="w-10 h-10 bg-blue-50 flex items-center justify-center text-blue-600 mr-2 shrink-0">
+                            <UserIcon size={18} />
+                        </div>
+                        <select
+                            value={selectedChildId}
+                            onChange={(e) => setSelectedChildId(e.target.value)}
+                            className="bg-transparent flex-1 py-3 px-2 font-black text-xs text-slate-700 uppercase tracking-widest outline-none cursor-pointer"
+                        >
+                            {filteredChildren.map((child: any) => (
+                                <option key={child.id} value={String(child.id)}>
+                                    {child.firstName} {child.lastName} {child.classe?.name ? `— ${child.classe.name}` : ''}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="md:col-span-2 space-y-8">
-                            <div className="grid grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                                 <MatrixBlock label="Absences" value={stats.absences} color="rose" icon={UserX} />
                                 <MatrixBlock label="Retards" value={stats.retards} color="amber" icon={Clock} />
                                 <MatrixBlock label="Justifiées" value={stats.excused} color="indigo" icon={AlertCircle} />
                             </div>
 
-                            <div className="bg-white ] shadow-2xl   overflow-hidden">
-                                <div className="px-10 py-8   bg-slate-50/20 flex items-center justify-between">
+                            <div className="bg-white shadow-2xl overflow-hidden">
+                                <div className="px-6 sm:px-10 py-6 sm:py-8 bg-slate-50/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
                                     <h3 className="text-xl font-black text-slate-900 flex items-center gap-3 italic">
                                         <Calendar size={24} className="text-blue-600" /> Historique de Présence
                                     </h3>
-                                    <div className="px-5 py-2 bg-emerald-50 text-emerald-600  text-[10px] font-black uppercase tracking-widest  ">
+                                    <div className="px-5 py-2 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
                                         Fidélité au cours
                                     </div>
                                 </div>
 
-                                <div className="p-4">
-                                    <table className="w-full text-left">
+                                <div className="p-0 sm:p-4 overflow-x-auto">
+                                    <table className="w-full text-left whitespace-nowrap min-w-[600px]">
                                         <thead>
                                             <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                                 <th className="px-8 py-6">Période / Date</th>
@@ -293,10 +289,10 @@ const ParentAttendance: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="space-y-8">
-                            <div className="bg-slate-900 ] p-10 text-white shadow-2xl relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20  blur-[80px]"></div>
-                                <h4 className="text-xl font-black mb-8 relative z-10 flex items-center gap-3">
+                        <div className="space-y-6 sm:space-y-8">
+                            <div className="bg-slate-900 p-6 sm:p-10 text-white shadow-2xl relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 blur-[80px]"></div>
+                                <h4 className="text-xl font-black mb-6 sm:mb-8 relative z-10 flex items-center gap-3">
                                     <AlertCircle size={22} className="text-blue-400" /> Alertes Directes
                                 </h4>
                                 <div className="space-y-6 relative z-10">
@@ -335,17 +331,21 @@ const ParentAttendance: React.FC = () => {
 
 const MatrixBlock = ({ label, value, color, icon: Icon }: any) => {
     const colors = {
-        rose: 'text-rose-600 bg-rose-50 ',
-        amber: 'text-amber-600 bg-amber-50 ',
-        indigo: 'text-indigo-600 bg-indigo-50 ',
+        rose: 'text-rose-600 bg-rose-50',
+        amber: 'text-amber-600 bg-amber-50',
+        indigo: 'text-indigo-600 bg-indigo-50',
     };
     return (
-        <div className="bg-white p-8 ] shadow-xl   group hover:-translate-y-1 transition-all">
-            <div className={`w-14 h-14  flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all ${colors[color as keyof typeof colors]}`}>
-                <Icon size={28} />
+        <div className="group bg-white p-4 shadow-lg border border-slate-100 rounded-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden flex items-center gap-4">
+            <div className={`w-12 h-12 flex items-center justify-center rounded-xl shadow-inner shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all ${colors[color as keyof typeof colors]}`}>
+                <Icon size={24} />
             </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-            <h4 className="text-3xl font-black text-slate-900 tracking-tighter">{value}</h4>
+            <div className="flex-1">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+                <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-xl font-black text-slate-900 tracking-tight leading-none">{value}</h4>
+                </div>
+            </div>
         </div>
     );
 };

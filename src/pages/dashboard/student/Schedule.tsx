@@ -140,7 +140,8 @@ const StudentSchedule: React.FC = () => {
                 </button>
             </div>
 
-            <div className="bg-white ] shadow-2xl   overflow-hidden relative mb-12 min-w-[800px]">
+            <div className="bg-white shadow-2xl overflow-x-auto relative mb-12">
+                <div className="min-w-[800px] relative">
                 {loading && (
                     <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-50 flex items-center justify-center">
                         <Loader2 className="animate-spin text-blue-600" size={48} />
@@ -266,6 +267,7 @@ const StudentSchedule: React.FC = () => {
                             </div>
                         ))}
                     </div>
+                </div>
                 </div>
             </div>
 

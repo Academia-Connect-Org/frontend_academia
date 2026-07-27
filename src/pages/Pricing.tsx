@@ -4,6 +4,7 @@ import { Check, X, Clock, Zap, Crown, ArrowRight, ShieldCheck, Loader2 } from 'l
 import { motion } from 'framer-motion';
 import { ROUTES } from '../constants/routes';
 import api from '../api/axios';
+import SubscriptionPlanCard from '../components/shared/SubscriptionPlanCard';
 
 const Pricing = () => {
     const [isYearly, setIsYearly] = useState(false);
@@ -63,16 +64,18 @@ const Pricing = () => {
                         Choisissez le pack qui correspond à l'envergure de votre établissement.
                     </motion.p>
 
-                    <div className="mt-12 flex items-center justify-center gap-4">
-                        <span className={`text-sm font-black uppercase tracking-widest ${!isYearly ? 'text-white' : 'text-white/40'}`}>Mensuel</span>
-                        <button
-                            onClick={() => setIsYearly(!isYearly)}
-                            className="w-16 h-8 bg-white/20 rounded-full p-1 relative transition-colors hover:bg-white/30"
-                        >
-                            <div className={`w-6 h-6 bg-white rounded-full shadow-md transition-transform ${isYearly ? 'translate-x-8' : 'translate-x-0'}`}></div>
-                        </button>
-                        <span className={`text-sm font-black uppercase tracking-widest ${isYearly ? 'text-white' : 'text-white/40'}`}>Annuel <small className="text-blue-400 text-[10px] ml-1">(-10%)</small></span>
-                    </div>
+                    {!loading && plans.some(plan => plan.type !== 'FREE_TRIAL' && (plan.billingOptions === 'BOTH' || plan.billingOptions == null)) && (
+                        <div className="mt-12 flex items-center justify-center gap-4">
+                            <span className={`text-sm font-black uppercase tracking-widest ${!isYearly ? 'text-white' : 'text-white/40'}`}>Mensuel</span>
+                            <button
+                                onClick={() => setIsYearly(!isYearly)}
+                                className="w-16 h-8 bg-white/20 rounded-full p-1 relative transition-colors hover:bg-white/30"
+                            >
+                                <div className={`w-6 h-6 bg-white rounded-full shadow-md transition-transform ${isYearly ? 'translate-x-8' : 'translate-x-0'}`}></div>
+                            </button>
+                            <span className={`text-sm font-black uppercase tracking-widest ${isYearly ? 'text-white' : 'text-white/40'}`}>Annuel <small className="text-blue-400 text-[10px] ml-1">(-10%)</small></span>
+                        </div>
+                    )}
                 </div>
             </header>
 
@@ -82,25 +85,35 @@ const Pricing = () => {
                         <Loader2 className="animate-spin text-blue-500" size={48} />
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {plans.map((plan) => (
-                            <PricingCard
-                                key={plan.id}
-                                planType={plan.type}
-                                title={plan.title}
-                                price={
-                                    plan.monthlyPrice === 0 
-                                    ? "0 FCFA" 
-                                    : (isYearly ? `${plan.yearlyPrice.toLocaleString('fr-FR')} FCFA` : `${plan.monthlyPrice.toLocaleString('fr-FR')} FCFA`)
-                                }
-                                duration={plan.duration ? plan.duration : (isYearly ? "/ an" : "/ mois")}
-                                icon={getIconForPlan(plan.type)}
-                                highlight={plan.highlight}
-                                features={plan.features}
-                                missing={plan.missingFeatures}
-                                isFeatured={plan.featured}
-                            />
-                        ))}
+                    <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto">
+                        {plans.map((plan) => {
+                            let effectiveIsYearly = isYearly;
+                            if (plan.billingOptions === 'MONTHLY_ONLY') effectiveIsYearly = false;
+                            if (plan.billingOptions === 'YEARLY_ONLY') effectiveIsYearly = true;
+
+                            const calculatedPrice = plan.monthlyPrice === 0 
+                                ? "0 FCFA" 
+                                : (effectiveIsYearly ? `${plan.yearlyPrice.toLocaleString('fr-FR')} FCFA` : `${plan.monthlyPrice.toLocaleString('fr-FR')} FCFA`);
+                            const calculatedDuration = plan.duration ? plan.duration : (effectiveIsYearly ? "/ an" : "/ mois");
+
+                            return (
+                                <SubscriptionPlanCard
+                                    key={plan.id}
+                                    planType={plan.type}
+                                    title={plan.title}
+                                    price={calculatedPrice}
+                                    duration={calculatedDuration}
+                                    icon={getIconForPlan(plan.type)}
+                                    highlight={plan.highlight}
+                                    features={plan.features}
+                                    missing={plan.missingFeatures}
+                                    isFeatured={plan.featured}
+                                    forcedPeriod={plan.billingOptions !== 'BOTH' && plan.billingOptions != null ? effectiveIsYearly : null}
+                                    mode="public"
+                                    onButtonClick={() => navigate(`${ROUTES.PAYMENT}?plan=${plan.type}&planTitle=${encodeURIComponent(plan.title)}&price=${calculatedPrice}&duration=${calculatedDuration}`)}
+                                />
+                            );
+                        })}
                     </div>
                 )}
 
@@ -124,63 +137,6 @@ const Pricing = () => {
                 </div>
             </div>
         </div>
-    );
-};
-
-const PricingCard = ({ planType, title, price, duration, icon: Icon, features, missing, isFeatured, highlight }: any) => {
-    const navigate = useNavigate();
-
-    return (
-        <motion.div
-            whileHover={{ y: -10 }}
-            className={`relative p-10 rounded-3xl transition-all duration-500 ${isFeatured ? ' bg-white shadow-2xl shadow-indigo-100 scale-105 z-10 border-2 border-indigo-100' : ' bg-white/50 backdrop-blur-sm shadow-xl'}`}
-        >
-            <div className="mb-8 min-h-[30px]">
-                {highlight && (
-                    <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full ${isFeatured ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                        {highlight}
-                    </span>
-                )}
-            </div>
-
-            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-8 ${isFeatured ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-400'}`}>
-                <Icon size={32} />
-            </div>
-
-            <h3 className="text-3xl font-black text-slate-800 mb-2 uppercase tracking-tighter">{title}</h3>
-            <div className="flex items-baseline gap-1 mb-8 pb-8 border-b border-slate-100">
-                <span className="text-3xl font-black text-slate-900">{price}</span>
-                <span className="text-sm font-bold text-slate-400">{duration}</span>
-            </div>
-
-            <div className="space-y-5 mb-10">
-                {features?.map((f: string, i: number) => (
-                    <div key={i} className="flex gap-4">
-                        <div className="w-5 h-5 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                            <Check size={12} strokeWidth={3} />
-                        </div>
-                        <span className="text-sm font-bold text-slate-600">{f}</span>
-                    </div>
-                ))}
-                {missing?.map((m: string, i: number) => (
-                    <div key={i} className="flex gap-4 opacity-40">
-                        <div className="w-5 h-5 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                            <X size={12} strokeWidth={3} />
-                        </div>
-                        <span className="text-sm font-medium text-slate-400 italic line-through">{m}</span>
-                    </div>
-                ))}
-            </div>
-
-            <button
-                onClick={() => navigate(`${ROUTES.PAYMENT}?plan=${planType}&price=${price}&duration=${duration}`)}
-                className={`w-full py-5 rounded-xl font-black uppercase text-xs tracking-widest transition-all ${isFeatured
-                        ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-600/20'
-                        : 'bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-900/10'
-                    }`}>
-                Sélectionner ce plan
-            </button>
-        </motion.div>
     );
 };
 

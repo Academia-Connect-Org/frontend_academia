@@ -464,7 +464,7 @@ const Profile: React.FC = () => {
                         <div className="bg-red-50 dark:bg-red-950/20   dark: p-8 ]">
                             <h4 className="text-red-800 dark:text-red-400 font-black text-lg mb-4 uppercase tracking-tight">Supprimer définitivement le compte</h4>
                             <p className="text-red-600 dark:text-red-400/70 font-medium mb-8 leading-relaxed">
-                                En supprimant votre compte, vous perdrez l'accès à toutes vos données, y compris vos messages, vos préférences et vos informations liées à NB-MIND School. <br />
+                                En supprimant votre compte, vous perdrez l'accès à toutes vos données, y compris vos messages, vos préférences et vos informations liées à ACADEMIA CONNECT. <br />
                                 <strong>Cette action est irréversible et immédiate.</strong>
                             </p>
 

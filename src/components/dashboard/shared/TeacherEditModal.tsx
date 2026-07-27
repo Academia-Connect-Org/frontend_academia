@@ -100,25 +100,29 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ teacher, onClose, o
                 {/* Close Button UI */}
                 <button
                     onClick={onClose}
-                    className="absolute top-8 right-8 w-12 h-12 bg-slate-50 text-slate-400  flex items-center justify-center hover:text-slate-900 hover:rotate-90 hover:bg-slate-100 transition-all z-50 group"
+                    className="absolute top-4 right-4 sm:top-8 sm:right-8 w-10 h-10 sm:w-12 sm:h-12 bg-slate-50 text-slate-400  flex items-center justify-center hover:text-slate-900 hover:rotate-90 hover:bg-slate-100 transition-all z-50 group shadow-sm"
                 >
-                    <X size={24} />
+                    <X size={20} className="sm:w-6 sm:h-6" />
                 </button>
 
                 <div className="flex flex-col lg:flex-row h-full max-h-[90vh]">
                     {/* Left Panel: Profile Sidebar */}
-                    <div className="lg:w-80 bg-slate-50/50 p-10 flex flex-col items-center  ">
-                        <div className="w-32 h-32 ] bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center text-4xl font-black shadow-2xl shadow-indigo-200 mb-6 transition-transform hover:scale-105 duration-500">
-                            {formData.firstName.charAt(0)}{formData.lastName.charAt(0)}
+                    <div className="w-full lg:w-80 bg-slate-50/50 p-6 lg:p-10 flex flex-col items-center shrink-0 border-b lg:border-b-0 lg:border-r border-slate-200/50">
+                        <div className="flex flex-row lg:flex-col items-center gap-4 lg:gap-0 w-full lg:w-auto">
+                            <div className="w-16 h-16 lg:w-32 lg:h-32 bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center text-2xl lg:text-4xl font-black shadow-lg lg:shadow-2xl shadow-indigo-200 lg:mb-6 transition-transform hover:scale-105 duration-500 shrink-0">
+                                {formData.firstName.charAt(0)}{formData.lastName.charAt(0)}
+                            </div>
+                            <div className="flex flex-col items-start lg:items-center min-w-0 flex-1">
+                                <h3 className="text-lg lg:text-xl font-black text-slate-900 text-left lg:text-center uppercase tracking-tight mb-1 lg:mb-2 truncate w-full">
+                                    {formData.firstName} {formData.lastName}
+                                </h3>
+                                <p className="text-[9px] lg:text-[10px] font-black text-indigo-500 bg-white px-3 py-1 lg:px-4 lg:py-1.5 uppercase tracking-[0.2em] shadow-sm">
+                                    Profil Enseignant
+                                </p>
+                            </div>
                         </div>
-                        <h3 className="text-xl font-black text-slate-900 text-center uppercase tracking-tight mb-2">
-                            {formData.firstName} {formData.lastName}
-                        </h3>
-                        <p className="text-[10px] font-black text-indigo-500 bg-white   px-4 py-1.5  uppercase tracking-[0.2em] mb-10 shadow-sm">
-                            Profil Enseignant
-                        </p>
 
-                        <div className="w-full space-y-5 pt-10  ">
+                        <div className="w-full flex flex-row lg:flex-col gap-4 lg:gap-0 lg:space-y-5 pt-6 lg:pt-10 overflow-x-auto custom-scrollbar pb-2 lg:pb-0">
                             <SidebarStat label="ID Personnel" value={`#TCH-${teacher.id}`} icon={<Layers size={14} />} />
                             <SidebarStat label="Type" value="Corps Enseignant" icon={<UserCheck size={14} />} />
                             <SidebarStat label="Email Pro" value={formData.email} icon={<Mail size={14} />} />
@@ -134,8 +138,8 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ teacher, onClose, o
 
                     {/* Right Panel: Scrollable Form */}
                     <div className="flex-1 flex flex-col bg-white overflow-hidden">
-                        <div className="flex-1 overflow-y-auto p-12 custom-scrollbar scroll-smooth">
-                            <form id="editTeacherForm" onSubmit={handleSubmit} className="space-y-16">
+                        <div className="flex-1 overflow-y-auto p-6 sm:p-8 lg:p-12 custom-scrollbar scroll-smooth">
+                            <form id="editTeacherForm" onSubmit={handleSubmit} className="space-y-10 lg:space-y-16">
                                 {/* Identity Section */}
                                 <SectionContainer title="Identité & Coordonnées" icon={<UserCircle size={22} className="text-indigo-600" />}>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
@@ -260,23 +264,24 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ teacher, onClose, o
                         </div>
 
                         {/* Footer UI */}
-                        <div className="p-10 bg-slate-900   flex items-center justify-between">
-                            <button onClick={onClose} className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-white transition-colors px-6">
+                        <div className="p-6 lg:p-10 bg-slate-900 flex items-center justify-between gap-4">
+                            <button type="button" onClick={onClose} className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-white transition-colors px-2 lg:px-6">
                                 Annuler
                             </button>
                             <button
                                 type="submit"
                                 form="editTeacherForm"
                                 disabled={loading}
-                                className="bg-white text-slate-900 px-10 py-5 ] font-black shadow-2xl hover:scale-[1.05] active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 flex items-center gap-4 group"
+                                className="bg-white text-slate-900 px-6 py-4 lg:px-10 lg:py-5 font-black shadow-2xl hover:scale-[1.05] active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 flex items-center gap-3 lg:gap-4 group shrink-0"
                             >
                                 {loading ? (
-                                    <div className="w-5 h-5 ]    animate-spin"></div>
+                                    <div className="w-5 h-5 animate-spin border-2 border-slate-900 border-t-transparent rounded-full"></div>
                                 ) : (
                                     <>
-                                        Sauvegarder les modifications
-                                        <div className="w-8 h-8  bg-indigo-600 text-white flex items-center justify-center group-hover:rotate-12 transition-transform">
-                                            <CheckCircle2 size={16} />
+                                        <span className="hidden sm:inline">Sauvegarder les modifications</span>
+                                        <span className="sm:hidden">Enregistrer</span>
+                                        <div className="w-6 h-6 lg:w-8 lg:h-8 bg-indigo-600 text-white flex items-center justify-center group-hover:rotate-12 transition-transform">
+                                            <CheckCircle2 size={14} className="lg:w-4 lg:h-4" />
                                         </div>
                                     </>
                                 )}
@@ -292,16 +297,16 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ teacher, onClose, o
 // --- Crisp Styled Components ---
 
 const SectionContainer = ({ title, icon, children }: any) => (
-    <div className="space-y-8">
-        <div className="flex items-center gap-5">
-            <div className="w-12 h-12 ] bg-white shadow-xl shadow-slate-100   flex items-center justify-center font-black">
+    <div className="space-y-6 lg:space-y-8">
+        <div className="flex items-center gap-3 lg:gap-5">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-white shadow-xl shadow-slate-100 flex items-center justify-center font-black shrink-0">
                 {icon}
             </div>
-            <h4 className="text-2xl font-black text-slate-900 tracking-tight">{title}</h4>
+            <h4 className="text-lg lg:text-2xl font-black text-slate-900 tracking-tight">{title}</h4>
         </div>
         <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-slate-100 to-transparent ] opacity-20 blur-xl"></div>
-            <div className="relative bg-white p-10 ]   shadow-sm overflow-hidden">
+            <div className="absolute -inset-1 bg-gradient-to-r from-slate-100 to-transparent opacity-20 blur-xl"></div>
+            <div className="relative bg-white p-6 lg:p-10 shadow-sm overflow-hidden">
                 {children}
             </div>
         </div>
@@ -360,13 +365,13 @@ const TagButton = ({ label, active, onClick, variant = 'primary' }: any) => {
 };
 
 const SidebarStat = ({ label, value, icon }: any) => (
-    <div className="flex items-center gap-5 w-full group">
-        <div className="w-10 h-10 ] bg-white   shadow-sm flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover: transition-colors">
+    <div className="flex items-center gap-3 lg:gap-5 min-w-[140px] lg:w-full group shrink-0">
+        <div className="w-8 h-8 lg:w-10 lg:h-10 bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-indigo-600 transition-colors shrink-0">
             {icon}
         </div>
         <div className="min-w-0">
-            <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">{label}</p>
-            <p className="text-xs font-black text-slate-800 truncate leading-tight tracking-tight">{value}</p>
+            <p className="text-[8px] lg:text-[9px] font-black text-slate-300 uppercase tracking-widest mb-0.5 lg:mb-1">{label}</p>
+            <p className="text-[10px] lg:text-xs font-black text-slate-800 truncate leading-tight tracking-tight">{value}</p>
         </div>
     </div>
 );

@@ -11,7 +11,8 @@ import {
     AlertCircle,
     MoreVertical,
     History,
-    X
+    X,
+    Edit
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../api/axios';
@@ -23,6 +24,7 @@ const Book: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [loading, setLoading] = React.useState(true);
     const [editingLesson, setEditingLesson] = React.useState<any>(null);
+    const [viewingLesson, setViewingLesson] = React.useState<any>(null);
     const [searchQuery, setSearchQuery] = React.useState('');
     const [dateFilter, setDateFilter] = React.useState('');
 
@@ -176,8 +178,8 @@ const Book: React.FC = () => {
 
                         <div className="space-y-6">
                             {filteredLessons.length > 0 ? filteredLessons.map((lesson) => (
-                                <div key={lesson.id} className="group cursor-pointer" onClick={() => handleEditClick(lesson)}>
-                                    <div className="p-6 ] bg-slate-50/50 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5   hover: transition-all duration-300 relative overflow-hidden">
+                                <div key={lesson.id} className="group cursor-pointer" onClick={() => setViewingLesson(lesson)}>
+                                    <div className="p-6 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 relative overflow-hidden">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-4 items-center">
                                                 <div className={`w-12 h-12  flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform ${lesson.status === 'Terminé' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
@@ -194,14 +196,22 @@ const Book: React.FC = () => {
                                             <button className="text-slate-300 hover:text-slate-600 transition-colors"><MoreVertical size={20} /></button>
                                         </div>
                                         <div className="pl-16">
-                                            <p className="text-sm text-slate-500 leading-relaxed font-medium mb-4">{lesson.content}</p>
-                                            <div className="flex items-center gap-4">
-                                                <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                    <Clock size={12} /> {lesson.duration}
+                                            <p className="text-sm text-slate-500 leading-relaxed font-medium mb-4 line-clamp-3">{lesson.content}</p>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                        <Clock size={12} /> {lesson.duration}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                        <FileText size={12} /> Aucun document
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                    <FileText size={12} /> Aucun document
-                                                </div>
+                                                <button 
+                                                    onClick={(e) => { e.stopPropagation(); handleEditClick(lesson); }} 
+                                                    className="px-3 py-1.5 bg-blue-600 text-white rounded text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+                                                >
+                                                    <Edit size={12} /> Modifier
+                                                </button>
                                             </div>
                                         </div>
                                         <ChevronRight className="absolute right-6 bottom-6 text-slate-200 group-hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100" />
@@ -257,6 +267,33 @@ const Book: React.FC = () => {
                     </div>
                 </div>
             </div>
+            {/* Modal Détail Séance */}
+            {viewingLesson && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setViewingLesson(null)}></div>
+                    <div className="bg-white p-8 md:p-10 w-full max-w-2xl relative z-10 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto">
+                        <button onClick={() => setViewingLesson(null)} className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
+                            <X size={20} />
+                        </button>
+                        
+                        <div className="flex items-center gap-4 mb-6">
+                            <span className="px-3 py-1 bg-blue-100 text-blue-600 text-xs font-black uppercase tracking-widest rounded">{viewingLesson.classe?.name}</span>
+                            <span className="text-sm text-slate-500 font-bold flex items-center gap-1 uppercase"><Calendar size={14} /> {new Date(viewingLesson.lessonDate).toLocaleDateString()}</span>
+                            <span className="text-sm text-slate-500 font-bold flex items-center gap-1 uppercase"><Clock size={14} /> {viewingLesson.duration}</span>
+                        </div>
+                        
+                        <h2 className="text-3xl font-black text-slate-800 mb-8">{viewingLesson.title}</h2>
+                        
+                        <div>
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Contenu du cours</h3>
+                            <div className="bg-blue-50/50 p-6 rounded-xl border border-blue-100 min-h-[200px]">
+                                <p className="text-slate-600 leading-relaxed text-sm whitespace-pre-wrap">{viewingLesson.content || 'Aucun contenu.'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Modal Nouvelle Séance */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">

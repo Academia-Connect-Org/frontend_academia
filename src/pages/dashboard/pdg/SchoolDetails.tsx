@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import api, { getFileUrl } from '../../../api/axios';
 import Cycles from '../direction/Cycles';
+import TuitionFees from '../direction/TuitionFees';
 import SchoolSubscription from '../../../components/dashboard/pdg/SchoolSubscription';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ROUTES } from '../../../constants/routes';
@@ -35,7 +36,7 @@ const SchoolDetails: React.FC = () => {
     const [stats, setStats] = useState<any>(null);
     const [staff, setStaff] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'overview' | 'staff' | 'cycles' | 'subscriptions'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'staff' | 'cycles' | 'finance' | 'subscriptions'>('overview');
     const [showAddStaffModal, setShowAddStaffModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -243,6 +244,7 @@ const SchoolDetails: React.FC = () => {
                     { id: 'overview', label: 'Aperçu', icon: Info },
                     { id: 'staff', label: 'Responsables', icon: Users },
                     { id: 'cycles', label: 'Gestion Cycles', icon: Layers },
+                    { id: 'finance', label: 'Frais & Paiements', icon: CreditCard },
                     { id: 'subscriptions', label: 'Abonnement', icon: Crown }
                 ].map((tab) => (
                     <button
@@ -276,9 +278,9 @@ const SchoolDetails: React.FC = () => {
                                     <div className="w-12 h-12  bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
                                         <Mail size={24} />
                                     </div>
-                                    <div>
+                                    <div className="min-w-0">
                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Email</p>
-                                        <p className="text-lg font-black text-slate-700">{institution.email}</p>
+                                        <p className="text-lg font-black text-slate-700 break-all">{institution.email}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4">
@@ -324,14 +326,14 @@ const SchoolDetails: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                     >
-                        <div className="flex justify-between items-center mb-10">
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 mb-10">
                             <div>
-                                <h3 className="text-2xl font-black text-slate-800 tracking-tight">Responsables & Effectifs</h3>
-                                <p className="text-slate-500 font-medium">Gestion du personnel administratif et accès aux effectifs.</p>
+                                <h3 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Responsables & Effectifs</h3>
+                                <p className="text-sm sm:text-base text-slate-500 font-medium">Gestion du personnel administratif et accès aux effectifs.</p>
                             </div>
                             <button
                                 onClick={() => setShowAddStaffModal(true)}
-                                className="bg-indigo-600 text-white px-6 py-3  font-black flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-indigo-600/20"
+                                className="bg-indigo-600 text-white px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-black flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-indigo-600/20 whitespace-nowrap w-full sm:w-auto justify-center"
                             >
                                 <Plus size={20} /> Ajouter un responsable
                             </button>
@@ -369,11 +371,11 @@ const SchoolDetails: React.FC = () => {
                                                 </p>
                                                 <h4 className="text-2xl font-black text-slate-800 mb-1">{mainAdmin.firstName} {mainAdmin.lastName}</h4>
                                                 <div className="flex flex-col gap-3 mt-8">
-                                                    <div className="flex items-center gap-3 text-slate-500 font-bold text-sm bg-slate-50 p-4   ">
-                                                        <Mail size={16} className="text-indigo-400" /> {mainAdmin.email}
+                                                    <div className="flex items-center gap-3 text-slate-500 font-bold text-sm bg-slate-50 p-4 break-all">
+                                                        <Mail size={16} className="text-indigo-400 shrink-0" /> {mainAdmin.email}
                                                     </div>
-                                                    <div className="flex items-center gap-3 text-slate-500 font-bold text-sm bg-slate-50 p-4   ">
-                                                        <Phone size={16} className="text-indigo-400" /> {institution.phone || 'Non renseigné'}
+                                                    <div className="flex items-center gap-3 text-slate-500 font-bold text-sm bg-slate-50 p-4">
+                                                        <Phone size={16} className="text-indigo-400 shrink-0" /> {institution.phone || 'Non renseigné'}
                                                     </div>
                                                 </div>
                                             </div>
@@ -411,11 +413,11 @@ const SchoolDetails: React.FC = () => {
                                                 </p>
                                                 <h4 className="text-2xl font-black text-slate-800 mb-1">{secretary.firstName} {secretary.lastName}</h4>
                                                 <div className="flex flex-col gap-3 mt-8">
-                                                    <div className="flex items-center gap-3 text-slate-500 font-bold text-sm bg-slate-50 p-4   ">
-                                                        <Mail size={16} className="text-emerald-400" /> {secretary.email}
+                                                    <div className="flex items-center gap-3 text-slate-500 font-bold text-sm bg-slate-50 p-4 break-all">
+                                                        <Mail size={16} className="text-emerald-400 shrink-0" /> {secretary.email}
                                                     </div>
-                                                    <div className="flex items-center gap-3 text-slate-500 font-bold text-sm bg-slate-50 p-4   ">
-                                                        <Phone size={16} className="text-emerald-400" /> {institution.phone || 'Non renseigné'}
+                                                    <div className="flex items-center gap-3 text-slate-500 font-bold text-sm bg-slate-50 p-4">
+                                                        <Phone size={16} className="text-emerald-400 shrink-0" /> {institution.phone || 'Non renseigné'}
                                                     </div>
                                                 </div>
                                             </div>
@@ -447,18 +449,18 @@ const SchoolDetails: React.FC = () => {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={() => navigate(`${ROUTES.DASHBOARD.PDG.TEACHERS}?institutionId=${id}`)}
-                                    className="bg-white ] p-10   shadow-xl flex items-center gap-8 text-left hover: transition-all group relative overflow-hidden"
+                                    className="bg-white p-6 sm:p-10 shadow-xl flex items-center gap-4 sm:gap-8 text-left hover: transition-all group relative overflow-hidden"
                                 >
-                                    <div className="absolute top-0 right-0 w-40 h-40 bg-slate-900/5  -mr-16 -mt-16 group-hover:bg-indigo-500/5 transition-all"></div>
-                                    <div className="w-20 h-20 ] bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-2xl shadow-slate-900/20 group-hover:bg-indigo-600 transition-all">
-                                        <Users size={32} />
+                                    <div className="absolute top-0 right-0 w-40 h-40 bg-slate-900/5 -mr-16 -mt-16 group-hover:bg-indigo-500/5 transition-all"></div>
+                                    <div className="w-12 h-12 sm:w-20 sm:h-20 bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-2xl shadow-slate-900/20 group-hover:bg-indigo-600 transition-all">
+                                        <Users className="w-6 h-6 sm:w-8 sm:h-8" />
                                     </div>
                                     <div>
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h4 className="text-2xl font-black text-slate-800 tracking-tight">Corps Enseignant</h4>
-                                            <span className="px-3 py-1 bg-indigo-50 text-indigo-600  text-[10px] font-black shadow-sm  ">{stats?.teacherCount || 0}</span>
+                                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                                            <h4 className="text-lg sm:text-2xl font-black text-slate-800 tracking-tight leading-tight">Corps Enseignant</h4>
+                                            <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black shadow-sm">{stats?.teacherCount || 0}</span>
                                         </div>
-                                        <p className="text-slate-400 text-sm font-medium leading-relaxed">Consultez la liste et les spécialités des enseignants.</p>
+                                        <p className="text-slate-400 text-xs sm:text-sm font-medium leading-relaxed">Consultez la liste et les spécialités des enseignants.</p>
                                     </div>
                                 </motion.button>
 
@@ -467,18 +469,18 @@ const SchoolDetails: React.FC = () => {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={() => navigate(`${ROUTES.DASHBOARD.PDG.STUDENTS}?institutionId=${id}`)}
-                                    className="bg-white ] p-10   shadow-xl flex items-center gap-8 text-left hover: transition-all group relative overflow-hidden"
+                                    className="bg-white p-6 sm:p-10 shadow-xl flex items-center gap-4 sm:gap-8 text-left hover: transition-all group relative overflow-hidden"
                                 >
-                                    <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-600/5  -mr-16 -mt-16 group-hover:bg-emerald-500/5 transition-all"></div>
-                                    <div className="w-20 h-20 ] bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-2xl shadow-indigo-600/20 group-hover:bg-emerald-500 transition-all">
-                                        <GraduationCap size={32} />
+                                    <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-600/5 -mr-16 -mt-16 group-hover:bg-emerald-500/5 transition-all"></div>
+                                    <div className="w-12 h-12 sm:w-20 sm:h-20 bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-2xl shadow-indigo-600/20 group-hover:bg-emerald-500 transition-all">
+                                        <GraduationCap className="w-6 h-6 sm:w-8 sm:h-8" />
                                     </div>
                                     <div>
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h4 className="text-2xl font-black text-slate-800 tracking-tight">Effectif Élèves</h4>
-                                            <span className="px-3 py-1 bg-emerald-50 text-emerald-600  text-[10px] font-black shadow-sm  ">{stats?.studentCount || 0}</span>
+                                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                                            <h4 className="text-lg sm:text-2xl font-black text-slate-800 tracking-tight leading-tight">Effectif Élèves</h4>
+                                            <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black shadow-sm">{stats?.studentCount || 0}</span>
                                         </div>
-                                        <p className="text-slate-400 text-sm font-medium leading-relaxed">Accédez aux dossiers et aux effectifs par classes.</p>
+                                        <p className="text-slate-400 text-xs sm:text-sm font-medium leading-relaxed">Accédez aux dossiers et aux effectifs par classes.</p>
                                     </div>
                                 </motion.button>
                             </div>
@@ -494,6 +496,17 @@ const SchoolDetails: React.FC = () => {
                         exit={{ opacity: 0, y: -20 }}
                     >
                         <Cycles institutionId={Number(id)} hideLayout />
+                    </motion.div>
+                )}
+
+                {activeTab === 'finance' && (
+                    <motion.div
+                        key="finance"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                    >
+                        <TuitionFees institutionId={Number(id)} hideLayout />
                     </motion.div>
                 )}
 

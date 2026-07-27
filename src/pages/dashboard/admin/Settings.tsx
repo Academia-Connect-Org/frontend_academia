@@ -29,11 +29,11 @@ const AdminSettings: React.FC = () => {
                             <div className="space-y-12">
                                 <div>
                                     <h3 className="text-3xl font-black text-slate-800 mb-2 uppercase tracking-tighter">Réglages Système</h3>
-                                    <p className="text-slate-500 font-medium italic">Configurez les paramètres globaux de la plateforme NB-MIND School.</p>
+                                    <p className="text-slate-500 font-medium italic">Configurez les paramètres globaux de la plateforme ACADEMIA CONNECT.</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                    <InputField label="Nom de la Plateforme" placeholder="NB-MIND School Réseau" />
+                                    <InputField label="Nom de la Plateforme" placeholder="ACADEMIA CONNECT Réseau" />
                                     <InputField label="Version du Système" placeholder="v2.4.0-Stable" disabled />
                                     <InputField label="URL du Serveur" placeholder="https://api.academia.edu" />
                                     <InputField label="Temps de Session (min)" placeholder="60" />

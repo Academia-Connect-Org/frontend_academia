@@ -55,18 +55,18 @@ const Support: React.FC = () => {
     const render_getting_started = () => (
         <div className='animate-in fade-in transition-all duration-700'>
             <div className="mb-10 text-center">
-                <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tight leading-tight py-2">📚 NB-MIND School : Manuel d'Utilisation Intégral (2026)</h1>
+                <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tight leading-tight py-2">📚 ACADEMIA CONNECT : Manuel d'Utilisation Intégral (2026)</h1>
                 <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Bienvenue dans le guide de référence d'**NB-MIND School**. Ce manuel a été conçu pour offrir une vision exhaustive de chaque module, de chaque bouton et de chaque flux de travail pour l'ensemble des acteurs de l'écosystème scolaire.
+                Bienvenue dans le guide de référence d'**ACADEMIA CONNECT**. Ce manuel a été conçu pour offrir une vision exhaustive de chaque module, de chaque bouton et de chaque flux de travail pour l'ensemble des acteurs de l'écosystème scolaire.
             </p>
             <div className="mt-16 mb-8 relative">
                 <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
                 <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🌟 Vision du Produit</h2>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                NB-MIND School n'est pas qu'un simple logiciel de gestion. C'est un environnement de travail unifié qui relie l'administration, les enseignants et les familles pour garantir le succès des élèves.
+                ACADEMIA CONNECT n'est pas qu'un simple logiciel de gestion. C'est un environnement de travail unifié qui relie l'administration, les enseignants et les familles pour garantir le succès des élèves.
             </p>
             <div className="mt-16 mb-8 relative">
                 <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
@@ -243,7 +243,7 @@ const Support: React.FC = () => {
                 <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Ce sous-manuel est destiné aux propriétaires d'établissement(s) et aux directeurs de gestion de haut niveau cherchant à piloter leur(s) structure(s) scolaires via les indicateurs de performance d'NB-MIND School.
+                Ce sous-manuel est destiné aux propriétaires d'établissement(s) et aux directeurs de gestion de haut niveau cherchant à piloter leur(s) structure(s) scolaires via les indicateurs de performance d'ACADEMIA CONNECT.
             </p>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
             <div className="mt-16 mb-8 relative">
@@ -431,7 +431,7 @@ const Support: React.FC = () => {
                 <h3 className="text-lg md:text-2xl font-bold text-blue-900">💳 3.2 Renouveler son Abonnement (Pas à Pas)</h3>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le PDG gère ici son propre accès au logiciel NB-MIND School pour l'ensemble du groupe.
+                Le PDG gère ici son propre accès au logiciel ACADEMIA CONNECT pour l'ensemble du groupe.
             </p>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
                 1.  **Naviguer vers "Mon Compte / Licence"** : Cliquez sur votre profil en haut à droite, puis sur **Abonnement**.
@@ -849,7 +849,7 @@ const Support: React.FC = () => {
                 <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🎒 1. Processus d'Inscription (Enrollment)</h2>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                C'est l'un des flux les plus critiques d'NB-MIND School.
+                C'est l'un des flux les plus critiques d'ACADEMIA CONNECT.
             </p>
             <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
                 <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
@@ -902,7 +902,7 @@ const Support: React.FC = () => {
                 <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
                     <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
                     <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Historique Scolaire</strong> : Conservation des bulletins des années précédentes (si l'école utilise NB-MIND School depuis longtemps).</span>
+                        <span>  <strong className="text-blue-800 font-extrabold">Historique Scolaire</strong> : Conservation des bulletins des années précédentes (si l'école utilise ACADEMIA CONNECT depuis longtemps).</span>
                     </div>
                 </div>
             </motion.div>
@@ -1031,7 +1031,7 @@ const Support: React.FC = () => {
                 <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le professeur utilise NB-MIND School au quotidien, souvent en classe ou à domicile. Ce manuel présente les outils pour optimiser la gestion pédagogique.
+                Le professeur utilise ACADEMIA CONNECT au quotidien, souvent en classe ou à domicile. Ce manuel présente les outils pour optimiser la gestion pédagogique.
             </p>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
             <div className="mt-16 mb-8 relative">
@@ -1183,7 +1183,7 @@ const Support: React.FC = () => {
                 <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📊 4. Évaluation et Saisie des Notes (Grades)</h2>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                La saisie des notes est l'un des volets les plus optimisés d'NB-MIND School.
+                La saisie des notes est l'un des volets les plus optimisés d'ACADEMIA CONNECT.
             </p>
             <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
                 <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
@@ -1263,7 +1263,7 @@ const Support: React.FC = () => {
                 <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                L'application mobile est l'interface vivante d'NB-MIND School, elle assure le lien constant entre l'école et la famille.
+                L'application mobile est l'interface vivante d'ACADEMIA CONNECT, elle assure le lien constant entre l'école et la famille.
             </p>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
             <div className="mt-16 mb-8 relative">
@@ -1482,7 +1482,7 @@ const Support: React.FC = () => {
                 <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Ce manuel s'adresse aux référents informatiques et aux utilisateurs avancés de la solution NB-MIND School. Il détaille les bonnes pratiques pour le maintien de l'application.
+                Ce manuel s'adresse aux référents informatiques et aux utilisateurs avancés de la solution ACADEMIA CONNECT. Il détaille les bonnes pratiques pour le maintien de l'application.
             </p>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
             <div className="mt-16 mb-8 relative">
@@ -1490,7 +1490,7 @@ const Support: React.FC = () => {
                 <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">💻 1. Installation et Mises à Jour (Setup)</h2>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                NB-MIND School est une solution hybride combinant Web, Desktop et Mobile.
+                ACADEMIA CONNECT est une solution hybride combinant Web, Desktop et Mobile.
             </p>
             <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
                 <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
@@ -1540,7 +1540,7 @@ const Support: React.FC = () => {
                 <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
                     <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
                     <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Android (Play Store) & iOS (App Store)</strong> : L'application est nommée "NB-MIND School Mobile".</span>
+                        <span>  <strong className="text-blue-800 font-extrabold">Android (Play Store) & iOS (App Store)</strong> : L'application est nommée "ACADEMIA CONNECT Mobile".</span>
                     </div>
                 </div>
             </motion.div>
@@ -1607,7 +1607,7 @@ const Support: React.FC = () => {
                 <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
                     <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
                     <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Nettoyage du Local Storage</strong> : Dans les options du navigateur (F12, Application puis Storage), vider les données de cache (LocalStorage/IndexDB). NB-MIND School utilise IndexDB pour la fluidité hors-ligne.</span>
+                        <span>  <strong className="text-blue-800 font-extrabold">Nettoyage du Local Storage</strong> : Dans les options du navigateur (F12, Application puis Storage), vider les données de cache (LocalStorage/IndexDB). ACADEMIA CONNECT utilise IndexDB pour la fluidité hors-ligne.</span>
                     </div>
                 </div>
             </motion.div>
@@ -1617,7 +1617,7 @@ const Support: React.FC = () => {
                 <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">💾 3. Sauvegardes et Sécurité (Backup)</h2>
             </div>
             <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                La sécurité des données est au cœur d'NB-MIND School.
+                La sécurité des données est au cœur d'ACADEMIA CONNECT.
             </p>
             <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
                 <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
@@ -1646,7 +1646,7 @@ const Support: React.FC = () => {
             <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
             <div className="mt-16 mb-8 relative">
                 <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📞 4. Support Technique NB-MIND School</h2>
+                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📞 4. Support Technique ACADEMIA CONNECT</h2>
             </div>
             <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
                 <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
@@ -1708,7 +1708,7 @@ const Support: React.FC = () => {
                             <span>Centre de Support & Documentation Ultime</span>
                         </div>
                         <h1 className="text-3xl md:text-5xl xl:text-6xl font-black text-white mb-6 leading-tight tracking-tighter">
-                            Maîtrisez <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">NB-MIND School</span>
+                            Maîtrisez <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">ACADEMIA CONNECT</span>
                         </h1>
                         <div className="relative max-w-2xl mx-auto mt-6">
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500  blur opacity-25"></div>
@@ -1743,7 +1743,7 @@ const Support: React.FC = () => {
                                         </button>
                                         <AnimatePresence>
                                             {isMobileMenuOpen && (
-                                                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute top-full mt-1 left-0 w-full bg-white shadow-2xl z-50 flex flex-col border border-slate-100 max-h-[60vh] overflow-y-auto">
+                                                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="mt-2 bg-white shadow-xl z-50 flex flex-col border border-slate-100 max-h-[60vh] overflow-y-auto">
                                                     {filteredMenuItems.map(item => (
                                                         <button key={item.id} onClick={() => { handleTabChange(item.id); setIsMobileMenuOpen(false); }} className={`flex items-start gap-3 p-4 text-left hover:bg-slate-50 transition-colors ${activeTab === item.id ? 'bg-blue-50 text-blue-700' : 'text-slate-600 border-b border-slate-50 last:border-0'}`}>
                                                             <item.icon size={18} className={`mt-0.5 shrink-0 ${activeTab === item.id ? 'text-blue-600' : 'text-slate-400'}`} />

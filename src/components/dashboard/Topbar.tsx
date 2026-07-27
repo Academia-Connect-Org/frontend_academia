@@ -111,7 +111,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                         else if (r === 'direction' || r === 'provisoriat') path = '/dashboard/direction/messages';
                         else if (r === 'secretariat') path = '/dashboard/secretariat/messages';
                         else if (r === 'enseignant') path = '/dashboard/teacher/messages';
-                        else if (r === 'parents') path = '/dashboard/parent/messages';
+                        else if (r === 'parent' || r === 'parents') path = '/dashboard/parent/messages';
                         else if (r === 'eleve') path = '/dashboard/student/messages';
                         navigate(path);
                     }}

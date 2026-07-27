@@ -55,31 +55,31 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-8 right-8 p-3 bg-white hover:bg-rose-50 hover:text-rose-500  transition-all shadow-sm z-50 text-slate-400"
+                    className="absolute top-4 sm:top-8 right-4 sm:right-8 p-2 sm:p-3 bg-white hover:bg-rose-50 hover:text-rose-500 transition-all shadow-sm z-50 text-slate-400"
                 >
-                    <X size={24} />
+                    <X size={20} className="sm:w-6 sm:h-6" />
                 </button>
 
                 {/* Print/Download Actions */}
-                <div className="absolute top-8 right-24 flex gap-3 z-50 no-print">
-                    <button onClick={() => window.print()} className="p-3 bg-white hover:bg-slate-50  transition-all shadow-sm text-slate-600 flex items-center gap-2 font-black text-[10px] uppercase tracking-widest px-6">
-                        <Printer size={18} /> Imprimer
+                <div className="absolute top-4 sm:top-8 right-16 sm:right-24 flex gap-2 sm:gap-3 z-50 no-print">
+                    <button onClick={() => window.print()} className="p-2 sm:p-3 bg-white hover:bg-slate-50 transition-all shadow-sm text-slate-600 flex items-center gap-2 font-black text-[10px] uppercase tracking-widest px-3 sm:px-6">
+                        <Printer size={16} className="sm:w-4 sm:h-4" /> <span className="hidden sm:inline">Imprimer</span>
                     </button>
-                    <button className="p-3 bg-blue-600 hover:bg-blue-700  transition-all shadow-lg text-white flex items-center gap-2 font-black text-[10px] uppercase tracking-widest px-6 shadow-blue-500/30">
-                        <Download size={18} /> PDF
+                    <button className="p-2 sm:p-3 bg-blue-600 hover:bg-blue-700 transition-all shadow-lg text-white flex items-center gap-2 font-black text-[10px] uppercase tracking-widest px-3 sm:px-6 shadow-blue-500/30">
+                        <Download size={16} className="sm:w-4 sm:h-4" /> <span className="hidden sm:inline">PDF</span>
                     </button>
                 </div>
 
-                <div className="relative p-12 lg:p-16">
+                <div className="relative p-4 pt-20 sm:p-12 lg:p-16">
                     {/* Header: School Info & Student Profile */}
-                    <div className="flex flex-col lg:flex-row justify-between gap-10 mb-16   pb-16">
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 bg-blue-600 ] flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
+                    <div className="flex flex-col lg:flex-row justify-between gap-6 sm:gap-10 mb-8 sm:mb-16 pb-8 sm:pb-16 border-b border-slate-100/50">
+                        <div className="space-y-4 sm:space-y-6">
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+                                <div className="w-16 h-16 bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-500/20 rounded-full sm:rounded-none">
                                     <School size={32} />
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none mb-1">
+                                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight leading-none mb-1">
                                         {data.student?.institution?.name || "Institution Académique"}
                                     </h2>
                                     <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em]">Excellence & Réussite</p>
@@ -91,12 +91,12 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
                             </div>
                         </div>
 
-                        <div className="bg-white p-8 ] shadow-sm   flex items-center gap-8 pr-12">
-                            <div className="w-24 h-24 bg-slate-100 ] flex items-center justify-center font-black text-2xl text-slate-300 shadow-inner">
+                        <div className="bg-white p-4 sm:p-8 shadow-sm flex flex-col sm:flex-row items-center gap-4 sm:gap-8 sm:pr-12 text-center sm:text-left">
+                            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-100 flex items-center justify-center font-black text-2xl text-slate-300 shadow-inner rounded-full sm:rounded-none overflow-hidden">
                                 {data.student?.profileImage ? (
-                                    <img src={data.student.profileImage} alt="" className="w-full h-full object-cover ]" />
+                                    <img src={data.student.profileImage} alt="" className="w-full h-full object-cover" />
                                 ) : (
-                                    <GraduationCap size={44} />
+                                    <GraduationCap size={40} className="sm:w-11 sm:h-11" />
                                 )}
                             </div>
                             <div>
@@ -113,15 +113,15 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
                     </div>
 
                     {/* General Summary Matrix */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8 mb-8 sm:mb-16">
                         <MatrixTile label="Moyenne Trimestrielle" value={data.generalAverage.toFixed(2)} icon={BarChart3} color="text-blue-600" bg="bg-blue-50" />
                         <MatrixTile label="Total Coefficients" value={data.totalCoefficients.toFixed(1)} icon={Award} color="text-indigo-600" bg="bg-indigo-50" />
                         <MatrixTile label="Total Points Pondérés" value={data.totalWeightedPoints.toFixed(2)} icon={Target} color="text-emerald-600" bg="bg-emerald-50" />
                     </div>
 
                     {/* Results Table */}
-                    <div className="bg-white ] shadow-xl   overflow-hidden mb-16">
-                        <table className="w-full text-left">
+                    <div className="bg-white shadow-xl overflow-x-auto mb-8 sm:mb-16">
+                        <table className="w-full text-left whitespace-nowrap min-w-[700px]">
                             <thead>
                                 <tr className="bg-slate-900 text-white">
                                     <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em]">{isEcole ? "Matières" : "Matières & Enseignants"}</th>
@@ -180,7 +180,7 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
                     </div>
 
                     {/* Footer Signs */}
-                    <div className="flex flex-col md:flex-row justify-between gap-10 mt-16 pt-16   ">
+                    <div className="flex flex-col md:flex-row justify-between gap-6 sm:gap-10 mt-8 sm:mt-16 pt-8 sm:pt-16 border-t border-slate-100">
                         <div className="space-y-4">
                             <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Observation de la Direction</p>
                             <div className="w-64 h-24    p-4 italic text-slate-400 text-xs">
@@ -201,13 +201,13 @@ const BulletinModal: React.FC<BulletinModalProps> = ({ studentId, trimester, aca
 };
 
 const MatrixTile = ({ label, value, icon: Icon, color, bg }: { label: string, value: string, icon: any, color: string, bg: string }) => (
-    <div className="bg-white p-8 ] shadow-sm   flex items-center gap-6">
-        <div className={`w-14 h-14 ${bg} ${color}  flex items-center justify-center shadow-inner`}>
-            <Icon size={24} />
+    <div className="bg-white p-4 sm:p-8 shadow-sm flex items-center gap-4 sm:gap-6">
+        <div className={`w-12 h-12 sm:w-14 sm:h-14 ${bg} ${color} flex items-center justify-center shadow-inner rounded-full sm:rounded-none shrink-0`}>
+            <Icon size={24} className="w-5 h-5 sm:w-6 sm:h-6" />
         </div>
         <div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{label}</p>
-            <h4 className="text-2xl font-black text-slate-900 tracking-tight leading-none">{value}</h4>
+            <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{label}</p>
+            <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">{value}</h4>
         </div>
     </div>
 );

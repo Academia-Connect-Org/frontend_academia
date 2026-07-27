@@ -17,6 +17,7 @@ import {
 import api, { getFileUrl } from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { COUNTRIES } from '../../../constants/countries';
 
 const Schools: React.FC = () => {
     const { user } = useAuth();
@@ -34,7 +35,8 @@ const Schools: React.FC = () => {
         logoUrl: '',
         country: '',
         motto: '',
-        ministry: ''
+        ministry: '',
+        description: ''
     });
     const [logoFile, setLogoFile] = useState<File | null>(null);
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -92,7 +94,8 @@ const Schools: React.FC = () => {
             logoUrl: school.logoUrl || '',
             country: school.country || '',
             motto: school.motto || '',
-            ministry: school.ministry || ''
+            ministry: school.ministry || '',
+            description: school.description || ''
         });
         setLogoPreview(school.logoUrl ? getFileUrl(school.logoUrl) : null);
         setShowModal(true);
@@ -111,7 +114,8 @@ const Schools: React.FC = () => {
             logoUrl: '',
             country: '',
             motto: '',
-            ministry: ''
+            ministry: '',
+            description: ''
         });
         setLogoFile(null);
         setLogoPreview(null);
@@ -146,9 +150,10 @@ const Schools: React.FC = () => {
             if (!editingId && res?.data?.id) {
                 navigate(`/dashboard/pdg/select-plan/${res.data.id}?isNew=true`);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            setFeedback({ type: 'error', message: 'Erreur lors de la sauvegarde de l\'établissement.' });
+            const errorMsg = err.response?.data?.message || 'Erreur lors de la sauvegarde de l\'établissement.';
+            setFeedback({ type: 'error', message: errorMsg });
         } finally {
             setIsSubmitting(false);
         }
@@ -391,13 +396,16 @@ const Schools: React.FC = () => {
                                     </div>
                                     <div className="md:col-span-2 space-y-2">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Pays</label>
-                                        <input
-                                            type="text"
+                                        <select
                                             value={formData.country}
                                             onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                                             className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700"
-                                            placeholder="Ex: République du Benin"
-                                        />
+                                        >
+                                            <option value="">Sélectionnez un pays</option>
+                                            {COUNTRIES.map(c => (
+                                                <option key={c} value={c}>{c}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Devise</label>
@@ -417,6 +425,16 @@ const Schools: React.FC = () => {
                                             onChange={(e) => setFormData({ ...formData, ministry: e.target.value })}
                                             className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700"
                                             placeholder="Ex: Ministère de l'Éducation Nationale..."
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2 space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Description de l'établissement</label>
+                                        <textarea
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            rows={5}
+                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700 whitespace-pre-wrap"
+                                            placeholder="Ex: Une description détaillée de votre école..."
                                         />
                                     </div>
                                     <div className="md:col-span-2 space-y-2">

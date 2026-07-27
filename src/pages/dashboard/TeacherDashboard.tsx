@@ -18,6 +18,7 @@ const TeacherDashboard: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [classes, setClasses] = React.useState<any[]>([]);
+    const [timetableEntries, setTimetableEntries] = React.useState<any[]>([]);
     const [teacherSpecialties, setTeacherSpecialties] = React.useState<string[]>([]);
     const [searchQuery, setSearchQuery] = React.useState('');
     const [recentChats, setRecentChats] = React.useState<any[]>([]);
@@ -32,10 +33,14 @@ const TeacherDashboard: React.FC = () => {
                 const resClasses = await api.get(`/classes/teacher/${user.id}`);
                 setClasses(resClasses.data);
 
+                // Fetch timetable
+                const resTimetable = await api.get(`/timetable/teacher/${user.id}`).catch(() => ({ data: [] }));
+                setTimetableEntries(resTimetable.data);
+
                 // Fetch pending submissions count
-                const resPending = await api.get(`/submissions/teacher/${user.id}/count-pending`);
+                const resPending = await api.get(`/submissions/teacher/${user.id}/count-pending`).catch(() => ({ data: 0 }));
                 // Fetch unread messages count
-                const resUnread = await api.get(`/chat/unread/${user.id}`);
+                const resUnread = await api.get(`/chat/unread/${user.id}`).catch(() => ({ data: { unreadCount: 0 } }));
 
                 setStats({
                     pendingCopies: resPending.data,
@@ -43,12 +48,12 @@ const TeacherDashboard: React.FC = () => {
                 });
 
                 // Fetch teacher details for specialties
-                const resTeacher = await api.get(`/teachers/${user.id}`);
+                const resTeacher = await api.get(`/teachers/${user.id}`).catch(() => ({ data: {} }));
                 const rawSpecialties = resTeacher.data.specialties || [];
                 setTeacherSpecialties(Array.from(new Set(rawSpecialties)));
 
                 // Fetch recent chats
-                const resRooms = await api.get(`chat/rooms/${user.id}`);
+                const resRooms = await api.get(`chat/rooms/${user.id}`).catch(() => ({ data: [] }));
                 const topRooms = resRooms.data.slice(0, 3);
 
                 const chatsWithMessages = await Promise.all(topRooms.map(async (room: any) => {
@@ -85,7 +90,7 @@ const TeacherDashboard: React.FC = () => {
                 setRecentChats(chatsWithMessages);
 
                 // Fetch recent lessons
-                const resLessons = await api.get(`/lessons/teacher/${user.id}`);
+                const resLessons = await api.get(`/lessons/teacher/${user.id}`).catch(() => ({ data: [] }));
                 setRecentLessons(resLessons.data.slice(0, 3));
             } catch (err) {
                 console.error("Erreur lors du chargement des données enseignant:", err);
@@ -93,6 +98,46 @@ const TeacherDashboard: React.FC = () => {
         };
         fetchData();
     }, [user?.id]);
+
+    const getNextClassTime = (classeId: number) => {
+        const dayMap: { [key: string]: number } = {
+            'DIMANCHE': 0, 'LUNDI': 1, 'MARDI': 2, 'MERCREDI': 3, 'JEUDI': 4, 'VENDREDI': 5, 'SAMEDI': 6
+        };
+
+        const now = new Date();
+        const currentDayIdx = now.getDay();
+        const currentHour = now.getHours() * 60 + now.getMinutes();
+
+        const classEntries = timetableEntries.filter(e => e.classeId === classeId);
+        if (classEntries.length === 0) return { dayText: "Non planifié", timeText: "--h--" };
+
+        const upcoming = classEntries.map(e => {
+            const entryDayIdx = dayMap[e.dayOfWeek.toUpperCase()] || 0;
+            const [h, m] = (e.startTime || "00:00").split(':').map(Number);
+            const entryTime = h * 60 + (m || 0);
+
+            let daysDiff = entryDayIdx - currentDayIdx;
+            if (daysDiff < 0 || (daysDiff === 0 && entryTime <= currentHour)) {
+                daysDiff += 7;
+            }
+
+            const minutesUntil = daysDiff * 24 * 60 + (entryTime - currentHour);
+            return { ...e, minutesUntil, daysDiff };
+        }).sort((a, b) => a.minutesUntil - b.minutesUntil);
+
+        const nextEntry = upcoming[0];
+        
+        let dayText = "";
+        if (nextEntry.daysDiff === 0) {
+            dayText = "Aujourd'hui";
+        } else if (nextEntry.daysDiff === 1) {
+            dayText = "Demain";
+        } else {
+            dayText = nextEntry.dayOfWeek.charAt(0).toUpperCase() + nextEntry.dayOfWeek.slice(1).toLowerCase();
+        }
+
+        return { dayText, timeText: `${nextEntry.startTime} - ${nextEntry.endTime}` };
+    };
 
     const filteredClasses = classes.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -103,7 +148,10 @@ const TeacherDashboard: React.FC = () => {
                 <div className="bg-white p-6 ] shadow-lg   flex items-center justify-between">
                     <div>
                         <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Cours du jour</p>
-                        <h4 className="text-2xl font-black text-slate-800">4 Séances</h4>
+                        <h4 className="text-2xl font-black text-slate-800">{timetableEntries.filter(e => {
+                            const days = ['DIMANCHE', 'LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI'];
+                            return e.dayOfWeek?.toUpperCase() === days[new Date().getDay()];
+                        }).length} Séances</h4>
                     </div>
                     <div className="w-12 h-12 bg-blue-50 text-blue-600  flex items-center justify-center">
                         <Calendar size={24} />
@@ -120,7 +168,7 @@ const TeacherDashboard: React.FC = () => {
                 </div>
                 <div className="bg-white p-6 ] shadow-lg   flex items-center justify-between">
                     <div>
-                        <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Messages unread</p>
+                        <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Messages non lus</p>
                         <h4 className="text-2xl font-black text-red-600">{stats.unreadMsgs} Messages</h4>
                     </div>
                     <div className="w-12 h-12 bg-red-50 text-red-600  flex items-center justify-center">
@@ -150,12 +198,15 @@ const TeacherDashboard: React.FC = () => {
                             {filteredClasses.length > 0 ? filteredClasses.map((cls: any, i) => (
                                 <ClassCard
                                     key={cls.id}
+                                    onClick={() => navigate('/dashboard/teacher/classes', { state: { openClassId: cls.id } })}
                                     grade={cls.name}
                                     subject={cls.subjectsTaught && cls.subjectsTaught.length > 0 ? cls.subjectsTaught.join(', ') : (teacherSpecialties.length > 0 ? teacherSpecialties.join(', ') : 'Toutes les matières')}
                                     students={cls.capacity}
                                     boys={cls.boysCount}
                                     girls={cls.girlsCount}
-                                    time="Emploi du temps..."
+                                    nextDay={getNextClassTime(cls.id).dayText}
+                                    nextTime={getNextClassTime(cls.id).timeText}
+                                    isMainTeacher={cls.mainTeacher?.id === user?.id}
                                     color={['bg-blue-600', 'bg-indigo-600', 'bg-purple-600', 'bg-emerald-600'][i % 4]}
                                 />
                             )) : (
@@ -257,8 +308,8 @@ const TeacherDashboard: React.FC = () => {
     );
 };
 
-const ClassCard = ({ grade, subject, students, time, color, boys, girls }: { grade: string, subject: string, students: number, time: string, color: string, boys?: number, girls?: number }) => (
-    <div className="group relative p-6 ] bg-white   hover: hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col justify-between min-h-[220px]">
+const ClassCard = ({ grade, subject, students, nextDay, nextTime, color, boys, girls, isMainTeacher, onClick }: { grade: string, subject: string, students: number, nextDay: string, nextTime: string, color: string, boys?: number, girls?: number, isMainTeacher?: boolean, onClick?: () => void }) => (
+    <div onClick={onClick} className="group relative p-6 ] bg-white hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col justify-between min-h-[220px]">
         {/* Animated background shape */}
         <div className={`absolute -top-12 -right-12 w-24 h-24  blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-700 ${color}`}></div>
 
@@ -269,11 +320,19 @@ const ClassCard = ({ grade, subject, students, time, color, boys, girls }: { gra
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50    group-hover:bg-blue-50 group-hover: transition-all">
                     <Clock size={12} className="text-slate-400 group-hover:text-blue-500" />
-                    <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest group-hover:text-blue-600">Prochain: --h--</span>
+                    <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest group-hover:text-blue-600">Prochain: {nextTime}</span>
                 </div>
             </div>
             <h4 className="text-lg font-black text-slate-800 leading-tight mb-2 group-hover:text-blue-700 transition-colors uppercase tracking-tight">{subject}</h4>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">{time}</p>
+            <div className="flex flex-col gap-1.5">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">{nextDay}</p>
+                {isMainTeacher && (
+                    <div className="flex items-center gap-1.5 text-amber-500">
+                        <Star size={12} className="fill-amber-500" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Enseignant Principal</span>
+                    </div>
+                )}
+            </div>
         </div>
 
         <div className="relative z-10 pt-5   mt-6">

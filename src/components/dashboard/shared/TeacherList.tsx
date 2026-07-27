@@ -13,13 +13,44 @@ const TeacherList: React.FC<TeacherListProps> = ({ institutionId, ceoId }) => {
     const [teachers, setTeachers] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [filterInstitutionId, setFilterInstitutionId] = useState('');
+    const [filterCycleId, setFilterCycleId] = useState('');
+    const [institutions, setInstitutions] = useState<any[]>([]);
+    const [cycles, setCycles] = useState<any[]>([]);
+
     const [selectedTeacher, setSelectedTeacher] = useState<any | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
     useEffect(() => {
         fetchTeachers();
+        if (ceoId) {
+            fetchFiltersData();
+        }
     }, []);
+
+    const fetchFiltersData = async () => {
+        try {
+            const [instRes, cycleRes] = await Promise.all([
+                api.get(`/institutions/ceo/${ceoId}`),
+                api.get(`/cycles?ceoId=${ceoId}`)
+            ]);
+            setInstitutions(instRes.data);
+            setCycles(cycleRes.data);
+        } catch (error) {
+            console.error("Error fetching filter data", error);
+        }
+    };
+
+    const availableCycles = filterInstitutionId
+        ? cycles.filter(c => c.institution?.id === Number(filterInstitutionId))
+        : cycles;
+
+    useEffect(() => {
+        if (filterCycleId && !availableCycles.find(c => c.id === Number(filterCycleId))) {
+            setFilterCycleId('');
+        }
+    }, [filterInstitutionId, availableCycles, filterCycleId]);
 
     const fetchTeachers = async () => {
         setLoading(true);
@@ -51,9 +82,14 @@ const TeacherList: React.FC<TeacherListProps> = ({ institutionId, ceoId }) => {
 
     const filteredTeachers = teachers.filter(t => {
         const searchLower = searchQuery.toLowerCase();
-        return (t.firstName?.toLowerCase() + ' ' + t.lastName?.toLowerCase()).includes(searchLower) ||
+        const matchesSearch = (t.firstName?.toLowerCase() + ' ' + t.lastName?.toLowerCase()).includes(searchLower) ||
             t.email?.toLowerCase().includes(searchLower) ||
             t.specialties?.some((s: string) => s.toLowerCase().includes(searchLower));
+
+        const matchesInst = filterInstitutionId ? t.institution?.id === Number(filterInstitutionId) : true;
+        const matchesCycle = filterCycleId ? t.cycles?.some((c: any) => c.id === Number(filterCycleId)) : true;
+
+        return matchesSearch && matchesInst && matchesCycle;
     });
 
     return (
@@ -79,6 +115,30 @@ const TeacherList: React.FC<TeacherListProps> = ({ institutionId, ceoId }) => {
                         className="w-full pl-12 pr-6 py-4 bg-slate-50    text-sm font-bold text-slate-700 focus:bg-white focus: outline-none transition-all"
                     />
                 </div>
+                {ceoId && (
+                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <select
+                            className="bg-slate-50 border border-slate-200 text-slate-600 px-3 py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-indigo-500 w-full sm:w-auto"
+                            value={filterInstitutionId}
+                            onChange={(e) => setFilterInstitutionId(e.target.value)}
+                        >
+                            <option value="">Tous les établissements</option>
+                            {institutions.map(inst => (
+                                <option key={inst.id} value={inst.id}>{inst.name}</option>
+                            ))}
+                        </select>
+                        <select
+                            className="bg-slate-50 border border-slate-200 text-slate-600 px-3 py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-indigo-500 w-full sm:w-auto"
+                            value={filterCycleId}
+                            onChange={(e) => setFilterCycleId(e.target.value)}
+                        >
+                            <option value="">Tous les cycles</option>
+                            {availableCycles.map(cycle => (
+                                <option key={cycle.id} value={cycle.id}>{cycle.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
                 <div className="flex gap-2">
                     <div className="px-4 py-2 bg-indigo-50 text-indigo-700  text-xs font-black uppercase tracking-widest  ">
                         {filteredTeachers.length} Enseignants

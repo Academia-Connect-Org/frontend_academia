@@ -238,14 +238,35 @@ const Homework: React.FC = () => {
     const fetchMetadata = async () => {
         if (!user?.id) return;
         try {
-            const [classesRes, subjectsRes, allClassesRes] = await Promise.all([
+            const [classesRes, subjectsRes, allClassesRes, allSubjectsRes, teacherRes] = await Promise.all([
                 api.get(`/classes/teacher/${user.id}`),
                 api.get(`/subjects/teacher/${user.id}`),
-                api.get(`/classes?institutionId=${user.institution?.id || 1}`)
+                api.get(`/classes?institutionId=${user.institution?.id || 1}`),
+                api.get(`/subjects?institutionId=${user.institution?.id || 1}`),
+                api.get(`/teachers/${user.id}`).catch(() => ({ data: {} }))
             ]);
             setClasses(classesRes.data);
-            setSubjects(subjectsRes.data);
             setAllClasses(allClassesRes.data);
+
+            if (subjectsRes.data && subjectsRes.data.length > 0) {
+                setSubjects(subjectsRes.data);
+            } else {
+                const allSubjects = allSubjectsRes.data || [];
+                const teacherDetails = teacherRes.data || {};
+                const specialties = teacherDetails.specialties || (user as any)?.specialties || [];
+
+                let filteredSubjects = allSubjects;
+                if (specialties.length > 0) {
+                    const specMatches = allSubjects.filter((s: any) =>
+                        specialties.some((spec: string) =>
+                            s.name.toLowerCase().includes(spec.toLowerCase().trim()) ||
+                            spec.toLowerCase().includes(s.name.toLowerCase().trim())
+                        )
+                    );
+                    if (specMatches.length > 0) filteredSubjects = specMatches;
+                }
+                setSubjects(filteredSubjects);
+            }
         } catch (err) {
             console.error("Erreur lors du chargement des préférences:", err);
         }

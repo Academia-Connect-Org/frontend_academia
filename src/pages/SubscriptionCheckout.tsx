@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { ROUTES } from '../constants/routes';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../api/axios';
 import { getFileUrl } from '../api/axios';
 
 interface PaymentMethod {
@@ -57,13 +57,14 @@ const METHODS_CONFIG: Record<string, PaymentMethod> = {
     vodafone: { id: 'vodafone', name: 'Vodafone Cash', icon: Smartphone, description: 'Vodafone Cash semi-wallet' },
 };
 
-const Payment: React.FC = () => {
+const SubscriptionCheckout: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user, token, refreshUser } = useAuth();
     const queryParams = new URLSearchParams(location.search);
 
-    const plan = queryParams.get('plan') || 'Standard';
+    const plan = queryParams.get('plan') || 'STANDARD';
+    const planTitle = queryParams.get('planTitle') || plan;
     const priceValue = queryParams.get('price') || '95 000 FCFA';
     const durationLabel = queryParams.get('duration') || '/ mois';
 
@@ -82,10 +83,7 @@ const Payment: React.FC = () => {
         const fetchInstitutions = async () => {
             if (!user?.id) return;
             try {
-                const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
-                const res = await axios.get(`${baseUrl}/institutions/ceo/${user.id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await api.get(`/institutions/ceo/${user.id}`);
                 setInstitutions(res.data);
 
                 if (institutionIdParam) {
@@ -136,25 +134,17 @@ const Payment: React.FC = () => {
         setError(null);
 
         try {
-            // Map plan title to SubscriptionType enum
-            let subscriptionType = "STANDARD";
-            if (plan.toUpperCase().includes("SIMPLE")) subscriptionType = "SIMPLE";
-            else if (plan.toUpperCase().includes("PREMIUM")) subscriptionType = "PREMIUM";
-            else if (plan.toUpperCase().includes("ESSAI")) subscriptionType = "FREE_TRIAL";
+            let subscriptionType = plan;
 
             // Map duration to SubscriptionPeriod enum
             const subscriptionPeriod = durationLabel.includes("an") ? "ANNUAL" : "MONTHLY";
 
-            const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
-            await axios.post(`${baseUrl}/subscription/subscribe`, null, {
+            await api.post(`/subscription/subscribe`, null, {
                 params: {
                     pdgId: user.id,
                     institutionId: selectedInstitution.id,
                     type: subscriptionType,
                     period: subscriptionPeriod
-                },
-                headers: {
-                    Authorization: `Bearer ${token}`
                 }
             });
 
@@ -360,7 +350,7 @@ const Payment: React.FC = () => {
                             <CheckCircle2 size={48} />
                         </div>
                         <h2 className="text-3xl font-black text-slate-900 mb-4">Paiement Réussi !</h2>
-                        <p className="text-slate-500 text-lg mb-10 max-w-sm mx-auto">Votre abonnement <strong>{plan}</strong> pour <strong>{selectedInstitution?.name}</strong> est maintenant actif.</p>
+                        <p className="text-slate-500 text-lg mb-10 max-w-sm mx-auto">Votre abonnement <strong>{planTitle}</strong> pour <strong>{selectedInstitution?.name}</strong> est maintenant actif.</p>
                         <button
                             onClick={() => navigate('/dashboard/pdg')}
                             className="px-10 py-4 bg-slate-900 text-white  font-black shadow-xl hover:bg-slate-800 transition-all"
@@ -452,7 +442,7 @@ const Payment: React.FC = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-blue-300/60 text-xs font-black uppercase tracking-widest mb-1">Plan Sélectionné</p>
-                                    <h4 className="text-2xl font-black">{plan}</h4>
+                                    <h4 className="text-2xl font-black">{planTitle}</h4>
                                 </div>
                                 <div className="p-3 bg-white/10 ">
                                     <Globe className="text-blue-400" size={24} />
@@ -526,4 +516,4 @@ const Payment: React.FC = () => {
     );
 };
 
-export default Payment;
+export default SubscriptionCheckout;

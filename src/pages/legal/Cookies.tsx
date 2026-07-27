@@ -25,7 +25,7 @@ const Cookies: React.FC = () => {
                         Gestion des <span className="text-amber-600">Cookies</span>
                     </h1>
                     <p className="text-slate-500 text-lg mb-12 leading-relaxed italic font-medium">
-                        Nous utilisons des cookies pour améliorer votre expérience sur NB-MIND School.
+                        Nous utilisons des cookies pour améliorer votre expérience sur ACADEMIA CONNECT.
                     </p>
 
                     <div className="space-y-12">

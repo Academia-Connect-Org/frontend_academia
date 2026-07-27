@@ -1,13 +1,16 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     Users,
     Search,
     ChevronRight,
     Phone,
     Mail,
-    Download,
     MessageCircle,
     FileText,
+    X,
+    Download,
+    Star
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../api/axios';
@@ -84,13 +87,26 @@ const Classes: React.FC = () => {
     const [searchQuery, setSearchQuery] = React.useState('');
     const [isBulletinOpen, setIsBulletinOpen] = React.useState(false);
     const [isBroadcastOpen, setIsBroadcastOpen] = React.useState(false);
+    const [isClassModalOpen, setIsClassModalOpen] = React.useState(false);
     const [viewingStudent, setViewingStudent] = React.useState<number | null>(null);
     const [selectedTrimester, setSelectedTrimester] = React.useState('1er Trimestre');
     const [selectedAcademicYear, setSelectedAcademicYear] = React.useState('2025-2026');
+    const location = useLocation();
 
     React.useEffect(() => {
         fetchClasses();
     }, [user?.id]);
+
+    React.useEffect(() => {
+        if (classes.length > 0 && location.state?.openClassId) {
+            const cls = classes.find((c: any) => c.id === location.state.openClassId);
+            if (cls) {
+                handleClassSelect(cls);
+                // Nettoyer le state pour éviter la réouverture au rafraîchissement
+                window.history.replaceState({}, document.title);
+            }
+        }
+    }, [classes, location.state]);
 
     const fetchClasses = async () => {
         if (!user?.id) return;
@@ -98,9 +114,6 @@ const Classes: React.FC = () => {
         try {
             const res = await api.get(`/classes/teacher/${user.id}`);
             setClasses(res.data);
-            if (res.data.length > 0) {
-                handleClassSelect(res.data[0]);
-            }
         } catch (err) {
             console.error("Erreur classes:", err);
         } finally {
@@ -110,6 +123,7 @@ const Classes: React.FC = () => {
 
     const handleClassSelect = async (cls: any) => {
         setSelectedClass(cls);
+        setIsClassModalOpen(true);
         try {
             const res = await api.get(`/students/classe/${cls.id}`);
             setStudents(res.data);
@@ -179,9 +193,9 @@ const Classes: React.FC = () => {
                     </button>
                     <button
                         onClick={() => setIsBroadcastOpen(true)}
-                        className="bg-slate-900 text-white px-8 py-3.5  font-extrabold flex items-center gap-3 shadow-xl shadow-slate-900/30 hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all"
+                        className="bg-slate-900 text-white px-5 py-3.5  font-extrabold flex items-center gap-3 shadow-xl shadow-slate-900/30 hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all"
                     >
-                        <MessageCircle size={20} /> Diffuser Alerte
+                        <MessageCircle size={15} /> Diffuser Alerte pour cette classe
                     </button>
                 </div>
             </div>
@@ -231,7 +245,15 @@ const Classes: React.FC = () => {
 
                             <div className="relative z-10">
                                 <h3 className={`text-2xl font-black mb-1 transition-colors ${isSelected ? 'text-slate-900' : 'text-slate-700 group-hover:text-blue-700'}`}>{cls.name}</h3>
-                                <p className="text-[10px] font-black text-blue-500/60 uppercase tracking-widest mb-8">{cls.cycle?.name || 'Cycle'}</p>
+                                <div className="flex flex-col gap-2 mb-8">
+                                    <p className="text-[10px] font-black text-blue-500/60 uppercase tracking-widest leading-none">{cls.cycle?.name || 'Cycle'}</p>
+                                    {cls.mainTeacher?.id === user?.id && (
+                                        <div className="flex items-center gap-1.5 text-amber-500">
+                                            <Star size={12} className="fill-amber-500" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest leading-none">Enseignant Principal</span>
+                                        </div>
+                                    )}
+                                </div>
 
                                 <div className="grid grid-cols-1 gap-3 mb-8">
                                     <StatLine label="Effectif Total" value={cls.boysCount + cls.girlsCount} icon={Users} highlight={isSelected} />
@@ -259,134 +281,146 @@ const Classes: React.FC = () => {
                 })}
             </div>
 
-            <div className="bg-white ] shadow-2xl   overflow-hidden">
-                <div className="p-8   flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <h3 className="text-xl font-black text-slate-800">Liste des élèves - {selectedClass?.name}</h3>
-                        <div className="px-3 py-1 bg-slate-50  text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{students.length} Élèves</div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex items-center gap-2 bg-slate-50 px-4 py-2   ">
-                            <span className="text-[9px] font-black uppercase text-slate-400">Période:</span>
-                            <select
-                                value={selectedTrimester}
-                                onChange={e => setSelectedTrimester(e.target.value)}
-                                className="text-[10px] font-black text-slate-600 bg-transparent border-none outline-none uppercase"
-                            >
-                                <option value="1er Trimestre">1er Trimestre</option>
-                                <option value="2ème Trimestre">2ème Trimestre</option>
-                                <option value="3ème Trimestre">3ème Trimestre</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center gap-2 bg-slate-50 px-4 py-2   ">
-                            <span className="text-[9px] font-black uppercase text-slate-400">Année:</span>
-                            <select
-                                value={selectedAcademicYear}
-                                onChange={e => setSelectedAcademicYear(e.target.value)}
-                                className="text-[10px] font-black text-slate-600 bg-transparent border-none outline-none"
-                            >
-                                <option value="2025-2026">2025-2026</option>
-                                <option value="2024-2025">2024-2025</option>
-                            </select>
-                        </div>
-                        <div className="relative group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600" size={16} />
-                            <input
-                                type="text"
-                                placeholder="Chercher un élève..."
-                                value={searchQuery}
-                                onChange={e => setSearchQuery(e.target.value)}
-                                className="bg-slate-50 border-none  pl-11 pr-4 py-2.5 text-xs font-bold outline-none ring-2 ring-transparent focus:ring-blue-500/10 transition-all w-40"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="p-4 overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400  ">
-                                <th className="px-6 py-4">Élève</th>
-                                <th className="px-6 py-4">Matricule</th>
-                                <th className="px-6 py-4">Genre</th>
-                                <th className="px-6 py-4">Informations Parents</th>
-                                <th className="px-6 py-4">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50">
-                            {filteredStudents.length > 0 ? filteredStudents.map((s) => (
-                                <tr key={s.id} className="hover:bg-slate-50/50 group transition-all cursor-pointer">
-                                    <td className="px-6 py-5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10  bg-slate-100 flex items-center justify-center font-black text-xs text-slate-400 group-hover:scale-110 group-hover:rotate-6 transition-all shadow-sm">
-                                                {s.firstName[0]}{s.lastName[0]}
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-slate-900 leading-none mb-1 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{s.lastName} {s.firstName}</p>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">{s.birthDate ? new Date(s.birthDate).toLocaleDateString() : 'N/A'}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.studentIdNumber || 'N/A'}</td>
-                                    <td className="px-6 py-5">
-                                        <span className={`px-3 py-1  text-[9px] font-black uppercase tracking-widest ${s.gender === 'Masculin' ? 'bg-blue-50 text-blue-600' : 'bg-pink-50 text-pink-600'}`}>
-                                            {s.gender}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <div className="flex flex-col gap-1.5">
-                                            {(s.fatherFirstName || s.fatherLastName) && (
-                                                <div className="flex items-center gap-2">
-                                                    <span className="w-4 h-4  bg-blue-50 text-blue-500 flex items-center justify-center text-[8px] font-black shrink-0">P</span>
-                                                    <span className="text-xs font-bold text-slate-700 truncate max-w-[120px]">{s.fatherLastName} {s.fatherFirstName}</span>
-                                                    <span className="text-[10px] font-medium text-slate-400">{s.fatherPhone}</span>
-                                                </div>
-                                            )}
-                                            {(s.motherFirstName || s.motherLastName) && (
-                                                <div className="flex items-center gap-2">
-                                                    <span className="w-4 h-4  bg-pink-50 text-pink-500 flex items-center justify-center text-[8px] font-black shrink-0">M</span>
-                                                    <span className="text-xs font-bold text-slate-700 truncate max-w-[120px]">{s.motherLastName} {s.motherFirstName}</span>
-                                                    <span className="text-[10px] font-medium text-slate-400">{s.motherPhone}</span>
-                                                </div>
-                                            )}
-                                            {!s.fatherFirstName && !s.motherFirstName && (
-                                                <span className="text-xs font-medium text-slate-400 italic">Non renseigné</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => {
-                                                    setViewingStudent(s.id);
-                                                    setIsBulletinOpen(true);
-                                                }}
-                                                className="p-2 bg-blue-50  text-blue-600 hover:bg-blue-600 hover:text-white transition-all   hover: opacity-0 group-hover:opacity-100 duration-500 shadow-sm"
-                                                title="Voir Bulletin"
+            {isClassModalOpen && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                    <div className="bg-white w-full max-w-6xl max-h-[95vh] flex flex-col rounded-[40px] shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden relative">
+                        <button onClick={() => setIsClassModalOpen(false)} className="absolute top-6 right-6 w-10 h-10 bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-full flex items-center justify-center transition-colors z-10">
+                            <X size={20} />
+                        </button>
+                        <div className="flex-1 overflow-y-auto">
+                            <div className="bg-white">
+                                <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-100">
+                                    <div className="flex items-center gap-4 pr-12">
+                                        <h3 className="text-xl font-black text-slate-800">Liste des élèves - {selectedClass?.name}</h3>
+                                        <div className="px-3 py-1 bg-slate-50  text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{students.length} Élèves</div>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-4">
+                                        <div className="flex items-center gap-2 bg-slate-50 px-4 py-2   ">
+                                            <span className="text-[9px] font-black uppercase text-slate-400">Période:</span>
+                                            <select
+                                                value={selectedTrimester}
+                                                onChange={e => setSelectedTrimester(e.target.value)}
+                                                className="text-[10px] font-black text-slate-600 bg-transparent border-none outline-none uppercase"
                                             >
-                                                <FileText size={14} />
-                                            </button>
-                                            <button className="p-2 bg-slate-50  text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition-all   hover: opacity-0 group-hover:opacity-100 duration-500"><Phone size={14} /></button>
-                                            <button className="p-2 bg-slate-50  text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 transition-all   hover: opacity-0 group-hover:opacity-100 duration-500"><Mail size={14} /></button>
+                                                <option value="1er Trimestre">1er Trimestre</option>
+                                                <option value="2ème Trimestre">2ème Trimestre</option>
+                                                <option value="3ème Trimestre">3ème Trimestre</option>
+                                            </select>
                                         </div>
-                                    </td>
-                                </tr>
-                            )) : (
-                                <tr>
-                                    <td colSpan={5} className="px-6 py-20 text-center text-slate-400 font-bold italic">Aucun élève trouvé dans cette classe.</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                        <div className="flex items-center gap-2 bg-slate-50 px-4 py-2   ">
+                                            <span className="text-[9px] font-black uppercase text-slate-400">Année:</span>
+                                            <select
+                                                value={selectedAcademicYear}
+                                                onChange={e => setSelectedAcademicYear(e.target.value)}
+                                                className="text-[10px] font-black text-slate-600 bg-transparent border-none outline-none"
+                                            >
+                                                <option value="2025-2026">2025-2026</option>
+                                                <option value="2024-2025">2024-2025</option>
+                                            </select>
+                                        </div>
+                                        <div className="relative group">
+                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600" size={16} />
+                                            <input
+                                                type="text"
+                                                placeholder="Chercher un élève..."
+                                                value={searchQuery}
+                                                onChange={e => setSearchQuery(e.target.value)}
+                                                className="bg-slate-50 border-none  pl-11 pr-4 py-2.5 text-xs font-bold outline-none ring-2 ring-transparent focus:ring-blue-500/10 transition-all w-40"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
 
-                <div className="p-8   bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Affichage de {filteredStudents.length} sur {students.length} élèves</p>
-                    <button className="px-6 py-3 bg-white    font-black text-xs uppercase tracking-widest text-slate-900 shadow-sm hover:bg-slate-50 active:scale-95 transition-all outline-none">
-                        Exporter Rapport de Classe
-                    </button>
+                                <div className="p-4 overflow-x-auto">
+                                    <table className="w-full text-left">
+                                        <thead>
+                                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400  ">
+                                                <th className="px-6 py-4">Élève</th>
+                                                <th className="px-6 py-4">Matricule</th>
+                                                <th className="px-6 py-4">Genre</th>
+                                                <th className="px-6 py-4">Informations Parents</th>
+                                                <th className="px-6 py-4">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-50">
+                                            {filteredStudents.length > 0 ? filteredStudents.map((s) => (
+                                                <tr key={s.id} className="hover:bg-slate-50/50 group transition-all cursor-pointer">
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10  bg-slate-100 flex items-center justify-center font-black text-xs text-slate-400 group-hover:scale-110 group-hover:rotate-6 transition-all shadow-sm">
+                                                                {s.firstName[0]}{s.lastName[0]}
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-bold text-slate-900 leading-none mb-1 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{s.lastName} {s.firstName}</p>
+                                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">{s.birthDate ? new Date(s.birthDate).toLocaleDateString() : 'N/A'}</p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.studentIdNumber || 'N/A'}</td>
+                                                    <td className="px-6 py-5">
+                                                        <span className={`px-3 py-1  text-[9px] font-black uppercase tracking-widest ${s.gender === 'Masculin' ? 'bg-blue-50 text-blue-600' : 'bg-pink-50 text-pink-600'}`}>
+                                                            {s.gender}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex flex-col gap-1.5">
+                                                            {(s.fatherFirstName || s.fatherLastName) && (
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="w-4 h-4  bg-blue-50 text-blue-500 flex items-center justify-center text-[8px] font-black shrink-0">P</span>
+                                                                    <span className="text-xs font-bold text-slate-700 truncate max-w-[120px]">{s.fatherLastName} {s.fatherFirstName}</span>
+                                                                    <span className="text-[10px] font-medium text-slate-400">{s.fatherPhone}</span>
+                                                                </div>
+                                                            )}
+                                                            {(s.motherFirstName || s.motherLastName) && (
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="w-4 h-4  bg-pink-50 text-pink-500 flex items-center justify-center text-[8px] font-black shrink-0">M</span>
+                                                                    <span className="text-xs font-bold text-slate-700 truncate max-w-[120px]">{s.motherLastName} {s.motherFirstName}</span>
+                                                                    <span className="text-[10px] font-medium text-slate-400">{s.motherPhone}</span>
+                                                                </div>
+                                                            )}
+                                                            {!s.fatherFirstName && !s.motherFirstName && (
+                                                                <span className="text-xs font-medium text-slate-400 italic">Non renseigné</span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setViewingStudent(s.id);
+                                                                    setIsBulletinOpen(true);
+                                                                }}
+                                                                className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm rounded-lg flex items-center justify-center"
+                                                                title="Voir Bulletin"
+                                                            >
+                                                                <FileText size={14} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )) : (
+                                                <tr>
+                                                    <td colSpan={5} className="px-6 py-20 text-center text-slate-400 font-bold italic">Aucun élève trouvé dans cette classe.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div className="p-8 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Affichage de {filteredStudents.length} sur {students.length} élèves</p>
+                                    <button
+                                        onClick={handleDownloadList}
+                                        className="px-6 py-3 bg-white font-black text-xs uppercase tracking-widest text-slate-900 shadow-sm hover:bg-slate-50 active:scale-95 transition-all outline-none rounded-2xl"
+                                    >
+                                        Exporter Rapport de Classe
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            )}
         </>
     );
 };

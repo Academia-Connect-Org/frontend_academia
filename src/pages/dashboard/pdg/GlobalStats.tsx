@@ -55,7 +55,7 @@ const GlobalStats: React.FC = () => {
 
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(18);
-        doc.text("NB-MIND SCHOOL", 45, 15);
+        doc.text("ACADEMIA CONNECT", 45, 15);
         doc.setFontSize(14);
         doc.text("RAPPORT ANALYTIQUE GLOBAL", 45, 22);
 
@@ -112,12 +112,12 @@ const GlobalStats: React.FC = () => {
                     <h2 className="text-2xl font-black text-slate-800">Analyse de Performance</h2>
                     <p className="text-slate-500">Données consolidées de l'ensemble du réseau Academia</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="flex bg-white    shadow-sm overflow-hidden">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                    <div className="flex flex-col sm:flex-row bg-white shadow-sm overflow-hidden w-full sm:w-auto">
                         <select
                             value={month}
                             onChange={(e) => setMonth(parseInt(e.target.value))}
-                            className="px-3 py-2 text-sm font-bold text-slate-600 bg-transparent   outline-none hover:bg-slate-50 transition-all"
+                            className="px-3 py-3 sm:py-2 text-sm font-bold text-slate-600 bg-transparent outline-none hover:bg-slate-50 transition-all border-b sm:border-b-0 sm:border-r border-slate-100"
                         >
                             {[...Array(12)].map((_, i) => (
                                 <option key={i + 1} value={i + 1}>{new Date(0, i).toLocaleString('fr-FR', { month: 'long' })}</option>
@@ -126,7 +126,7 @@ const GlobalStats: React.FC = () => {
                         <select
                             value={year}
                             onChange={(e) => setYear(parseInt(e.target.value))}
-                            className="px-3 py-2 text-sm font-bold text-slate-600 bg-transparent outline-none hover:bg-slate-50 transition-all"
+                            className="px-3 py-3 sm:py-2 text-sm font-bold text-slate-600 bg-transparent outline-none hover:bg-slate-50 transition-all"
                         >
                             {[2023, 2024, 2025, 2026].map(y => (
                                 <option key={y} value={y}>{y}</option>
@@ -135,7 +135,7 @@ const GlobalStats: React.FC = () => {
                     </div>
                     <button
                         onClick={exportGlobalStatsToPDF}
-                        className="bg-blue-600 text-white px-6 py-2.5  font-bold flex items-center gap-2 shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all"
+                        className="bg-blue-600 text-white px-6 py-3 sm:py-2.5 font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all whitespace-nowrap"
                     >
                         <Download size={18} />
                         Exporter Rapport
@@ -303,19 +303,19 @@ interface DistributionEntry {
 }
 
 const StatCard = ({ title, value, trend, icon: Icon, color, bg }: any) => (
-    <div className="bg-white p-6 ] shadow-lg shadow-slate-200/50   group hover:scale-[1.02] transition-all duration-300">
-        <div className="flex items-center justify-between mb-4">
-            <div className={`w-14 h-14 ${bg} ${color}  flex items-center justify-center transition-transform group-hover:rotate-12`}>
-                <Icon size={28} />
+    <div className="bg-white p-4 sm:p-6 shadow-lg shadow-slate-200/50 group hover:scale-[1.02] transition-all duration-300">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className={`w-10 h-10 sm:w-14 sm:h-14 ${bg} ${color} flex items-center justify-center transition-transform group-hover:rotate-12`}>
+                <Icon className="w-5 h-5 sm:w-7 sm:h-7" />
             </div>
-            <div className={`flex items-center gap-1 text-[10px] font-black px-2.5 py-1  ${trend === 'up' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+            <div className={`flex items-center gap-1 text-[10px] font-black px-2.5 py-1 ${trend === 'up' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
                 {trend === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                 {trend === 'up' ? 'HAUSSE' : 'BAISSE'}
             </div>
         </div>
         <div>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">{title}</p>
-            <h4 className="text-2xl font-black text-slate-800">{value}</h4>
+            <p className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1">{title}</p>
+            <h4 className="text-xl sm:text-2xl font-black text-slate-800">{value}</h4>
         </div>
     </div>
 );

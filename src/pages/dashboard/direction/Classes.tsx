@@ -183,7 +183,7 @@ const Classes: React.FC = () => {
                             <div className="w-12 h-12 bg-indigo-50 text-indigo-600  flex items-center justify-center group-hover:rotate-12 transition-transform">
                                 <Layers size={24} />
                             </div>
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                 <button onClick={() => handleEditClass(c)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all">
                                     <Edit size={16} />
                                 </button>

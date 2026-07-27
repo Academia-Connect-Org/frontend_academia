@@ -12,20 +12,20 @@ const Privacy: React.FC = () => {
                     <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Retour à l'accueil
                 </Link>
 
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white ] p-12 md:p-20 shadow-2xl shadow-slate-200  "
+                    className="bg-white p-6 sm:p-10 md:p-20 shadow-2xl shadow-slate-200"
                 >
-                    <div className="w-20 h-20 bg-blue-50 text-blue-600  flex items-center justify-center mb-10">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-50 text-blue-600 flex items-center justify-center mb-8 md:mb-10">
                         <Shield size={40} />
                     </div>
 
-                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-8 uppercase tracking-tighter">
+                    <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-6 uppercase tracking-tighter leading-tight">
                         Politique de <span className="text-blue-600">Confidentialité</span>
                     </h1>
                     <p className="text-slate-500 text-lg mb-12 leading-relaxed italic font-medium">
-                        Dernière mise à jour : 27 Avril 2026. Chez NB-MIND School, la protection de vos données personnelles est notre priorité absolue.
+                        Dernière mise à jour : 27 Avril 2026. Chez ACADEMIA CONNECT, la protection de vos données personnelles est notre priorité absolue.
                     </p>
 
                     <div className="space-y-12">
@@ -108,7 +108,7 @@ const Privacy: React.FC = () => {
                                 <Eye className="text-blue-500" size={24} /> 6. Cookies et Traceurs
                             </h2>
                             <p className="text-slate-600 leading-relaxed">
-                                L'application NB-MIND School utilise des "cookies" (petits fichiers texte) de manière très limitée. Nous n'utilisons **aucun cookie publicitaire ou de suivi tiers**. Les seuls cookies utilisés sont strictement nécessaires au fonctionnement technique de l'application :
+                                L'application ACADEMIA CONNECT utilise des "cookies" (petits fichiers texte) de manière très limitée. Nous n'utilisons **aucun cookie publicitaire ou de suivi tiers**. Les seuls cookies utilisés sont strictement nécessaires au fonctionnement technique de l'application :
                             </p>
                             <ul className="list-disc pl-6 space-y-2 mt-4 text-slate-600 font-medium">
                                 <li>Cookies de session pour maintenir votre connexion sécurisée au Dashboard.</li>
@@ -116,8 +116,8 @@ const Privacy: React.FC = () => {
                             </ul>
                         </section>
 
-                        <section className="p-10 bg-slate-50 ]   italic font-medium">
-                            Pour toute question concernant vos données personnelles, contactez notre délégué à la protection des données (DPO) à l'adresse : <a href="mailto:privacy@nb-mind.com" className="text-blue-600 font-bold underline">privacy@nb-mind.com</a>
+                        <section className="p-6 md:p-10 bg-slate-50 italic font-medium rounded-lg">
+                            Pour toute question concernant vos données personnelles, contactez notre délégué à la protection des données (DPO) à l'adresse : <a href="mailto:academiaconnects@gmail.com" className="text-blue-600 font-bold underline break-all">Cliquez pour envoyer un mail à <br /> <span className="text-blue-600 font-bold underline break-all">l'equipe ACADEMIA CONNECT PRIVACY</span></a>
                         </section>
                     </div>
                 </motion.div>

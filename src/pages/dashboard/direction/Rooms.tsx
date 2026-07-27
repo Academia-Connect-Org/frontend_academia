@@ -212,13 +212,13 @@ const RoomManagement: React.FC = () => {
 
                                 <div className="relative z-10">
                                     <div className="flex items-start justify-between mb-6">
-                                        <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white  flex items-center justify-center shadow-lg shadow-blue-200">
+                                        <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-lg shadow-blue-200">
                                             <DoorOpen size={24} />
                                         </div>
-                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                             <button
                                                 onClick={() => openModal(room)}
-                                                className="p-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all"
+                                                className="p-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
                                             >
                                                 <Edit2 size={16} />
                                             </button>

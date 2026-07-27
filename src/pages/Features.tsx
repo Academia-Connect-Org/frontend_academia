@@ -108,7 +108,7 @@ const Features: React.FC = () => {
                             Des fonctionnalités <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">PENSÉES POUR VOUS</span>
                         </h1>
                         <p className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
-                            NB-MIND School digitalise chaque aspect de votre établissement pour offrir une expérience fluide, sécurisée et performante.
+                            ACADEMIA CONNECT digitalise chaque aspect de votre établissement pour offrir une expérience fluide, sécurisée et performante.
                         </p>
                     </motion.div>
                 </div>

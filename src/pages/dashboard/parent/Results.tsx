@@ -10,7 +10,8 @@ import {
     GraduationCap,
     Clock,
     Target,
-    Star
+    Star,
+    User
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../api/axios';
@@ -23,6 +24,7 @@ const ParentResults: React.FC = () => {
     const [selectedClassId, setSelectedClassId] = useState<string>('all');
     const [selectedChild, setSelectedChild] = useState<any>(null);
     const [allGrades, setAllGrades] = useState<any[]>([]);
+    const [classSubjects, setClassSubjects] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [gradesLoading, setGradesLoading] = useState(false);
     const [isBulletinOpen, setIsBulletinOpen] = useState(false);
@@ -37,7 +39,7 @@ const ParentResults: React.FC = () => {
 
     useEffect(() => {
         if (selectedChild?.id) {
-            fetchGrades(selectedChild.id);
+            fetchGrades(selectedChild.id, selectedChild.classe?.cycle?.id);
         }
     }, [selectedChild?.id]);
 
@@ -67,11 +69,22 @@ const ParentResults: React.FC = () => {
         }
     };
 
-    const fetchGrades = async (studentId: number) => {
+    const fetchGrades = async (studentId: number, cycleId?: number) => {
         setGradesLoading(true);
         try {
             const res = await api.get(`/submissions/student/${studentId}/results`);
             setAllGrades(res.data);
+
+            if (cycleId) {
+                try {
+                    const subjRes = await api.get(`/subjects/cycle/${cycleId}`);
+                    setClassSubjects(subjRes.data);
+                } catch (e) {
+                    console.error("Erreur lors du chargement des matières:", e);
+                }
+            } else {
+                setClassSubjects([]);
+            }
         } catch (err) {
             console.error("Erreur lors du chargement des notes:", err);
         } finally {
@@ -130,12 +143,12 @@ const ParentResults: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-col sm:flex-row flex-wrap items-center gap-4 w-full md:w-auto">
                     {classes.length > 1 && (
                         <select
                             value={selectedClassId}
                             onChange={(e) => setSelectedClassId(e.target.value)}
-                            className="bg-white   px-6 py-4  font-bold text-slate-600 outline-none focus: transition-all shadow-sm text-xs uppercase tracking-widest"
+                            className="bg-white px-6 py-4 font-bold text-slate-600 outline-none transition-all shadow-sm text-xs uppercase tracking-widest w-full sm:w-auto"
                         >
                             <option value="all">Filtre: Toutes les classes</option>
                             {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -145,7 +158,7 @@ const ParentResults: React.FC = () => {
                     <select
                         value={selectedYear}
                         onChange={e => setSelectedYear(e.target.value)}
-                        className="bg-white   px-6 py-4  font-bold text-slate-600 outline-none focus: transition-all shadow-sm text-xs"
+                        className="bg-white px-6 py-4 font-bold text-slate-600 outline-none transition-all shadow-sm text-xs w-full sm:w-auto"
                     >
                         <option value="2024-2025">Année: 2024-2025</option>
                         <option value="2025-2026">Année: 2025-2026</option>
@@ -154,7 +167,7 @@ const ParentResults: React.FC = () => {
 
                     <button
                         onClick={() => setIsBulletinOpen(true)}
-                        className="bg-slate-900 text-white px-10 py-4.5  font-black flex items-center gap-3 shadow-2xl hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all outline-none uppercase text-xs tracking-[0.1em]"
+                        className="bg-slate-900 text-white px-6 sm:px-10 py-4 font-black flex items-center justify-center gap-3 shadow-2xl hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all outline-none uppercase text-xs tracking-[0.1em] w-full sm:w-auto"
                     >
                         <Download size={18} /> Télécharger Bulletin
                     </button>
@@ -163,22 +176,24 @@ const ParentResults: React.FC = () => {
 
             {/* Child Selector & Trimester Toggle */}
             <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-                <div className="bg-white p-2 ] shadow-xl   flex items-center gap-2 overflow-x-auto no-scrollbar w-full lg:w-auto">
-                    {filteredChildren.map((child: any) => (
-                        <button
-                            key={child.id}
-                            onClick={() => setSelectedChild(child)}
-                            className={`px-8 py-4.5 ] font-black text-[11px] uppercase tracking-[0.15em] transition-all flex items-center gap-4 whitespace-nowrap
-                                ${selectedChild?.id === child.id
-                                    ? 'bg-blue-600 text-white shadow-2xl shadow-blue-600/30 scale-105 active:scale-95'
-                                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
-                        >
-                            <div className={`w-8 h-8  flex items-center justify-center text-[10px] ${selectedChild?.id === child.id ? 'bg-white/20' : 'bg-slate-100'}`}>
-                                {child.firstName[0]}
-                            </div>
-                            {child.firstName} {child.lastName}
-                        </button>
-                    ))}
+                <div className="bg-white p-2 shadow-xl flex items-center w-full lg:w-auto min-w-[250px]">
+                    <div className="w-10 h-10 bg-blue-50 flex items-center justify-center text-blue-600 mr-2 shrink-0">
+                        <User size={18} />
+                    </div>
+                    <select
+                        value={selectedChild?.id || ''}
+                        onChange={(e) => {
+                            const child = filteredChildren.find((c: any) => c.id === Number(e.target.value));
+                            if (child) setSelectedChild(child);
+                        }}
+                        className="bg-transparent flex-1 py-3 px-2 font-black text-xs text-slate-700 uppercase tracking-widest outline-none cursor-pointer"
+                    >
+                        {filteredChildren.map((child: any) => (
+                            <option key={child.id} value={child.id}>
+                                {child.firstName} {child.lastName}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="flex bg-white p-2 ]   shadow-lg">
@@ -196,44 +211,44 @@ const ParentResults: React.FC = () => {
 
             {selectedChild ? (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    <div className="lg:col-span-2 space-y-10">
+                    <div className="lg:col-span-2 space-y-6 sm:space-y-10">
                         {/* Matrix Stats */}
-                        <div className="grid grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                             <MatrixBlock label="Moyenne" value={averageGeneral} color="blue" icon={BarChart3} />
                             <MatrixBlock label="Meilleure Note" value={bestGrade} color="amber" icon={Star} trend="Record" />
                             <MatrixBlock label="Évaluations" value={filteredGrades.length} color="emerald" icon={Target} trend="Global" />
                         </div>
 
                         {/* Main Grades Table */}
-                        <div className="bg-white ] shadow-2xl   overflow-hidden min-h-[500px] relative">
+                        <div className="bg-white shadow-2xl overflow-hidden min-h-[500px] relative">
                             {gradesLoading && (
                                 <div className="absolute inset-0 bg-white/60 backdrop-blur-[4px] z-20 flex flex-col items-center justify-center gap-4">
-                                    <div className="w-10 h-10     animate-spin"></div>
+                                    <div className="w-10 h-10 animate-spin"></div>
                                     <p className="font-black text-blue-900 text-[10px] uppercase tracking-widest">Calcul des moyennes...</p>
                                 </div>
                             )}
 
-                            <div className="p-10   flex items-center justify-between bg-slate-50/20">
+                            <div className="p-6 sm:p-10 flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left gap-4 sm:gap-0 bg-slate-50/20">
                                 <div>
                                     <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Récapitulatif des Notes</h3>
                                     <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Période: {selectedTrimester} de {selectedChild.firstName}</p>
                                 </div>
-                                <div className="w-14 h-14 bg-white  shadow-sm   flex items-center justify-center text-blue-600">
+                                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white shadow-sm flex items-center justify-center text-blue-600 rounded-full sm:rounded-none">
                                     <TrendingUp size={24} />
                                 </div>
                             </div>
 
-                            <div className="p-6">
+                            <div className="p-0 sm:p-6 overflow-x-auto">
                                 {filteredGrades.length === 0 && !gradesLoading ? (
-                                    <div className="py-24 flex flex-col items-center justify-center text-center">
-                                        <div className="w-20 h-20 bg-slate-50  flex items-center justify-center mb-6 grayscale opacity-50">
+                                    <div className="py-24 flex flex-col items-center justify-center text-center px-4">
+                                        <div className="w-20 h-20 bg-slate-50 flex items-center justify-center mb-6 grayscale opacity-50 rounded-full">
                                             <Search size={40} className="text-slate-300" />
                                         </div>
                                         <h4 className="text-lg font-black text-slate-300 uppercase tracking-widest">Aucune note publiée</h4>
                                         <p className="text-[10px] text-slate-300 font-bold uppercase tracking-[0.2em] mt-2 max-w-xs">Les professeurs n'ont pas encore saisi de notes pour ce trimestre.</p>
                                     </div>
                                 ) : (
-                                    <table className="w-full text-left">
+                                    <table className="w-full text-left whitespace-nowrap min-w-[600px]">
                                         <thead>
                                             <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                                                 <th className="px-8 py-6">Matière / Évaluation</th>
@@ -285,15 +300,19 @@ const ParentResults: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="space-y-10">
+                    <div className="space-y-6 sm:space-y-10">
                         {/* Subject Progress Chart-like Sidebar */}
-                        <div className="bg-slate-950 p-12 ] text-white shadow-3xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10  blur-[120px] group-hover:scale-125 transition-transform duration-1000"></div>
-                            <h3 className="text-xl font-black mb-10 relative z-10 flex items-center gap-4 italic tracking-tight">
+                        <div className="bg-slate-950 p-6 sm:p-12 text-white shadow-3xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[120px] group-hover:scale-125 transition-transform duration-1000"></div>
+                            <h3 className="text-xl font-black mb-6 sm:mb-10 relative z-10 flex items-center gap-4 italic tracking-tight">
                                 <TrendingUp size={24} className="text-blue-400" /> Profil par Matière
                             </h3>
-                            <div className="space-y-10 relative z-10">
-                                {Array.from(new Set(allGrades.map(g => g.homework?.subject?.name))).slice(0, 6).map(s => {
+                            <div className="space-y-6 sm:space-y-10 relative z-10">
+                                {
+                                    (classSubjects.length > 0 
+                                        ? classSubjects.map((s: any) => s.name)
+                                        : Array.from(new Set(allGrades.map(g => g.homework?.subject?.name)))
+                                    ).filter(Boolean).slice(0, 6).map((s: string) => {
                                     const subjGrades = filteredGrades.filter(g => g.homework?.subject?.name === s);
                                     const avg = subjGrades.length > 0
                                         ? subjGrades.reduce((acc, curr) => acc + curr.grade, 0) / subjGrades.length
@@ -314,15 +333,15 @@ const ParentResults: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white p-12 ] shadow-2xl   relative overflow-hidden text-center group">
-                            <div className="w-20 h-20 bg-blue-50 text-blue-600 ] flex items-center justify-center mx-auto mb-8   group-hover:rotate-12 transition-transform">
+                        <div className="bg-white p-6 sm:p-12 shadow-2xl relative overflow-hidden text-center group">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-6 sm:mb-8 group-hover:rotate-12 transition-transform rounded-full sm:rounded-none">
                                 <BarChart3 size={32} />
                             </div>
-                            <h4 className="text-2xl font-black text-slate-800 uppercase tracking-tight mb-4">Moyenne Générale</h4>
-                            <div className="text-6xl font-black text-slate-900 tracking-tighter mb-8">
-                                {averageGeneral}<span className="text-xl text-slate-300 font-bold ml-2">/20</span>
+                            <h4 className="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-tight mb-2 sm:mb-4">Moyenne Générale</h4>
+                            <div className="text-5xl sm:text-6xl font-black text-slate-900 tracking-tighter mb-6 sm:mb-8">
+                                {averageGeneral}<span className="text-lg sm:text-xl text-slate-300 font-bold ml-2">/20</span>
                             </div>
-                            <button className="w-full py-5 bg-slate-50 text-slate-400  font-black text-[10px] uppercase tracking-widest   hover:bg-slate-100 transition-all">Imprimer Relevé</button>
+                            <button className="w-full py-4 sm:py-5 bg-slate-50 text-slate-400 font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all rounded sm:rounded-none">Imprimer Relevé</button>
                         </div>
                     </div>
                 </div>
@@ -346,19 +365,21 @@ const ParentResults: React.FC = () => {
 
 const MatrixBlock = ({ label, value, color, icon: Icon, trend }: any) => {
     const colors = {
-        blue: 'text-blue-600 bg-blue-50 ',
-        amber: 'text-amber-600 bg-amber-50 ',
-        emerald: 'text-emerald-600 bg-emerald-50 ',
+        blue: 'text-blue-600 bg-blue-50',
+        amber: 'text-amber-600 bg-amber-50',
+        emerald: 'text-emerald-600 bg-emerald-50',
     };
     return (
-        <div className="group bg-white p-10 ] shadow-2xl   transition-all duration-300 hover:-translate-y-2 relative overflow-hidden">
-            <div className={`w-16 h-16 ] flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 group-hover:rotate-12 transition-all ${colors[color as keyof typeof colors]}`}>
-                <Icon size={30} />
+        <div className="group bg-white p-4 shadow-lg border border-slate-100 rounded-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden flex items-center gap-4">
+            <div className={`w-12 h-12 flex items-center justify-center rounded-xl shadow-inner shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all ${colors[color as keyof typeof colors]}`}>
+                <Icon size={24} />
             </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{label}</p>
-            <div className="flex items-end justify-between">
-                <h4 className="text-4xl font-black text-slate-900 tracking-tighter leading-none">{value}</h4>
-                {trend && <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest px-3 py-1.5 bg-slate-50   ">{trend}</span>}
+            <div className="flex-1">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+                <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-xl font-black text-slate-900 tracking-tight leading-none">{value}</h4>
+                    {trend && <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest px-1.5 py-0.5 bg-slate-50 rounded border border-slate-100">{trend}</span>}
+                </div>
             </div>
         </div>
     );

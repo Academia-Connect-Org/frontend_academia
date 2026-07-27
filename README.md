@@ -1,7 +1,7 @@
-# Frontend Web - Projet École (NB MIND School)
+# Frontend Web - Projet École (Academia Connect)
 
-## À propos de NB MIND
-**NB MIND** est une entreprise visionnaire dédiée à l'innovation éducative. Nous concevons des interfaces modernes et fluides pour faciliter l'interaction entre tous les acteurs du monde scolaire. Le **Projet École** (interface Web) est une vitrine de notre savoir-faire en UX/UI.
+## À propos de Academia Connect
+**Academia Connect** est une entreprise visionnaire dédiée à l'innovation éducative. Nous concevons des interfaces modernes et fluides pour faciliter l'interaction entre tous les acteurs du monde scolaire. Le **Projet École** (interface Web) est une vitrine de notre savoir-faire en UX/UI.
 
 ## Présentation du Frontend Web
 L'application web est le portail principal pour les administrateurs, la direction (PDG) et le personnel administratif. Elle offre une vue d'ensemble complète et des outils de gestion puissants.
@@ -36,10 +36,10 @@ L'application web est le portail principal pour les administrateurs, la directio
    ```
 
 ## Engagement Qualité
-Chez **NB MIND**, nous nous engageons à fournir des interfaces performantes, accessibles et centrées sur l'utilisateur final.
+Chez **Academia Connect**, nous nous engageons à fournir des interfaces performantes, accessibles et centrées sur l'utilisateur final.
 
 ---
-© 2026 **NB MIND**. Tous droits réservés.
+© 2026 **Academia Connect**. Tous droits réservés.
 
 
 

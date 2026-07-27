@@ -5,6 +5,7 @@ import api, { getFileUrl } from '../../../api/axios';
 import { ROUTES } from '../../../constants/routes';
 import { motion } from 'framer-motion';
 import { CheckCircle, Crown, ChevronLeft, ArrowRight, Building, RefreshCw, AlertCircle } from 'lucide-react';
+import SubscriptionPlanCard from '../../../components/shared/SubscriptionPlanCard';
 
 const SelectPlan: React.FC = () => {
     const { institutionId } = useParams<{ institutionId: string }>();
@@ -86,12 +87,17 @@ const SelectPlan: React.FC = () => {
                 setIsSubmitting(false);
             }
         } else {
-            // Paid plan -> Redirect to Payment Gateway
-            const rawPrice = selectedPeriod === 'MONTHLY' ? selectedPlan.monthlyPrice : selectedPlan.yearlyPrice;
-            const priceStr = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(rawPrice);
-            const durationStr = selectedPeriod === 'MONTHLY' ? '/ mois' : '/ an';
+            // Calculate actual period based on plan's constraints
+            let effectiveIsYearly = selectedPeriod === 'YEARLY';
+            if (selectedPlan.billingOptions === 'MONTHLY_ONLY') effectiveIsYearly = false;
+            if (selectedPlan.billingOptions === 'YEARLY_ONLY') effectiveIsYearly = true;
+            const actualPeriod = effectiveIsYearly ? 'YEARLY' : 'MONTHLY';
 
-            navigate(`${ROUTES.PAYMENT}?plan=${selectedPlan.title}&price=${priceStr}&duration=${durationStr}&institutionId=${institution.id}`);
+            // Paid plan -> Redirect to Payment Gateway
+            const rawPrice = actualPeriod === 'MONTHLY' ? selectedPlan.monthlyPrice : selectedPlan.yearlyPrice;
+            const priceStr = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(rawPrice);
+            const durationStr = actualPeriod === 'MONTHLY' ? '/ mois' : '/ an';
+            navigate(`${ROUTES.PAYMENT}?plan=${selectedPlan.type}&planTitle=${encodeURIComponent(selectedPlan.title)}&price=${priceStr}&duration=${durationStr}&institutionId=${institution.id}&period=${actualPeriod}`);
         }
     };
 
@@ -148,24 +154,26 @@ const SelectPlan: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Billing Toggle (Hide if only free trial is selected/available) */}
-                <div className="flex justify-center mb-12">
-                    <div className="bg-slate-200/50 p-1.5 rounded-2xl flex items-center shadow-inner border border-slate-200">
-                        <button
-                            onClick={() => setSelectedPeriod('MONTHLY')}
-                            className={`px-8 py-3 rounded-xl font-black text-sm transition-all ${selectedPeriod === 'MONTHLY' ? 'bg-white text-slate-800 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            Facturation Mensuelle
-                        </button>
-                        <button
-                            onClick={() => setSelectedPeriod('YEARLY')}
-                            className={`px-8 py-3 rounded-xl font-black text-sm transition-all flex items-center gap-2 ${selectedPeriod === 'YEARLY' ? 'bg-white text-slate-800 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            Facturation Annuelle
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-600 text-[10px] font-black rounded-lg uppercase tracking-wider">-10%</span>
-                        </button>
+                {/* Billing Toggle (Hide if only free trial is selected/available or if all plans have forced periods) */}
+                {plans.some(plan => plan.type !== 'FREE_TRIAL' && (plan.billingOptions === 'BOTH' || plan.billingOptions == null)) && (
+                    <div className="flex justify-center mb-12">
+                        <div className="bg-slate-200/50 p-1.5 rounded-2xl flex items-center shadow-inner border border-slate-200">
+                            <button
+                                onClick={() => setSelectedPeriod('MONTHLY')}
+                                className={`px-8 py-3 rounded-xl font-black text-sm transition-all ${selectedPeriod === 'MONTHLY' ? 'bg-white text-slate-800 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                Facturation Mensuelle
+                            </button>
+                            <button
+                                onClick={() => setSelectedPeriod('YEARLY')}
+                                className={`px-8 py-3 rounded-xl font-black text-sm transition-all flex items-center gap-2 ${selectedPeriod === 'YEARLY' ? 'bg-white text-slate-800 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                Facturation Annuelle
+                                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-600 text-[10px] font-black rounded-lg uppercase tracking-wider">-10%</span>
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {error && (
                     <div className="mb-8 p-4 bg-red-50 text-red-600 rounded-xl font-bold border border-red-100 flex items-center gap-3">
@@ -175,67 +183,39 @@ const SelectPlan: React.FC = () => {
                 )}
 
                 {/* Plan Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto">
                     {plans.map((plan) => {
                         const isSelected = selectedPlan?.id === plan.id;
                         const isFree = plan.type === 'FREE_TRIAL';
                         const isFeatured = plan.featured;
+                        
+                        let effectiveIsYearly = selectedPeriod === 'YEARLY';
+                        if (plan.billingOptions === 'MONTHLY_ONLY') effectiveIsYearly = false;
+                        if (plan.billingOptions === 'YEARLY_ONLY') effectiveIsYearly = true;
+                        
+                        const actualPeriod = effectiveIsYearly ? 'YEARLY' : 'MONTHLY';
+                        const forcedPeriod = plan.billingOptions !== 'BOTH' && plan.billingOptions != null ? effectiveIsYearly : null;
+
+                        const calculatedPrice = isFree ? "0 FCFA" : (actualPeriod === 'MONTHLY' ? plan.monthlyPrice : plan.yearlyPrice).toLocaleString('fr-FR') + " FCFA";
+                        const calculatedDuration = isFree ? "" : (actualPeriod === 'MONTHLY' ? '/ mois' : '/ an');
 
                         return (
-                            <motion.div
+                            <SubscriptionPlanCard
                                 key={plan.id}
-                                whileHover={{ y: -5 }}
-                                onClick={() => setSelectedPlan(plan)}
-                                className={`p-5 border-2 transition-all cursor-pointer relative flex flex-col bg-white ${isFeatured ? 'border-indigo-500 shadow-2xl shadow-indigo-500/20 scale-[1.02] z-10' : 'border-slate-100 hover:border-indigo-300 hover:shadow-xl'
-                                    } ${isSelected
-                                        ? 'ring-4 ring-indigo-600/20 bg-indigo-50/10'
-                                        : ''
-                                    }`}
-                            >
-                                {isFeatured && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1.5 bg-indigo-600 text-white text-xs font-black tracking-widest uppercase shadow-lg flex items-center gap-2 w-max">
-                                        <Crown size={14} /> {plan.highlight || "Recommandé"}
-                                    </div>
-                                )}
-
-                                {isSelected && !isFeatured && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-slate-800 text-white text-xs font-black tracking-widest uppercase shadow-md flex items-center gap-2 w-max">
-                                        <CheckCircle size={14} /> Sélectionné
-                                    </div>
-                                )}
-
-                                <div className="mb-6 mt-2">
-                                    <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight mb-2">{plan.title}</h3>
-                                    <p className="text-sm text-slate-500 font-medium h-10">{plan.description}</p>
-                                </div>
-
-                                <div className="mb-8">
-                                    {isFree ? (
-                                        <div className="text-4xl font-black text-slate-900">0 FCFA</div>
-                                    ) : (
-                                        <>
-                                            <span className="text-4xl font-black text-slate-900">
-                                                {(selectedPeriod === 'MONTHLY' ? plan.monthlyPrice : plan.yearlyPrice).toLocaleString()}
-                                            </span>
-                                            <span className="text-slate-500 font-bold ml-1 text-sm">FCFA / {selectedPeriod === 'MONTHLY' ? 'mois' : 'an'}</span>
-                                        </>
-                                    )}
-                                </div>
-
-                                <div className="flex-1">
-                                    <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-4">Inclus :</p>
-                                    <ul className="space-y-4">
-                                        {plan.features?.map((f: string, i: number) => (
-                                            <li key={i} className="flex items-start gap-3 text-sm text-slate-700 font-medium leading-tight">
-                                                <div className="mt-0.5 w-4 h-4 bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                                                    <CheckCircle size={10} />
-                                                </div>
-                                                {f}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </motion.div>
+                                planType={plan.type}
+                                title={plan.title}
+                                description={plan.description}
+                                price={calculatedPrice}
+                                duration={calculatedDuration}
+                                features={plan.features}
+                                missing={plan.missingFeatures}
+                                isFeatured={isFeatured}
+                                highlight={plan.highlight}
+                                forcedPeriod={forcedPeriod}
+                                mode="selectable"
+                                isSelected={isSelected}
+                                onSelect={() => setSelectedPlan(plan)}
+                            />
                         );
                     })}
                 </div>

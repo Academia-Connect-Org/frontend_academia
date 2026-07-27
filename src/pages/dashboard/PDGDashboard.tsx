@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/logo.svg';
 import {
     Users,
     TrendingUp,
@@ -62,7 +62,7 @@ const PDGDashboard: React.FC = () => {
         api.get(`/dashboard/overview${qs}`).then(res => setOverview(res.data)).catch(console.error);
         api.get(`/dashboard/schools-performance${qs}`).then(res => setSchoolsPerf(res.data)).catch(console.error);
         api.get(`/institutions${qs}`).then(res => setInstitutions(res.data)).catch(console.error);
-        
+
         api.get(`/dashboard/alerts?userId=${user.id}`).then(res => setAlerts(res.data)).catch(console.error);
     }, [user?.id]);
 
@@ -80,7 +80,7 @@ const PDGDashboard: React.FC = () => {
                 if (filter.cycleId) params.append('cycleId', filter.cycleId);
                 if (filter.classeId) params.append('classeId', filter.classeId);
                 if (filter.year) params.append('year', filter.year);
-                
+
                 const res = await api.get(`/dashboard/success-stats?${params.toString()}`);
                 setSuccessStats(res.data);
             } catch (err) {
@@ -95,7 +95,7 @@ const PDGDashboard: React.FC = () => {
         const params = new URLSearchParams();
         params.append('ceoId', user.id.toString());
         params.append('groupBy', groupBy);
-        
+
         api.get(`/dashboard/growth?${params.toString()}`).then(res => setGrowthData(res.data)).catch(console.error);
     }, [groupBy, user?.id]);
 
@@ -115,7 +115,7 @@ const PDGDashboard: React.FC = () => {
 
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(22);
-        doc.text("NB-MIND SCHOOL - RÉSEAU", 50, 20);
+        doc.text("ACADEMIA CONNECT - RÉSEAU", 50, 20);
 
         doc.setFontSize(10);
         doc.text(`Rapport de Performance Généré le: ${new Date().toLocaleString()}`, 50, 30);
@@ -283,7 +283,7 @@ const PDGDashboard: React.FC = () => {
             <div className="mb-10">
                 <div className="bg-white p-8 ] shadow-2xl   overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5  blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
-                    
+
                     <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 mb-10 relative z-10">
                         <div>
                             <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
@@ -292,36 +292,36 @@ const PDGDashboard: React.FC = () => {
                             </h2>
                             <p className="text-slate-400 font-medium text-sm mt-1">Analyse approfondie des performances académiques à travers le réseau</p>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full xl:w-auto">
-                            <select 
+                            <select
                                 className="bg-slate-50 border-none  px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
                                 value={filter.year}
-                                onChange={(e) => setFilter({...filter, year: e.target.value})}
+                                onChange={(e) => setFilter({ ...filter, year: e.target.value })}
                             >
                                 <option value="2025-2026">2025-2026</option>
                                 <option value="2024-2025">2024-2025</option>
                             </select>
-                            <select 
+                            <select
                                 className="bg-slate-50 border-none  px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
                                 value={filter.instId}
-                                onChange={(e) => setFilter({...filter, instId: e.target.value, cycleId: '', classeId: ''})}
+                                onChange={(e) => setFilter({ ...filter, instId: e.target.value, cycleId: '', classeId: '' })}
                             >
                                 <option value="">Toutes les Écoles</option>
                                 {institutions.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
                             </select>
-                            <select 
+                            <select
                                 className="bg-slate-50 border-none  px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
                                 value={filter.cycleId}
-                                onChange={(e) => setFilter({...filter, cycleId: e.target.value, classeId: ''})}
+                                onChange={(e) => setFilter({ ...filter, cycleId: e.target.value, classeId: '' })}
                             >
                                 <option value="">Tous les Cycles</option>
                                 {cycles.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                             </select>
-                            <select 
+                            <select
                                 className="bg-slate-50 border-none  px-4 py-3 text-xs font-bold text-slate-600 focus:ring-2 focus:ring-blue-500/20"
                                 value={filter.classeId}
-                                onChange={(e) => setFilter({...filter, classeId: e.target.value})}
+                                onChange={(e) => setFilter({ ...filter, classeId: e.target.value })}
                             >
                                 <option value="">Toutes les Classes</option>
                                 {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -395,22 +395,22 @@ const PDGDashboard: React.FC = () => {
 
             {/* Recent Table or Schools list */}
             <div className="bg-white ] shadow-xl shadow-slate-200/50   overflow-hidden">
-                <div className="p-8   flex items-center justify-between">
+                <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 className="text-xl font-black text-slate-800">Performance par Établissement</h3>
                         <p className="text-slate-400 text-sm">Vue d'ensemble de la performance des écoles du réseau</p>
                     </div>
-                    <div className="flex gap-4">
+                    <div className="flex items-center gap-4">
                         <button
                             onClick={exportToPDF}
-                            className="p-2.5 text-slate-400 hover:bg-slate-50    transition-all"
+                            className="p-2.5 text-slate-400 hover:bg-slate-50 transition-all"
                             title="Exporter en PDF"
                         >
                             <Download size={20} />
                         </button>
                         <button
                             onClick={() => navigate(ROUTES.DASHBOARD.PDG.STATS)}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-blue-900 text-white  font-bold text-sm shadow-lg shadow-blue-900/20 hover:bg-blue-800 transition-all"
+                            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-900 text-white font-bold text-sm shadow-lg shadow-blue-900/20 hover:bg-blue-800 transition-all whitespace-nowrap"
                         >
                             <Search size={16} /> Rapport détaillé
                         </button>
@@ -419,12 +419,13 @@ const PDGDashboard: React.FC = () => {
                 <div className="p-4 overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="text-slate-400 text-xs font-black uppercase tracking-widest  ">
-                                <th className="px-6 py-4">Établissement</th>
-                                <th className="px-6 py-4">Directeur</th>
-                                <th className="px-6 py-4">Effectif</th>
-                                <th className="px-6 py-4">Taux de Présence</th>
-                                <th className="px-6 py-4 text-center">Status</th>
+                            <tr className="text-slate-400 text-xs font-black uppercase tracking-widest">
+                                <th className="px-6 py-4 whitespace-nowrap">Établissement</th>
+                                <th className="px-6 py-4 whitespace-nowrap">Directeur</th>
+                                <th className="px-6 py-4 whitespace-nowrap">Effectif</th>
+                                <th className="px-6 py-4 whitespace-nowrap">Taux de Présence</th>
+                                <th className="px-6 py-4 whitespace-nowrap">Performance</th>
+                                <th className="px-6 py-4 whitespace-nowrap text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -483,13 +484,13 @@ const AlertItem = ({ title, desc, time, type, onClick }: any) => {
             onClick={onClick}
             className="flex gap-4 group cursor-pointer hover:translate-x-1 transition-all"
         >
-            <div className="relative">
+            <div className="relative shrink-0">
                 <div className={`w-3 h-3 ${colors[type as keyof typeof colors]}  mt-1.5 shadow-[0_0_10px_rgba(239,68,68,0.5)]`}></div>
                 <div className="absolute top-5 left-1/2 -translate-x-1/2 w-0.5 h-full bg-white/5 group-last:hidden"></div>
             </div>
-            <div>
-                <h5 className="font-bold text-sm text-blue-100 mb-1">{title}</h5>
-                <p className="text-xs text-white/40 leading-relaxed mb-1">{desc}</p>
+            <div className="flex-1 min-w-0">
+                <h5 className="font-bold text-sm text-blue-100 mb-1 truncate">{title}</h5>
+                <p className="text-xs text-white/40 leading-relaxed mb-1 line-clamp-2">{desc}</p>
                 <span className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">{time}</span>
             </div>
         </div>
@@ -498,22 +499,22 @@ const AlertItem = ({ title, desc, time, type, onClick }: any) => {
 
 const SchoolRow = ({ name, dir, students, attendance, progress, status }: any) => (
     <tr className="hover:bg-slate-50/50 transition-all group">
-        <td className="px-6 py-5">
+        <td className="px-6 py-5 whitespace-nowrap">
             <p className="font-bold text-slate-900 text-sm group-hover:text-blue-600 transition-colors">{name}</p>
         </td>
-        <td className="px-6 py-5 text-sm font-medium text-slate-500">{dir}</td>
-        <td className="px-6 py-5 text-sm font-bold text-slate-700">{students}</td>
-        <td className="px-6 py-5 text-sm font-bold text-slate-900">{attendance}</td>
-        <td className="px-6 py-5">
-            <div className="flex items-center gap-3">
-                <div className="w-full bg-slate-100 h-2  overflow-hidden max-w-[100px]">
+        <td className="px-6 py-5 text-sm font-medium text-slate-500 whitespace-nowrap">{dir}</td>
+        <td className="px-6 py-5 text-sm font-bold text-slate-700 whitespace-nowrap">{students}</td>
+        <td className="px-6 py-5 text-sm font-bold text-slate-900 whitespace-nowrap">{attendance}</td>
+        <td className="px-6 py-5 whitespace-nowrap">
+            <div className="flex items-center gap-3 min-w-[120px]">
+                <div className="w-full bg-slate-100 h-2 overflow-hidden">
                     <div className={`h-full ${progress > 90 ? 'bg-emerald-500' : progress > 80 ? 'bg-blue-500' : 'bg-amber-500'} `} style={{ width: `${progress}%` }}></div>
                 </div>
                 <span className="text-xs font-black text-slate-400">{progress}%</span>
             </div>
         </td>
-        <td className="px-6 py-5 text-center">
-            <span className={`px-3 py-1.5  text-[10px] font-black uppercase tracking-widest 
+        <td className="px-6 py-5 text-center whitespace-nowrap">
+            <span className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest 
                 ${status === 'good' ? 'bg-emerald-50 text-emerald-600' : status === 'warning' ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-500'}`}>
                 {status === 'good' ? 'Optimale' : status === 'warning' ? 'À Surveiller' : 'Stable'}
             </span>

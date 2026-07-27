@@ -41,6 +41,7 @@ const ParentSchedule: React.FC = () => {
     const [selectedClassId, setSelectedClassId] = useState<string>('all');
     const [selectedChildId, setSelectedChildId] = useState<string>('');
     const [entries, setEntries] = useState<TimetableEntry[]>([]);
+    const [subjects, setSubjects] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [timetableConfig, setTimetableConfig] = useState<{
         startHour: string;
@@ -59,15 +60,15 @@ const ParentSchedule: React.FC = () => {
             if (!user?.id) return;
             try {
                 const res = await api.get(`/dashboard/parent?userId=${user.id}`);
-                const kids = res.data?.children || [];
+                const kids = res.data?.childrenDetails || [];
                 setChildren(kids);
 
                 const uniqueClasses: any[] = [];
                 const classIds = new Set();
                 kids.forEach((k: any) => {
-                    if (k.classe && !classIds.has(k.classe.id)) {
-                        classIds.add(k.classe.id);
-                        uniqueClasses.push(k.classe);
+                    if (k.classeId && !classIds.has(k.classeId)) {
+                        classIds.add(k.classeId);
+                        uniqueClasses.push({ id: k.classeId, name: k.classeName });
                     }
                 });
                 setClasses(uniqueClasses);
@@ -86,23 +87,36 @@ const ParentSchedule: React.FC = () => {
 
     useEffect(() => {
         const child = children.find(c => String(c.id) === selectedChildId);
-        if (child?.classe?.id) {
-            fetchChildSchedule(child.classe.id);
+        if (child?.classeId) {
+            fetchChildSchedule(child.classeId, child.cycleId, child.institutionId);
         } else {
             setEntries([]);
+            setSubjects([]);
         }
     }, [selectedChildId]);
 
-    const fetchChildSchedule = async (classeId: number) => {
+    const fetchChildSchedule = async (classeId: number, cycleId?: number, instId?: number) => {
         setLoading(true);
         try {
-            const instId = user?.institution?.id;
-            const [scheduleRes, configRes] = await Promise.all([
+            const requests: Promise<any>[] = [
                 api.get(`/timetable/classe/${classeId}`),
-                api.get(`/timetable/config/institution/${instId}`)
-            ]);
-            setEntries(scheduleRes.data);
-            setTimetableConfig(configRes.data);
+                instId ? api.get(`/timetable/config/institution/${instId}`) : Promise.resolve({ data: { startHour: '08:00', endHour: '18:00', slotDuration: 60, breaks: [] } })
+            ];
+            
+            if (cycleId) {
+                requests.push(api.get(`/subjects/cycle/${cycleId}`).catch(() => ({ data: [] })));
+            }
+            
+            const results = await Promise.all(requests);
+            
+            setEntries(results[0].data);
+            setTimetableConfig(results[1].data);
+            
+            if (results[2]) {
+                setSubjects(results[2].data);
+            } else {
+                setSubjects([]);
+            }
         } catch (error) {
             console.error("Failed to fetch child schedule", error);
         } finally {
@@ -199,7 +213,7 @@ const ParentSchedule: React.FC = () => {
 
     const filteredChildren = selectedClassId === 'all'
         ? children
-        : children.filter(c => String(c.classe?.id) === selectedClassId);
+        : children.filter(c => String(c.classeId) === selectedClassId);
 
     return (
         <div className="space-y-10">
@@ -241,25 +255,21 @@ const ParentSchedule: React.FC = () => {
             </div>
 
             {/* Child Toggle Bar */}
-            <div className="bg-white p-2.5 ] shadow-xl   flex items-center gap-2 overflow-x-auto no-scrollbar">
-                {filteredChildren.map((child: any) => (
-                    <button
-                        key={child.id}
-                        onClick={() => setSelectedChildId(String(child.id))}
-                        className={`px-8 py-4.5 ] font-black text-[11px] uppercase tracking-[0.15em] transition-all flex items-center gap-4 whitespace-nowrap
-                            ${selectedChildId === String(child.id)
-                                ? 'bg-purple-600 text-white shadow-2xl shadow-purple-600/30 scale-105 active:scale-95'
-                                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
-                    >
-                        <div className={`w-8 h-8  flex items-center justify-center text-[10px] ${selectedChildId === String(child.id) ? 'bg-white/20' : 'bg-slate-100'}`}>
-                            {child.firstName[0]}
-                        </div>
-                        {child.firstName} {child.lastName}
-                        <span className={`ml-2 px-3 py-1  text-[9px] font-bold ${selectedChildId === String(child.id) ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                            {child.classe?.name}
-                        </span>
-                    </button>
-                ))}
+            <div className="bg-white p-2 shadow-xl flex items-center w-full lg:w-auto max-w-md">
+                <div className="w-10 h-10 bg-purple-50 flex items-center justify-center text-purple-600 mr-2 shrink-0">
+                    <UserIcon size={18} />
+                </div>
+                <select
+                    value={selectedChildId}
+                    onChange={(e) => setSelectedChildId(e.target.value)}
+                    className="bg-transparent flex-1 py-3 px-2 font-black text-xs text-slate-700 uppercase tracking-widest outline-none cursor-pointer"
+                >
+                    {filteredChildren.map((child: any) => (
+                        <option key={child.id} value={String(child.id)}>
+                            {child.firstName} {child.lastName} {child.classeName && child.classeName !== 'N/A' ? `— ${child.classeName}` : ''}
+                        </option>
+                    ))}
+                </select>
             </div>
 
             {/* Main Schedule Visualizer */}
@@ -433,6 +443,31 @@ const ParentSchedule: React.FC = () => {
                     </button>
                 </div>
             </div>
+
+            {/* Subjects List */}
+            {selectedChildId && subjects.length > 0 && (
+                <div className="bg-white p-12 shadow-2xl mt-12 relative overflow-hidden">
+                    <div className="absolute -top-32 -left-32 w-64 h-64 bg-purple-50 blur-3xl opacity-60"></div>
+                    <div className="relative z-10">
+                        <h4 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-4">
+                            <BookOpen size={32} className="text-purple-600" /> Programme de l'année
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {subjects.map((sub: any) => (
+                                <div key={sub.id} className="p-6 bg-slate-50 border border-slate-100 hover:border-purple-500/30 transition-all group flex items-start gap-4">
+                                    <div className="w-12 h-12 bg-white shadow-sm flex items-center justify-center text-purple-600 font-black text-lg group-hover:scale-110 transition-transform shrink-0">
+                                        {sub.name.substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <h5 className="font-bold text-slate-800 text-sm group-hover:text-purple-600 transition-colors">{sub.name}</h5>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Coef: {sub.coefficient || 1}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <style>
                 {`

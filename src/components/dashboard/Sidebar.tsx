@@ -22,7 +22,11 @@ import {
     Bell,
     UserCircle,
     User,
-    Mail
+    Mail,
+    CreditCard,
+    PlusCircle,
+    Building2,
+    DollarSign
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ROUTES } from '../../constants/routes';
@@ -96,8 +100,12 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
             { name: 'Tableau de bord', path: '/dashboard/pdg', icon: LayoutDashboard },
             { name: 'Statistiques Globales', path: '/dashboard/pdg/stats', icon: TrendingUp },
             { name: 'Établissements', path: '/dashboard/pdg/schools', icon: ShieldCheck },
+            { name: 'Finances & Analyses', path: '/dashboard/pdg/finances', icon: DollarSign },
             { name: 'Élèves & Effectifs', path: '/dashboard/pdg/students', icon: GraduationCap },
+            { name: 'Enseignants', path: ROUTES.DASHBOARD.PDG.TEACHERS, icon: BookOpen },
             { name: 'Assiduité Globale', path: '/dashboard/pdg/attendance', icon: Clock },
+            { name: 'Années Scolaires', path: ROUTES.DASHBOARD.PDG.ACADEMIC_YEARS, icon: Calendar },
+            { name: 'Annonce', path: ROUTES.DASHBOARD.PDG.ANNOUNCEMENTS, icon: Bell },
             { name: 'Messagerie', path: '/dashboard/pdg/messages', icon: MessageSquare, badge: globalUnreadCount > 0 ? globalUnreadCount : undefined },
             {
                 name: 'Paramètres',
@@ -113,29 +121,35 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
         Direction: [
             { name: 'Vue d\'ensemble', path: '/dashboard/direction', icon: LayoutDashboard },
             { name: 'Gestion Cycles', path: '/dashboard/direction/cycles', icon: Layers },
+            { name: 'Frais de scolarité', path: '/dashboard/direction/fees', icon: CreditCard },
             { name: 'Gestion des Classes', path: '/dashboard/direction/classes', icon: School },
             { name: 'Gestion des Matières', path: '/dashboard/direction/subjects', icon: BookOpen },
             { name: 'Liste Enseignants', path: ROUTES.DASHBOARD.DIRECTION.TEACHERS, icon: Users },
             { name: 'Gestion Elève', path: '/dashboard/direction/students', icon: GraduationCap },
             { name: 'Gestion des Présences', path: '/dashboard/direction/attendance', icon: Clock },
-            { name: 'Emploi du temps', path: '/dashboard/direction/schedule', icon: Calendar },
+            { name: 'Finances & Analyses', path: '/dashboard/direction/finances', icon: DollarSign },
+              { name: 'Emploi du temps', path: '/dashboard/direction/schedule', icon: Calendar },
             { name: 'Gestion des Salles', path: ROUTES.DASHBOARD.DIRECTION.ROOMS, icon: MapPin },
             { name: 'Messagerie', path: '/dashboard/direction/messages', icon: MessageSquare, badge: globalUnreadCount > 0 ? globalUnreadCount : undefined },
             { name: 'Annonce', path: '/dashboard/direction/announcements', icon: Bell },
             { name: 'Gestion des Bulletins', path: ROUTES.DASHBOARD.DIRECTION.REPORT_CARDS, icon: GraduationCap },
+            { name: 'Années Scolaires', path: ROUTES.DASHBOARD.DIRECTION.ACADEMIC_YEARS, icon: Calendar },
         ],
         Secretariat: [
             { name: 'Tableau de bord', path: '/dashboard/secretariat', icon: LayoutDashboard },
             { name: 'Gestion Cycles', path: ROUTES.DASHBOARD.SECRETARIAT.CYCLES, icon: Layers },
+            { name: 'Frais de scolarité', path: '/dashboard/secretariat/fees', icon: CreditCard },
             { name: 'Gestion des Classes', path: ROUTES.DASHBOARD.SECRETARIAT.CLASSES, icon: School },
             { name: 'Gestion des Matières', path: ROUTES.DASHBOARD.SECRETARIAT.SUBJECTS, icon: BookOpen },
             { name: 'Personnel / Enseignants', path: ROUTES.DASHBOARD.SECRETARIAT.TEACHERS, icon: Users },
             { name: 'Inscriptions', path: '/dashboard/secretariat/enroll', icon: UserCircle },
             { name: 'Dossiers Élèves', path: '/dashboard/secretariat/students', icon: GraduationCap },
             { name: 'Présences', path: '/dashboard/secretariat/attendance', icon: Clock },
-            { name: 'Emploi du temps', path: '/dashboard/secretariat/schedule', icon: Calendar },
+            { name: 'Finances & Analyses', path: '/dashboard/secretariat/finances', icon: DollarSign },
+              { name: 'Emploi du temps', path: '/dashboard/secretariat/schedule', icon: Calendar },
             { name: 'Gestion des Salles', path: ROUTES.DASHBOARD.SECRETARIAT.ROOMS, icon: MapPin },
             { name: 'Gestion des Bulletins', path: ROUTES.DASHBOARD.SECRETARIAT.REPORT_CARDS, icon: GraduationCap },
+            { name: 'Années Scolaires', path: ROUTES.DASHBOARD.SECRETARIAT.ACADEMIC_YEARS, icon: Calendar },
             { name: 'Annonce', path: ROUTES.DASHBOARD.SECRETARIAT.ANNOUNCEMENTS, icon: Bell },
             { name: 'Messagerie', path: '/dashboard/secretariat/messages', icon: MessageSquare, badge: globalUnreadCount > 0 ? globalUnreadCount : undefined },
         ],
@@ -152,6 +166,9 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
         ],
         Parents: [
             { name: 'Mes Enfants', path: '/dashboard/parent', icon: Users },
+            { name: 'Inscrire un enfant', path: '/dashboard/parent/enroll', icon: PlusCircle },
+            { name: 'Explorer les écoles', path: '/dashboard/parent/schools', icon: Building2 },
+            { name: 'Finances & Reçus', path: '/dashboard/parent/payments', icon: CreditCard },
             { name: 'Résultats & Bulletins', path: '/dashboard/parent/results', icon: BookOpen },
             { name: 'Emploi du temps', path: '/dashboard/parent/schedule', icon: Calendar },
             { name: 'Assiduité', path: '/dashboard/parent/attendance', icon: Clock },
@@ -217,7 +234,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, collapsed, setCollapsed, mobile
                     {(!collapsed || (typeof window !== 'undefined' && window.innerWidth < 1024)) && (
                         <div className="flex flex-col min-w-0">
                             <span className="text-sm font-black text-white truncate tracking-tight uppercase">
-                                {user?.institution?.name || "NB-MIND School"}
+                                {user?.institution?.name || "ACADEMIA CONNECT"}
                             </span>
                             <span className="text-[10px] font-bold text-blue-400/80 uppercase tracking-widest leading-none">
                                 Espace Éducation

@@ -19,7 +19,7 @@ const JoinGroup: React.FC = () => {
                 return;
             }
             try {
-                await api.post(`/chat/join?userId=${user.id}&inviteLink=${inviteLink}`);
+                await api.post(`/chat/join?userId=${user.id}&link=${inviteLink}`);
                 setStatus('success');
                 setMessage('Vous avez rejoint le groupe avec succès !');
                 setTimeout(() => {

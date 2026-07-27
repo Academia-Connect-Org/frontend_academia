@@ -34,11 +34,10 @@ const Footer: React.FC = () => {
 
                     {/* Brand Section */}
                     <div className="col-span-1">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="bg-white p-1.5 shadow-lg">
-                                <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
+                        <div className="flex items-center mb-6">
+                            <div className="shadow-lg rounded-full inline-block">
+                                <img src={logo} alt="Logo" className="h-48 w-48 object-contain rounded-full" />
                             </div>
-                            <span className="text-2xl font-black text-white tracking-tight uppercase">NB-MIND</span>
                         </div>
                         <p className="text-slate-400 mb-8 leading-relaxed font-medium">
                             Digitaliser la passion d'apprendre. Une solution complète et premium pour la gestion des établissements scolaires modernes.
@@ -71,7 +70,7 @@ const Footer: React.FC = () => {
                                 <div className="p-2 bg-slate-900 border border-slate-800 group-hover:bg-blue-600/20 group-hover:border-blue-500 transition-colors">
                                     <MapPin size={20} className="text-blue-500" />
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=N'Djamena,Tchad" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors mt-1">N'Djamena, Tchad</a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Tchad,Benin,Cameroun" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors mt-1">Tchad, Benin, Cameroun</a>
                             </li>
                             <li className="flex items-start gap-4 text-slate-400 group">
                                 <div className="p-2 bg-slate-900 border border-slate-800 group-hover:bg-emerald-500/20 group-hover:border-emerald-500 transition-colors">
@@ -85,7 +84,7 @@ const Footer: React.FC = () => {
                                 <div className="p-2 bg-slate-900 border border-slate-800 group-hover:bg-blue-600/20 group-hover:border-blue-500 transition-colors">
                                     <Mail size={20} className="text-blue-500" />
                                 </div>
-                                <a href="mailto:contact.school@nb-mind.com" className="hover:text-white transition-colors mt-1 break-all">contact.school@nb-mind.com</a>
+                                <a href="mailto:academiaconnects@gmail.com" className="hover:text-white transition-colors mt-1 break-all">academiaconnects@gmail.com</a>
                             </li>
                         </ul>
                     </div>
@@ -157,7 +156,7 @@ const Footer: React.FC = () => {
 
                 {/* Bottom Bar */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm font-semibold text-slate-500 pt-8">
-                    <p className="m-0">© 2026 NB-MIND School. Tous droits réservés.</p>
+                    <p className="m-0">© 2026 ACADEMIA CONNECT. Tous droits réservés.</p>
                     <div className="flex gap-6">
                         <Link to={ROUTES.TERMS} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">Conditions</Link>
                         <Link to={ROUTES.PRIVACY} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">Confidentialité</Link>

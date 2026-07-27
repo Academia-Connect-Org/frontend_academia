@@ -25,7 +25,7 @@ const Terms: React.FC = () => {
                         Conditions <span className="text-indigo-600">Générales</span>
                     </h1>
                     <p className="text-slate-500 text-lg mb-12 leading-relaxed italic font-medium">
-                        En utilisant NB-MIND School, vous acceptez les présentes conditions d'utilisation.
+                        En utilisant ACADEMIA CONNECT, vous acceptez les présentes conditions d'utilisation.
                     </p>
 
                     <div className="space-y-12">
@@ -34,7 +34,7 @@ const Terms: React.FC = () => {
                                 <CheckCircle className="text-indigo-500" size={24} /> 1. Objet du Service
                             </h2>
                             <p className="text-slate-600 leading-relaxed font-medium">
-                                NB-MIND School est une plateforme logicielle de gestion scolaire (SaaS) destinée à faciliter le pilotage des établissements scolaires.
+                                ACADEMIA CONNECT est une plateforme logicielle de gestion scolaire (SaaS) destinée à faciliter le pilotage des établissements scolaires.
                             </p>
                         </section>
 
@@ -57,7 +57,7 @@ const Terms: React.FC = () => {
                                 <FileText className="text-indigo-500" size={24} /> 3. Propriété Intellectuelle
                             </h2>
                             <p className="text-slate-600 leading-relaxed">
-                                Le logiciel, le design, le code et l'ensemble de l'interface sont la propriété exclusive de NB-MIND School. Toute reproduction est interdite.
+                                Le logiciel, le design, le code et l'ensemble de l'interface sont la propriété exclusive de ACADEMIA CONNECT. Toute reproduction est interdite.
                             </p>
                         </section>
                     </div>

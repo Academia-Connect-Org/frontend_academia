@@ -13,6 +13,55 @@ body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* Global Dark Mode & Glassmorphism Fixes */
+.dark .bg-white {
+    @apply bg-slate-900/40 backdrop-blur-md ring-1 ring-white/10 text-slate-100;
+}
+/* Handle fractional backgrounds for Schedule and other components */
+.dark .bg-white\/80 { @apply bg-slate-800/80 text-slate-200 ring-1 ring-white/10; }
+.dark .bg-white\/60 { @apply bg-slate-800/60 ring-1 ring-white/10; }
+.dark .bg-white\/50 { @apply bg-slate-800/50 ring-1 ring-white/10; }
+.dark .bg-white\/20 { @apply bg-slate-800/80 ring-1 ring-white/10; }
+.dark .bg-white\/10 { @apply bg-slate-800/40 ring-1 ring-white/5; }
+.dark .bg-slate-50\/50 { @apply bg-slate-900/50; }
+.dark .bg-slate-50\/80 { @apply bg-slate-900/80; }
+.dark .bg-slate-100\/40 { @apply bg-slate-800/40; }
+.dark .bg-slate-100\/50 { @apply bg-slate-800/50; }
+
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-slate-900,
+.dark .text-slate-800 {
+    color: #f1f5f9 !important; /* text-slate-100 */
+}
+.dark .text-gray-600,
+.dark .text-gray-700,
+.dark .text-slate-600,
+.dark .text-slate-700 {
+    color: #cbd5e1 !important; /* text-slate-300 */
+}
+.dark .bg-gray-50,
+.dark .bg-slate-50 {
+    @apply bg-slate-900/50;
+}
+.dark .bg-gray-100,
+.dark .bg-slate-100 {
+    @apply bg-slate-800/50;
+}
+.dark .border-gray-200,
+.dark .border-slate-200,
+.dark .border-gray-300,
+.dark .border-slate-300 {
+    @apply border-slate-700/50;
+}
+.dark .shadow-sm,
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl,
+.dark .shadow-2xl {
+    @apply shadow-none;
+}
+
 /* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
@@ -68,4 +117,13 @@ body {
 
 .animate-marquee:hover {
     animation-play-state: paused;
+}
+@layer utilities {
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
 }

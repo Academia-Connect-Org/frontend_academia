@@ -17,6 +17,7 @@ import BulletinModal from '../../../components/dashboard/shared/BulletinModal';
 const StudentGrades: React.FC = () => {
     const { user } = useAuth();
     const [allGrades, setAllGrades] = React.useState<any[]>([]);
+    const [classSubjects, setClassSubjects] = React.useState<any[]>([]);
     const [loading, setLoading] = React.useState(true);
 
     // Filters state
@@ -32,6 +33,15 @@ const StudentGrades: React.FC = () => {
             try {
                 const res = await api.get(`/submissions/student/${user.id}/results`);
                 setAllGrades(res.data);
+                
+                if (user?.classe?.cycle?.id) {
+                    try {
+                        const subjRes = await api.get(`/subjects/cycle/${user.classe.cycle.id}`);
+                        setClassSubjects(subjRes.data);
+                    } catch (e) {
+                        console.error("Erreur lors du chargement des matières:", e);
+                    }
+                }
             } catch (err) {
                 console.error("Erreur lors du chargement des notes:", err);
             } finally {
@@ -51,7 +61,9 @@ const StudentGrades: React.FC = () => {
         return matchYear && matchTrimestre && matchSubject && matchSearch && isPublished;
     });
 
-    const subjects = Array.from(new Set(allGrades.map(g => g.homework?.subject?.name).filter(Boolean)));
+    const subjects = classSubjects.length > 0 
+        ? classSubjects.map((s: any) => s.name).filter(Boolean)
+        : Array.from(new Set(allGrades.map(g => g.homework?.subject?.name).filter(Boolean)));
     const years = ['2023-2024', '2024-2025', '2025-2026', '2026-2027'];
 
     const averageGeneral = filteredGrades.length > 0

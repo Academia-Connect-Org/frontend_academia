@@ -23,6 +23,7 @@ export const ROUTES = {
             HOME: '/dashboard/admin',
             INSTITUTIONS: '/dashboard/admin/institutions',
             USERS: '/dashboard/admin/users',
+            SUBSCRIPTIONS: '/dashboard/admin/subscriptions',
             SETTINGS: '/dashboard/admin/settings',
         },
         PDG: {
@@ -39,6 +40,8 @@ export const ROUTES = {
             CYCLES: '/dashboard/pdg/cycles',
             ENROLL: '/dashboard/pdg/enroll',
             ATTENDANCE: '/dashboard/pdg/attendance',
+            ACADEMIC_YEARS: '/dashboard/pdg/academic-years',
+            ANNOUNCEMENTS: '/dashboard/pdg/announcements',
         },
         DIRECTION: {
             HOME: '/dashboard/direction',
@@ -55,6 +58,7 @@ export const ROUTES = {
             NOTIFICATIONS: '/dashboard/direction/notifications',
             ANNOUNCEMENTS: '/dashboard/direction/announcements',
             REPORT_CARDS: '/dashboard/direction/report-cards',
+            ACADEMIC_YEARS: '/dashboard/direction/academic-years',
         },
         SECRETARIAT: {
             HOME: '/dashboard/secretariat',
@@ -72,6 +76,7 @@ export const ROUTES = {
             NOTIFICATIONS: '/dashboard/secretariat/notifications',
             ANNOUNCEMENTS: '/dashboard/secretariat/announcements',
             REPORT_CARDS: '/dashboard/secretariat/report-cards',
+            ACADEMIC_YEARS: '/dashboard/secretariat/academic-years',
         },
         TEACHER: {
             HOME: '/dashboard/teacher',
