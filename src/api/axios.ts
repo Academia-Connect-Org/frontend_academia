@@ -1,20 +1,22 @@
 import axios from 'axios';
 import { ROUTES } from '../constants/routes';
 
-const getDefaultApiUrl = () => {
-    if (typeof window !== 'undefined') {
-        const hostname = window.location.hostname;
-        return `http://${hostname}:8080/api`;
+const getApiBaseUrl = () => {
+    const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+    if (envUrl) return envUrl;
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        return 'https://academia-api.duckdns.org/api';
     }
     return 'http://localhost:8080/api';
 };
 
+export const API_BASE_URL = getApiBaseUrl();
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '/api' : 'http://localhost:8080/api'),
+    baseURL: API_BASE_URL,
     headers: {},
 });
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || getDefaultApiUrl();
 export const BASE_URL = API_BASE_URL.endsWith('/api') ? API_BASE_URL.slice(0, -4) : API_BASE_URL;
 
 export const getFileUrl = (path: string | null, download: boolean = false) => {
