@@ -52,6 +52,7 @@ import Schedule from './pages/dashboard/direction/Schedule';
 import Rooms from './pages/dashboard/direction/Rooms';
 import Announcements from './pages/dashboard/direction/Announcements';
 import TuitionFees from './pages/dashboard/direction/TuitionFees';
+import { ReceiptConfigPage } from './pages/dashboard/direction/ReceiptConfigPage';
 
 // Secretariat
 import SecretariatDashboard from './pages/dashboard/SecretariatDashboard';
@@ -85,7 +86,9 @@ import ReportCards from './pages/dashboard/ReportCards';
 import Messages from './pages/dashboard/messages/index';
 import Notifications from './pages/dashboard/Notifications';
 import Profile from './pages/dashboard/Profile';
+import Library from './pages/dashboard/library/Library';
 import AcademicYears from './pages/dashboard/shared/AcademicYears';
+import AcademicYearClosurePage from './pages/dashboard/shared/AcademicYearClosurePage';
 import JoinGroup from './pages/JoinGroup';
 import MobileAnnotationViewer from './pages/MobileAnnotationViewer';
 import { ROUTES } from './constants/routes';
@@ -97,6 +100,7 @@ const DashboardWrapper: React.FC = () => {
 
   const getTitle = () => {
     const path = location.pathname;
+    if (path.includes('/library')) return "Bibliothèque Internationale";
     if (path.includes('/messages')) return "Messagerie";
     if (path.includes('/notifications')) return "Notifications";
     if (path.includes('/profile')) return "Mon Profil";
@@ -138,6 +142,8 @@ const App: React.FC = () => {
           <Route path={ROUTES.TERMS} element={<Terms />} />
           <Route path={ROUTES.COOKIES} element={<Cookies />} />
           <Route path={ROUTES.PRICING} element={<Pricing />} />
+          <Route path={ROUTES.LIBRARY} element={<Library />} />
+          <Route path="/library" element={<Library />} />
           <Route path={ROUTES.CONTACT} element={<Contact />} />
           <Route path={ROUTES.PAYMENT} element={<SubscriptionCheckout />} />
           <Route path={ROUTES.SUBSCRIPTION_EXPIRED} element={<SubscriptionExpired />} />
@@ -174,6 +180,7 @@ const App: React.FC = () => {
             <Route path="pdg/settings" element={<ProtectedRoute allowedRoles={['PDG']}><Settings /></ProtectedRoute>} />
             <Route path="pdg/attendance" element={<ProtectedRoute allowedRoles={['PDG']}><Attendance /></ProtectedRoute>} />
             <Route path="pdg/academic-years" element={<ProtectedRoute allowedRoles={['PDG']}><AcademicYears /></ProtectedRoute>} />
+            <Route path="pdg/academic-years/:id/close" element={<ProtectedRoute allowedRoles={['PDG']}><AcademicYearClosurePage /></ProtectedRoute>} />
             <Route path="pdg/announcements" element={<ProtectedRoute allowedRoles={['PDG']}><Announcements /></ProtectedRoute>} />
 
             {/* Direction */}
@@ -192,9 +199,11 @@ const App: React.FC = () => {
             <Route path="direction/rooms" element={<ProtectedRoute allowedRoles={['DIRECTION', 'PROVISORIAT']}><Rooms /></ProtectedRoute>} />
             <Route path="direction/announcements" element={<ProtectedRoute allowedRoles={['DIRECTION', 'PROVISORIAT']}><Announcements /></ProtectedRoute>} />
             <Route path="direction/finances" element={<ProtectedRoute allowedRoles={['DIRECTION', 'PROVISORIAT']}><SchoolFinances /></ProtectedRoute>} />
+            <Route path="direction/receipt-config" element={<ProtectedRoute allowedRoles={['DIRECTION', 'PROVISORIAT', 'PDG']}><ReceiptConfigPage /></ProtectedRoute>} />
             <Route path="direction/report-cards" element={<ProtectedRoute allowedRoles={['DIRECTION', 'PROVISORIAT']}><ReportCards role="Direction" /></ProtectedRoute>} />
             <Route path="direction/attendance" element={<ProtectedRoute allowedRoles={['DIRECTION', 'PROVISORIAT']}><Attendance /></ProtectedRoute>} />
             <Route path="direction/academic-years" element={<ProtectedRoute allowedRoles={['DIRECTION', 'PROVISORIAT']}><AcademicYears /></ProtectedRoute>} />
+            <Route path="direction/academic-years/:id/close" element={<ProtectedRoute allowedRoles={['DIRECTION', 'PROVISORIAT']}><AcademicYearClosurePage /></ProtectedRoute>} />
 
             {/* Secretariat */}
             <Route path="secretariat" element={<ProtectedRoute allowedRoles={['SECRETARIAT']}><SecretariatDashboard /></ProtectedRoute>} />
@@ -215,6 +224,7 @@ const App: React.FC = () => {
             <Route path="secretariat/finances" element={<ProtectedRoute allowedRoles={['SECRETARIAT']}><SchoolFinances /></ProtectedRoute>} />
             <Route path="secretariat/report-cards" element={<ProtectedRoute allowedRoles={['SECRETARIAT']}><ReportCards role="Secretariat" /></ProtectedRoute>} />
             <Route path="secretariat/academic-years" element={<ProtectedRoute allowedRoles={['SECRETARIAT']}><AcademicYears /></ProtectedRoute>} />
+            <Route path="secretariat/academic-years/:id/close" element={<ProtectedRoute allowedRoles={['SECRETARIAT']}><AcademicYearClosurePage /></ProtectedRoute>} />
 
             {/* Teacher */}
             <Route path="teacher" element={<ProtectedRoute allowedRoles={['ENSEIGNANT']}><TeacherDashboard /></ProtectedRoute>} />
@@ -249,7 +259,7 @@ const App: React.FC = () => {
             <Route path="student/courses" element={<ProtectedRoute allowedRoles={['ELEVE']}><StudentCourses /></ProtectedRoute>} />
             <Route path="student/payments" element={<ProtectedRoute allowedRoles={['ELEVE']}><Payments /></ProtectedRoute>} />
 
-            {/* Profile Shared */}
+            {/* Shared Profile */}
             <Route path="profile" element={<Profile />} />
           </Route>
 

@@ -39,7 +39,8 @@ interface User {
 interface AuthContextType {
     user: User | null;
     token: string | null;
-    login: (token: string, userData: User) => void;
+    refreshToken?: string | null;
+    login: (token: string, userData: User, refreshToken?: string) => void;
     logout: () => void;
     refreshUser: () => Promise<void>;
     isAuthenticated: boolean;
@@ -60,10 +61,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 if (loginTime) {
                     const elapsed = now - parseInt(loginTime);
                     console.log("[AuthContext Initialization] Elapsed time since login:", (elapsed / 3600000).toFixed(2), "hours");
-                    if (elapsed > 24 * 60 * 60 * 1000) {
-                        console.warn("[AuthContext Initialization] Session expired (24h+). Clearing storage.");
+                    if (elapsed > 7 * 24 * 60 * 60 * 1000) {
+                        console.warn("[AuthContext Initialization] Session expired (7d+). Clearing storage.");
                         localStorage.removeItem('user');
                         localStorage.removeItem('token');
+                        localStorage.removeItem('refreshToken');
                         localStorage.removeItem('loginTime');
                         return null;
                     }
@@ -75,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 console.error("[AuthContext Initialization] Failed to parse saved user:", e);
                 localStorage.removeItem('user');
                 localStorage.removeItem('token');
+                localStorage.removeItem('refreshToken');
                 localStorage.removeItem('loginTime');
                 return null;
             }
@@ -83,6 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (savedToken && !savedUser) {
             console.warn("[AuthContext Initialization] Token exists but User data is missing. Clearing.");
             localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
         }
 
         console.log("[AuthContext Initialization] No valid session found in localStorage.");
@@ -94,9 +98,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const savedUser = localStorage.getItem('user');
         return (savedToken && savedUser) ? savedToken : null;
     });
+    const [refreshToken, setRefreshToken] = useState<string | null>(() => {
+        return localStorage.getItem('refreshToken');
+    });
     const navigate = useNavigate();
 
-    const login = (newToken: string, userData: User) => {
+    const login = (newToken: string, userData: User, newRefreshToken?: string) => {
         console.log("AuthContext: login started with", { newToken, userData });
 
         if (!userData || !userData.role) {
@@ -104,8 +111,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return;
         }
 
+        // Clean any existing token / session data to prevent conflicts between login methods (email vs Google)
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('loginTime');
+
         setToken(newToken);
         setUser(userData);
+        if (newRefreshToken) {
+            setRefreshToken(newRefreshToken);
+            localStorage.setItem('refreshToken', newRefreshToken);
+        }
+
         localStorage.setItem('token', newToken);
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('loginTime', Date.now().toString());
@@ -142,8 +160,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = () => {
         setToken(null);
+        setRefreshToken(null);
         setUser(null);
         localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
         localStorage.removeItem('loginTime');
         localStorage.setItem('logout', Date.now().toString()); // Sync tabs

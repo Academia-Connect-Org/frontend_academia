@@ -19,7 +19,6 @@ const StudentListContainer: React.FC<StudentListContainerProps> = ({ role, insti
     const [cycles, setCycles] = useState<any[]>([]);
     const [classes, setClasses] = useState<any[]>([]);
 
-    // Filters
     const [selectedCycle, setSelectedCycle] = useState<string>('');
     const [selectedClass, setSelectedClass] = useState<string>('');
     const [searchQuery, setSearchQuery] = useState('');
@@ -33,7 +32,6 @@ const StudentListContainer: React.FC<StudentListContainerProps> = ({ role, insti
         setCurrentPage(1);
     }, [selectedCycle, selectedClass, searchQuery, selectedStatus]);
 
-    // CRUD Modals
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -83,9 +81,9 @@ const StudentListContainer: React.FC<StudentListContainerProps> = ({ role, insti
                 api.get(`/classes${qs}`).catch(() => ({ data: [] })),
                 api.get(`/students${qs}`).catch(() => ({ data: [] }))
             ]);
-            setCycles(cyclesRes.data);
-            setClasses(classesRes.data);
-            setStudents(studentsRes.data);
+            setCycles(cyclesRes.data || []);
+            setClasses(classesRes.data || []);
+            setStudents(studentsRes.data || []);
 
             const urlStudentId = searchParams.get('studentId');
             if (urlStudentId && studentsRes.data) {
@@ -235,12 +233,12 @@ const StudentListContainer: React.FC<StudentListContainerProps> = ({ role, insti
                 />
             )}
             {message.text && (
-                <div className={`p-4 mb-6 font-bold flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-                    <div className="flex items-center gap-3">
-                        {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-                        {message.text}
+                <div className={`p-4 rounded-xl font-bold text-xs flex items-center justify-between gap-3 ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400'}`}>
+                    <div className="flex items-center gap-2">
+                        {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                        <span>{message.text}</span>
                     </div>
-                    <button onClick={() => setMessage({ type: '', text: '' })}><X size={18} /></button>
+                    <button onClick={() => setMessage({ type: '', text: '' })}><X size={16} /></button>
                 </div>
             )}
 
@@ -286,14 +284,16 @@ const StudentListContainer: React.FC<StudentListContainerProps> = ({ role, insti
 
             {/* CONFIRM DELETE */}
             {confirmDelete.isOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-sm p-10 shadow-2xl animate-in zoom-in-95 duration-200 text-center">
-                        <div className="w-20 h-20 bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-8 animate-bounce transition-all"><AlertCircle size={40} /></div>
-                        <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2">Suprimer ce dossier ?</h3>
-                        <p className="text-slate-500 text-sm mb-10 leading-relaxed italic">Attention : cette action est définitive et supprimera toutes les notes, absences et données liées à cet élève.</p>
-                        <div className="flex gap-4">
-                            <button onClick={() => setConfirmDelete({ isOpen: false, id: null })} className="flex-1 py-4 font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Annuler</button>
-                            <button onClick={handleDelete} className="flex-1 py-4 font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all uppercase text-xs tracking-widest">Confirmer</button>
+                <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm p-6 rounded-2xl shadow-2xl text-center animate-in zoom-in-95 duration-200">
+                        <div className="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto mb-4">
+                            <AlertCircle size={24} />
+                        </div>
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Supprimer ce dossier ?</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">Cette action est définitive et supprimera toutes les notes, absences et données liées à cet élève.</p>
+                        <div className="flex gap-2">
+                            <button onClick={() => setConfirmDelete({ isOpen: false, id: null })} className="flex-1 py-2 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Annuler</button>
+                            <button onClick={handleDelete} className="flex-1 py-2 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-700 text-white shadow-md transition-all">Confirmer</button>
                         </div>
                     </div>
                 </div>

@@ -10,16 +10,18 @@ interface MatrixCardProps {
 }
 
 const MatrixCard: React.FC<MatrixCardProps> = ({ label, value, trend, icon: Icon, color }) => (
-    <div className="bg-white p-8 ] shadow-lg   group transition-all duration-300 hover:shadow-2xl hover:shadow-blue-900/5 relative overflow-hidden">
-        <div className={`w-14 h-14 ${color} text-white  flex items-center justify-center mb-6 transition-transform group-hover:rotate-12 group-hover:scale-110 shadow-xl shadow-slate-900/10`}>
-            <Icon size={26} />
+    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+        <div>
+            <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">{label}</p>
+            <div className="flex items-baseline gap-2">
+                <h4 className="text-xl font-bold text-slate-900 dark:text-white">{value}</h4>
+                <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                    {trend}
+                </span>
+            </div>
         </div>
-        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">{label}</p>
-        <div className="flex items-end justify-between">
-            <h4 className="text-3xl font-black text-slate-800 tracking-tighter leading-none">{value}</h4>
-            <span className="px-2.5 py-1  text-[10px] font-black uppercase tracking-widest bg-slate-50 text-slate-400  ">
-                {trend}
-            </span>
+        <div className={`w-12 h-12 rounded-xl ${color} text-white flex items-center justify-center shrink-0 shadow-sm`}>
+            <Icon size={22} />
         </div>
     </div>
 );

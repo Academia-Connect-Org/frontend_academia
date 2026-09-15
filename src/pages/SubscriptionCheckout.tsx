@@ -124,39 +124,14 @@ const SubscriptionCheckout: React.FC = () => {
         setStep(4);
     };
 
-    const handleConfirmPayment = async () => {
+    const [showUnavailableModal, setShowUnavailableModal] = useState(false);
+
+    const handleConfirmPayment = () => {
         if (!user || !selectedInstitution) {
             setError("Veuillez choisir un établissement pour procéder au paiement.");
             return;
         }
-
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            let subscriptionType = plan;
-
-            // Map duration to SubscriptionPeriod enum
-            const subscriptionPeriod = durationLabel.includes("an") ? "ANNUAL" : "MONTHLY";
-
-            await api.post(`/subscription/subscribe`, null, {
-                params: {
-                    pdgId: user.id,
-                    institutionId: selectedInstitution.id,
-                    type: subscriptionType,
-                    period: subscriptionPeriod
-                }
-            });
-
-            // Refresh user data before moving to success step
-            await refreshUser();
-            setStep(5);
-        } catch (err: any) {
-            console.error("Payment Error:", err);
-            setError(err.response?.data?.message || "Une erreur est survenue lors du traitement du paiement.");
-        } finally {
-            setIsLoading(false);
-        }
+        setShowUnavailableModal(true);
     };
 
     const renderStepContent = () => {
@@ -168,28 +143,32 @@ const SubscriptionCheckout: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         className="space-y-6"
                     >
-                        <p className="text-slate-500 font-medium">Sélectionnez l'établissement pour lequel vous souhaitez renouveler l'abonnement :</p>
+                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">Sélectionnez l'établissement pour lequel vous souhaitez renouveler l'abonnement :</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {institutions.map((inst) => (
                                 <button
                                     key={inst.id}
                                     onClick={() => handleInstitutionSelect(inst)}
-                                    className={`flex items-center gap-4 p-5   transition-all text-left group ${selectedInstitution?.id === inst.id ? ' bg-blue-50' : ' hover: bg-white'}`}
+                                    className={`flex items-center gap-4 p-4 rounded-2xl border transition-all text-left group ${selectedInstitution?.id === inst.id
+                                        ? 'bg-sky-50/80 dark:bg-sky-950/60 border-sky-500 dark:border-sky-400 shadow-md'
+                                        : 'bg-white dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-800 hover:border-sky-300 dark:hover:border-sky-700'
+                                        }`}
                                 >
-                                    <div className="w-12 h-12  bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all overflow-hidden">
-                                        {inst.logoUrl ? <img src={getFileUrl(inst.logoUrl)} alt={inst.name} className="w-full h-full object-cover" /> : <Building size={24} />}
+                                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700/60 flex items-center justify-center text-slate-400 group-hover:bg-sky-600 group-hover:text-white transition-all overflow-hidden shrink-0">
+                                        {inst.logoUrl ? <img src={getFileUrl(inst.logoUrl)} alt={inst.name} className="w-full h-full object-cover" /> : <Building size={22} />}
                                     </div>
-                                    <div className="flex-1">
-                                        <h4 className="font-bold text-slate-800">{inst.name}</h4>
-                                        <p className="text-xs text-slate-400 capitalize">{inst.type.toLowerCase()}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="font-bold text-slate-900 dark:text-white text-sm truncate">{inst.name}</h4>
+                                        <p className="text-xs text-slate-400 capitalize mt-0.5">{inst.type.toLowerCase()}</p>
                                     </div>
-                                    <div className={`w-6 h-6   flex items-center justify-center transition-all ${selectedInstitution?.id === inst.id ? ' bg-blue-600 text-white' : ''}`}>
-                                        {selectedInstitution?.id === inst.id && <ArrowRight size={14} />}
+                                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all shrink-0 ${selectedInstitution?.id === inst.id ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
+                                        }`}>
+                                        <ArrowRight size={14} />
                                     </div>
                                 </button>
                             ))}
                             {institutions.length === 0 && (
-                                <div className="col-span-full py-12 text-center text-slate-400 italic">
+                                <div className="col-span-full py-12 text-center text-slate-400 dark:text-slate-500 text-xs italic bg-slate-50/50 dark:bg-slate-800/30 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
                                     Aucun établissement trouvé. Veuillez d'abord créer un établissement.
                                 </div>
                             )}
@@ -204,24 +183,24 @@ const SubscriptionCheckout: React.FC = () => {
                         className="space-y-6"
                     >
                         <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                             <input
                                 type="text"
                                 placeholder="Rechercher votre pays..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4  bg-slate-100 border-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-slate-700"
+                                className="w-full pl-11 pr-4 py-3.5 bg-slate-100 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs sm:text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 transition-all"
                             />
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar">
                             {filteredCountries.map((c) => (
                                 <button
                                     key={c.code}
                                     onClick={() => handleCountrySelect(c)}
-                                    className="flex flex-col items-center gap-3 p-6    hover: hover:bg-blue-50/50 transition-all group"
+                                    className="flex flex-col items-center gap-2.5 p-5 bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-sky-400 hover:bg-sky-50/30 dark:hover:bg-sky-950/30 transition-all group"
                                 >
-                                    <span className="text-4xl group-hover:scale-110 transition-transform">{c.flag}</span>
-                                    <span className="font-bold text-slate-700">{c.name}</span>
+                                    <span className="text-3xl group-hover:scale-110 transition-transform">{c.flag}</span>
+                                    <span className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200">{c.name}</span>
                                 </button>
                             ))}
                         </div>
@@ -241,16 +220,16 @@ const SubscriptionCheckout: React.FC = () => {
                                 <button
                                     key={methodId}
                                     onClick={() => handleMethodSelect(method)}
-                                    className="w-full flex items-center gap-6 p-6    hover: hover:bg-blue-50/50 transition-all text-left group"
+                                    className="w-full flex items-center gap-5 p-5 bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-sky-500 hover:bg-sky-50/30 dark:hover:bg-sky-950/30 transition-all text-left group"
                                 >
-                                    <div className="w-14 h-14  bg-white   flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
-                                        <method.icon size={28} />
+                                    <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all shadow-sm shrink-0">
+                                        <method.icon size={22} />
                                     </div>
-                                    <div>
-                                        <h4 className="font-black text-slate-800 text-lg">{method.name}</h4>
-                                        <p className="text-slate-500">{method.description}</p>
+                                    <div className="flex-1">
+                                        <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">{method.name}</h4>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{method.description}</p>
                                     </div>
-                                    <ArrowRight size={20} className="ml-auto text-slate-300 group-hover:text-blue-500 transition-colors" />
+                                    <ArrowRight size={18} className="ml-auto text-slate-400 group-hover:text-sky-500 transition-colors shrink-0" />
                                 </button>
                             );
                         })}
@@ -263,79 +242,81 @@ const SubscriptionCheckout: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         className="space-y-6"
                     >
-                        <div className="bg-blue-50 p-4  flex items-center gap-4 text-blue-700 font-medium">
-                            {selectedMethod && <selectedMethod.icon size={20} />}
+                        <div className="bg-sky-50 dark:bg-sky-950/60 border border-sky-200/60 dark:border-sky-900/60 rounded-2xl p-4 flex items-center gap-3 text-sky-700 dark:text-sky-300 font-semibold text-xs sm:text-sm">
+                            {selectedMethod && <selectedMethod.icon size={18} />}
                             <span>Paiement via {selectedMethod?.name}</span>
                         </div>
 
                         <div className="space-y-4">
                             {selectedMethod?.id === 'card' ? (
                                 <>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Numéro de Carte</label>
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Numéro de Carte</label>
                                         <input
                                             type="text"
                                             placeholder="0000 0000 0000 0000"
-                                            className="w-full p-4  bg-slate-100 border-none focus:ring-2 focus:ring-blue-500 font-mono text-lg"
+                                            className="w-full p-3.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono text-sm sm:text-base text-slate-900 dark:text-white placeholder-slate-400"
                                         />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Expiration</label>
-                                            <input type="text" placeholder="MM / YY" className="w-full p-4  bg-slate-100 border-none focus:ring-2 focus:ring-blue-500" />
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Expiration</label>
+                                            <input type="text" placeholder="MM / YY" className="w-full p-3.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400" />
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">CVC</label>
-                                            <input type="text" placeholder="123" className="w-full p-4  bg-slate-100 border-none focus:ring-2 focus:ring-blue-500" />
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">CVC</label>
+                                            <input type="text" placeholder="123" className="w-full p-3.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400" />
                                         </div>
                                     </div>
                                 </>
                             ) : selectedMethod?.id === 'bank' ? (
-                                <div className="p-6  bg-slate-50   ">
-                                    <Building className="text-slate-400 mb-4" size={40} />
-                                    <h5 className="font-bold text-slate-800 mb-2">Informations de virement</h5>
-                                    <p className="text-slate-500 text-sm mb-6">Veuillez effectuer le virement vers notre compte ECOBANK :</p>
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between p-3 bg-white  text-sm   uppercase tracking-tighter">
+                                <div className="p-6 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+                                    <Building className="text-sky-500 mb-3" size={32} />
+                                    <h5 className="font-bold text-slate-900 dark:text-white text-sm mb-1">Informations de virement</h5>
+                                    <p className="text-slate-500 dark:text-slate-400 text-xs mb-4">Veuillez effectuer le virement vers notre compte ECOBANK :</p>
+                                    <div className="space-y-2.5">
+                                        <div className="flex justify-between items-center p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs">
                                             <span className="text-slate-400">IBAN</span>
-                                            <span className="font-black text-slate-800">TD65 1010 1000 1234 5678 90</span>
+                                            <span className="font-mono font-bold text-slate-900 dark:text-white">TD65 1010 1000 1234 5678 90</span>
                                         </div>
-                                        <div className="flex justify-between p-3 bg-white  text-sm   uppercase tracking-tighter">
+                                        <div className="flex justify-between items-center p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs">
                                             <span className="text-slate-400">BIC/SWIFT</span>
-                                            <span className="font-black text-slate-800">ECOBTDCT</span>
+                                            <span className="font-mono font-bold text-slate-900 dark:text-white">ECOBTDCT</span>
                                         </div>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Numéro de Téléphone {selectedMethod?.name}</label>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Numéro de Téléphone {selectedMethod?.name}</label>
                                     <div className="flex gap-2">
-                                        <div className="p-4 bg-slate-100  font-bold text-slate-500">+{selectedCountry?.code === 'TD' ? '235' : selectedCountry?.code === 'CM' ? '237' : '225'}</div>
+                                        <div className="p-3.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs sm:text-sm text-slate-600 dark:text-slate-300 flex items-center">
+                                            +{selectedCountry?.code === 'TD' ? '235' : selectedCountry?.code === 'CM' ? '237' : '225'}
+                                        </div>
                                         <input
                                             type="tel"
                                             placeholder="Numéro de compte"
-                                            className="flex-1 p-4  bg-slate-100 border-none focus:ring-2 focus:ring-blue-500 font-bold text-lg"
+                                            className="flex-1 p-3.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs sm:text-sm font-bold text-slate-900 dark:text-white placeholder-slate-400"
                                         />
                                     </div>
-                                    <p className="text-xs text-slate-400 mt-2 italic">* Une demande de confirmation apparaîtra sur votre téléphone.</p>
+                                    <p className="text-[11px] text-slate-400 mt-2 italic">* Une demande de confirmation apparaîtra sur votre téléphone.</p>
                                 </div>
                             )}
                         </div>
 
                         {error && (
-                            <div className="p-4 bg-red-50 text-red-600  text-sm font-bold   flex items-center gap-3">
+                            <div className="p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-xl text-xs font-semibold flex items-center gap-2.5">
                                 <ShieldCheck size={16} />
                                 {error}
                             </div>
                         )}
 
                         <button
-                            className="w-full py-5  bg-blue-600 text-white font-black text-lg shadow-xl shadow-blue-600/30 hover:bg-blue-700 disabled:opacity-50 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-3 mt-8"
+                            className="w-full py-4 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-lg shadow-sky-500/20 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2.5 mt-6 disabled:opacity-50"
                             onClick={handleConfirmPayment}
                             disabled={isLoading}
                         >
                             {isLoading ? 'Traitement en cours...' : 'Confirmer le Paiement'}
-                            {!isLoading && <ArrowRight size={20} />}
+                            {!isLoading && <ArrowRight size={18} />}
                         </button>
                     </motion.div>
                 );
@@ -344,16 +325,18 @@ const SubscriptionCheckout: React.FC = () => {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="text-center py-12"
+                        className="text-center py-10"
                     >
-                        <div className="w-24 h-24 bg-green-100 text-green-600  flex items-center justify-center mx-auto mb-8 animate-bounce">
-                            <CheckCircle2 size={48} />
+                        <div className="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                            <CheckCircle2 size={40} />
                         </div>
-                        <h2 className="text-3xl font-black text-slate-900 mb-4">Paiement Réussi !</h2>
-                        <p className="text-slate-500 text-lg mb-10 max-w-sm mx-auto">Votre abonnement <strong>{planTitle}</strong> pour <strong>{selectedInstitution?.name}</strong> est maintenant actif.</p>
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-3 tracking-tight">Paiement Réussi !</h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mb-8 max-w-xs mx-auto leading-relaxed">
+                            Votre abonnement <strong className="text-slate-900 dark:text-white">{planTitle}</strong> pour <strong className="text-slate-900 dark:text-white">{selectedInstitution?.name}</strong> est désormais actif.
+                        </p>
                         <button
                             onClick={() => navigate('/dashboard/pdg')}
-                            className="px-10 py-4 bg-slate-900 text-white  font-black shadow-xl hover:bg-slate-800 transition-all"
+                            className="px-8 py-3.5 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-semibold text-xs rounded-xl shadow-lg shadow-sky-500/20 transition-all duration-200"
                         >
                             Accéder à mon Dashboard
                         </button>
@@ -365,32 +348,32 @@ const SubscriptionCheckout: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-28 pb-12 px-4">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500 pt-32 pb-16 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8 items-start">
 
                 {/* Left side: Form */}
                 <div className="flex-1 w-full flex flex-col gap-6">
                     <button
                         onClick={handleBack}
-                        className="flex items-center gap-2 text-slate-400 hover:text-blue-600 font-bold transition-colors w-fit group"
+                        className="flex items-center gap-2 text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 font-semibold text-xs transition-colors w-fit group"
                     >
-                        <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                        <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
                         Retour
                     </button>
 
-                    <div className="bg-white ] shadow-2xl shadow-slate-200/50 p-8 md:p-12   flex-1 min-h-[600px] flex flex-col">
-                        <header className="mb-10">
-                            <div className="flex items-center gap-3 text-blue-600 font-black text-xs uppercase tracking-[0.2em] mb-4">
-                                <span className="w-8 h-[2px] bg-blue-600"></span>
+                    <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-xl p-6 sm:p-10 flex-1 min-h-[550px] flex flex-col transition-colors duration-300">
+                        <header className="mb-8">
+                            <div className="flex items-center gap-2 text-sky-600 dark:text-sky-400 font-semibold text-xs uppercase tracking-wider mb-3">
+                                <span className="w-6 h-[2px] bg-sky-500 rounded-full" />
                                 Étape {step}/4
                             </div>
-                            <h1 className="text-3xl md:text-5xl font-black text-slate-900 leading-tight">
+                            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                                 {step === 1 ? 'Choisissez l\'établissement' :
                                     step === 2 ? 'Choisissez votre pays' :
                                         step === 3 ? 'Moyen de paiement' :
                                             step === 4 ? 'Finalisation' : 'Succès !'}
                             </h1>
-                            <p className="text-slate-400 text-lg mt-2">
+                            <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1.5 font-normal">
                                 {step === 1 ? 'Sélectionnez l\'école concernée par cet abonnement.' :
                                     step === 2 ? 'Sélectionnez le pays de facturation pour voir les méthodes disponibles.' :
                                         step === 3 ? `Modes de paiement disponibles au ${selectedCountry?.name}.` :
@@ -404,9 +387,9 @@ const SubscriptionCheckout: React.FC = () => {
                             </AnimatePresence>
                         </div>
 
-                        <footer className="mt-12 pt-8   flex items-center justify-between text-slate-400 text-sm">
+                        <footer className="mt-10 pt-6 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-slate-400 dark:text-slate-500 text-xs">
                             <div className="flex items-center gap-2">
-                                <ShieldCheck size={16} className="text-green-500" />
+                                <ShieldCheck size={15} className="text-emerald-500" />
                                 Paiement Sécurisé SSL
                             </div>
                             <div>Propulsé par Academia Pay</div>
@@ -415,89 +398,88 @@ const SubscriptionCheckout: React.FC = () => {
                 </div>
 
                 {/* Right side: Summary (Sticky) */}
-                <aside className="lg:w-[400px] w-full sticky top-12">
-                    <div className="bg-blue-900 ] p-10 text-white shadow-2xl shadow-blue-900/30 overflow-hidden relative">
-                        {/* Abstract background decors */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5  blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/10  blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+                <aside className="lg:w-[380px] w-full sticky top-28">
+                    <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-sky-950 p-8 text-white rounded-3xl border border-slate-800 shadow-2xl overflow-hidden relative">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-                        <h3 className="text-xl font-black mb-8 relative z-10 flex items-center gap-3">
-                            <Building size={20} className="text-blue-400" />
+                        <h3 className="text-lg font-bold mb-6 relative z-10 flex items-center gap-2.5">
+                            <Building size={18} className="text-sky-400" />
                             Récapitulatif
                         </h3>
 
-                        <div className="space-y-8 relative z-10">
+                        <div className="space-y-6 relative z-10 text-xs">
                             {selectedInstitution && (
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <p className="text-blue-300/60 text-xs font-black uppercase tracking-widest mb-1">Établissement</p>
-                                        <h4 className="text-xl font-black">{selectedInstitution.name}</h4>
+                                        <p className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider mb-1">Établissement</p>
+                                        <h4 className="text-base font-bold text-white">{selectedInstitution.name}</h4>
                                     </div>
-                                    <div className="p-3 bg-white/10 ">
-                                        <Building className="text-blue-400" size={24} />
+                                    <div className="p-2.5 bg-white/10 rounded-xl">
+                                        <Building className="text-sky-400" size={20} />
                                     </div>
                                 </div>
                             )}
 
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="text-blue-300/60 text-xs font-black uppercase tracking-widest mb-1">Plan Sélectionné</p>
-                                    <h4 className="text-2xl font-black">{planTitle}</h4>
+                                    <p className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider mb-1">Plan Sélectionné</p>
+                                    <h4 className="text-xl font-extrabold text-white">{planTitle}</h4>
                                 </div>
-                                <div className="p-3 bg-white/10 ">
-                                    <Globe className="text-blue-400" size={24} />
+                                <div className="p-2.5 bg-white/10 rounded-xl">
+                                    <Globe className="text-sky-400" size={20} />
                                 </div>
                             </div>
 
-                            <div className="h-px bg-white/10"></div>
+                            <div className="h-px bg-slate-800 my-4" />
 
-                            <div className="space-y-4">
-                                <div className="flex justify-between text-blue-100/60 font-medium">
+                            <div className="space-y-3">
+                                <div className="flex justify-between text-slate-300">
                                     <span>Sous-total</span>
                                     <span>{priceValue}</span>
                                 </div>
-                                <div className="flex justify-between text-blue-100/60 font-medium">
+                                <div className="flex justify-between text-slate-300">
                                     <span>Frais de service</span>
-                                    <span>Inclut</span>
+                                    <span className="text-emerald-400 font-semibold">Inclus</span>
                                 </div>
-                                <div className="flex justify-between items-baseline pt-4">
-                                    <span className="text-lg font-bold">Total à payer</span>
+                                <div className="flex justify-between items-baseline pt-3 border-t border-slate-800">
+                                    <span className="text-sm font-bold text-white">Total à payer</span>
                                     <div className="text-right">
-                                        <div className="text-3xl font-black text-white">{priceValue}</div>
-                                        <div className="text-blue-400 text-xs font-bold uppercase tracking-widest mt-1">{durationLabel}</div>
+                                        <div className="text-2xl font-extrabold text-white">{priceValue}</div>
+                                        <div className="text-sky-400 text-[10px] font-semibold uppercase tracking-wider mt-0.5">{durationLabel}</div>
                                     </div>
                                 </div>
                             </div>
 
                             {selectedCountry && (
-                                <div className="pt-8   flex items-center gap-4">
-                                    <div className="w-12 h-12  bg-white/10 flex items-center justify-center text-3xl">
+                                <div className="pt-6 border-t border-slate-800 flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-2xl">
                                         {selectedCountry.flag}
                                     </div>
                                     <div>
-                                        <p className="text-blue-300/60 text-[10px] font-black uppercase tracking-widest mb-1">Pays de facturation</p>
-                                        <h5 className="font-bold">{selectedCountry.name}</h5>
+                                        <p className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider mb-0.5">Pays de facturation</p>
+                                        <h5 className="font-bold text-white text-xs">{selectedCountry.name}</h5>
                                     </div>
                                 </div>
                             )}
 
-                            <div className="pt-10">
-                                <div className="p-6  bg-white/5   space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2  bg-green-500 shadow-sm shadow-green-500"></div>
-                                        <span className="text-sm font-bold text-blue-100">Activation instantanée</span>
+                            <div className="pt-6">
+                                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-3 text-[11px]">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400" />
+                                        <span className="font-medium text-slate-200">Activation instantanée</span>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2  bg-blue-400"></div>
-                                        <span className="text-sm font-bold text-blue-100">Facture numérique incluse</span>
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-2 h-2 rounded-full bg-sky-400" />
+                                        <span className="font-medium text-slate-200">Facture numérique PDF incluse</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="mt-8 pt-8  ">
-                                <button className="w-full flex items-center justify-center gap-2 text-white/40 hover:text-white text-xs font-bold transition-colors">
-                                    <LogOut size={14} />
-                                    Annuler et recharger
+                            <div className="pt-4 text-center">
+                                <button onClick={() => navigate(ROUTES.PRICING)} className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-xs font-medium transition-colors">
+                                    <LogOut size={13} />
+                                    Changer de plan
                                 </button>
                             </div>
                         </div>
@@ -505,13 +487,55 @@ const SubscriptionCheckout: React.FC = () => {
                 </aside>
             </div>
 
-            {/* Global style for custom scrollbar */}
-            <style>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; -radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
-            `}</style>
+            {/* Payment Method Unavailable Modal */}
+            <AnimatePresence>
+                {showUnavailableModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl space-y-6 text-center"
+                        >
+                            <div className="w-16 h-16 bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+                                <ShieldCheck size={36} />
+                            </div>
+
+                            <div className="space-y-2">
+                                <h3 className="text-lg font-black text-slate-900 dark:text-white">Paiement en ligne indisponible</h3>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    Le moyen de paiement automatique par carte / mobile money n'est pas encore disponible en ligne.
+                                    <br /><br />
+                                    Pour souscrire ou renouveler l'accès de votre établissement <strong>{selectedInstitution?.name}</strong>, veuillez contacter directement l'administration.
+                                </p>
+                            </div>
+
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 text-left space-y-2">
+                                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Contact Administration</p>
+                                <div className="text-xs space-y-1 font-semibold text-slate-800 dark:text-slate-200">
+                                    <p>Email: <a href="mailto:academiaconnects@gmail.com" className="text-sky-600 dark:text-sky-400 underline">academiaconnects@gmail.com</a></p>
+                                    <p>Téléphone / WhatsApp: <span className="font-mono">+237 696 731 837</span></p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowUnavailableModal(false)}
+                                    className="flex-1 py-3 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all"
+                                >
+                                    Fermer
+                                </button>
+                                <a
+                                    href={`mailto:contact@academia-connect.com?subject=Demande%20d'activation%20d'abonnement%20-%20${encodeURIComponent(selectedInstitution?.name || '')}`}
+                                    className="flex-1 py-3 px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-md transition-all flex items-center justify-center gap-1.5"
+                                >
+                                    Contacter
+                                </a>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

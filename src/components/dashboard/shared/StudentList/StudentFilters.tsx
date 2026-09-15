@@ -27,40 +27,40 @@ const StudentFilters: React.FC<StudentFiltersProps> = ({
     filteredClasses
 }) => {
     return (
-        <div className="bg-white p-6 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-end justify-between">
-            <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="space-y-1.5 md:col-span-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Recherche</label>
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="space-y-1 sm:col-span-2">
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Recherche</label>
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <input
                             type="text"
                             placeholder="Nom, prénom, matricule..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-6 py-3.5 bg-slate-50 text-sm font-bold text-slate-700 focus:bg-white focus:outline-none"
+                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                         />
                     </div>
                 </div>
 
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Cycle</label>
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Cycle</label>
                     <select
                         value={selectedCycle}
                         onChange={(e) => { setSelectedCycle(e.target.value); setSelectedClass(''); }}
-                        className="w-full px-5 py-3.5 bg-slate-50 text-sm font-bold text-slate-700 outline-none appearance-none cursor-pointer focus:bg-white"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none cursor-pointer"
                     >
                         <option value="">Tous les cycles</option>
                         {cycles.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
                     </select>
                 </div>
 
-                <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Classe</label>
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Classe</label>
                     <select
                         value={selectedClass}
                         onChange={(e) => setSelectedClass(e.target.value)}
-                        className="w-full px-5 py-3.5 bg-slate-50 text-sm font-bold text-slate-700 outline-none appearance-none cursor-pointer focus:bg-white disabled:opacity-50"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none cursor-pointer disabled:opacity-50"
                     >
                         <option value="">Toutes les classes</option>
                         {filteredClasses.map((c: any) => (
@@ -69,14 +69,12 @@ const StudentFilters: React.FC<StudentFiltersProps> = ({
                     </select>
                 </div>
 
-                <div className="relative flex-1 min-w-[200px]">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span className="text-slate-400 font-black tracking-widest text-[10px] uppercase">Statut</span>
-                    </div>
+                <div className="space-y-1 sm:col-span-2 md:col-span-1">
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Statut</label>
                     <select
                         value={selectedStatus}
                         onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="w-full pl-16 pr-5 py-3.5 bg-slate-50 text-sm font-bold text-slate-700 outline-none appearance-none cursor-pointer focus:bg-white"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none cursor-pointer"
                     >
                         <option value="">Tous les statuts</option>
                         <option value="ENROLLED">Inscrits définitivement</option>

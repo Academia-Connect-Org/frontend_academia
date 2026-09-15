@@ -31,9 +31,9 @@ const Subjects: React.FC = () => {
                 api.get(`/classes?institutionId=${institutionId}`),
                 api.get(`/cycles?institutionId=${institutionId}`).catch(() => ({ data: [] }))
             ]);
-            setSubjects(subjectsRes.data);
-            setClasses(classesRes.data);
-            setCycles(cyclesRes.data);
+            setSubjects(subjectsRes.data || []);
+            setClasses(classesRes.data || []);
+            setCycles(cyclesRes.data || []);
         } catch (error) {
             console.error("Error fetching data", error);
         } finally {
@@ -107,27 +107,27 @@ const Subjects: React.FC = () => {
     const institutionType = user?.institution?.type;
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                         {institutionType === 'ECOLE' ? "Catalogue des Matières" : "Matières et Disciplines"}
                     </h2>
-                    <p className="text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         {institutionType === 'ECOLE'
                             ? "Configurez les disciplines fondamentales du primaire."
                             : "Gérez les matières spécialisées du collège et du lycée."}
                     </p>
                 </div>
-                <button onClick={() => { resetForm(); setShowSubjectModal(true); }} className="bg-blue-600 text-white px-6 py-3  font-black flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-blue-600/20">
-                    <Plus size={18} /> Ajouter une Matière
+                <button onClick={() => { resetForm(); setShowSubjectModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md transition-all self-start md:self-auto">
+                    <Plus size={16} /> Ajouter une Matière
                 </button>
             </div>
 
-            <div className="flex bg-white  p-4 shadow-sm   mb-6 items-center gap-4 w-fit">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Filtrer par Cycle</label>
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3 w-fit">
+                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Filtrer par Cycle</label>
                 <select
-                    className="px-5 py-2.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none w-64 focus:bg-white focus:"
+                    className="px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                     value={selectedCycleFilter}
                     onChange={(e) => setSelectedCycleFilter(e.target.value)}
                 >
@@ -137,74 +137,72 @@ const Subjects: React.FC = () => {
             </div>
 
             {message.text && (
-                <div className={`p-4  mb-6 font-bold flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600  ' : 'bg-red-50 text-red-600  '}`}>
-                    <div className="flex items-center gap-3">
-                        {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-                        {message.text}
+                <div className={`p-4 rounded-xl font-bold text-xs flex items-center justify-between gap-3 ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800'}`}>
+                    <div className="flex items-center gap-2">
+                        {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                        <span>{message.text}</span>
                     </div>
-                    <button onClick={() => setMessage({ type: '', text: '' })}><X size={18} /></button>
+                    <button onClick={() => setMessage({ type: '', text: '' })}><X size={16} /></button>
                 </div>
             )}
 
-            <div className="bg-white ]   shadow-sm overflow-hidden scrollbar-hide">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-slate-50/50 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                            <tr>
-                                <th className="px-10 py-6">Matière</th>
-                                <th className="px-10 py-6">Cycle / Niveau</th>
-                                <th className="px-10 py-6">Affectation</th>
-                                <th className="px-10 py-6 text-right">Actions</th>
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                                <th className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800">Matière</th>
+                                <th className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800">Cycle / Niveau</th>
+                                <th className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800">Affectation</th>
+                                <th className="px-5 py-3.5 text-right border-b border-slate-100 dark:border-slate-800">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                             {(selectedCycleFilter ? subjects.filter(s => s.cycle?.name === selectedCycleFilter) : subjects).map(s => (
-                                <tr key={s.id} className="hover:bg-slate-50/50 transition-colors group">
-                                    <td className="px-10 py-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 bg-blue-50 text-blue-600  flex items-center justify-center font-black group-hover:scale-110 transition-transform">
+                                <tr key={s.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                                    <td className="px-5 py-3.5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
                                                 {s.name.charAt(0).toUpperCase()}
                                             </div>
-                                            <span className="font-bold text-slate-800 tracking-tight">{s.name}</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">{s.name}</span>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-6">
-                                        <div className="flex flex-col gap-2 items-start">
-                                            <span className={`px-4 py-1.5  text-[10px] font-black tracking-widest uppercase ${!s.cycle ? 'bg-indigo-50/50 text-indigo-700' : 'bg-blue-50/50 text-blue-700'}`}>{s.cycle?.name || 'Tous Les Cycles'}</span>
+                                    <td className="px-5 py-3.5">
+                                        <div className="flex flex-col gap-1 items-start">
+                                            <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase ${!s.cycle ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400' : 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400'}`}>{s.cycle?.name || 'Tous Les Cycles'}</span>
                                             {institutionType !== 'ECOLE' && s.category && (
-                                                <span className={`px-3 py-1  text-[9px] font-bold uppercase tracking-widest ${s.category === 'SCIENTIFIQUE' ? 'bg-emerald-50 text-emerald-600  ' :
-                                                    s.category === 'ADDITIONNELLE' ? 'bg-amber-50 text-amber-600  ' :
-                                                        'bg-purple-50 text-purple-600  '
+                                                <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${s.category === 'SCIENTIFIQUE' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' :
+                                                    s.category === 'ADDITIONNELLE' ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400' :
+                                                        'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400'
                                                     }`}>
                                                     {s.category}
                                                 </span>
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-10 py-6">
+                                    <td className="px-5 py-3.5">
                                         {s.classes && s.classes.length > 0 ? (
-                                            <div className="flex flex-wrap gap-2 max-w-xs">
+                                            <div className="flex flex-wrap gap-1.5 max-w-xs">
                                                 {s.classes.map((c: any) => (
-                                                    <div key={c.id} className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-2.5 py-1  text-[10px] font-black uppercase tracking-tight  ">
-                                                        <div className="w-1.2 h-1.2 bg-blue-400 "></div>
+                                                    <span key={c.id} className="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase">
                                                         {c.name}
-                                                    </div>
+                                                    </span>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="flex items-center gap-2 text-slate-400 font-medium text-[10px] uppercase font-black tracking-widest italic">
-                                                <div className="w-1.5 h-1.5 bg-purple-200 "></div>
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase italic">
                                                 Tronc commun
-                                            </div>
+                                            </span>
                                         )}
                                     </td>
-                                    <td className="px-10 py-6 text-right">
-                                        <div className="flex justify-end gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-                                            <button onClick={() => handleEditSubject(s)} className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all">
-                                                <Edit size={18} />
+                                    <td className="px-5 py-3.5 text-right">
+                                        <div className="flex justify-end gap-1">
+                                            <button onClick={() => handleEditSubject(s)} className="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                                <Edit size={16} />
                                             </button>
-                                            <button onClick={() => handleDeleteSubject(s.id)} className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50  transition-all">
-                                                <Trash2 size={18} />
+                                            <button onClick={() => handleDeleteSubject(s.id)} className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors">
+                                                <Trash2 size={16} />
                                             </button>
                                         </div>
                                     </td>
@@ -214,51 +212,48 @@ const Subjects: React.FC = () => {
                     </table>
                 </div>
                 {subjects.length === 0 && !loading && (
-                    <div className="p-20 text-center animate-in fade-in zoom-in-95 duration-500">
-                        <BookOpen size={64} className="mx-auto text-slate-200 mb-6 stroke-[1]" />
-                        <p className="text-slate-400 font-black tracking-tight uppercase text-xs tracking-[0.2em] mb-2">Catalogue vide</p>
-                        <p className="text-slate-300 text-sm">Commencez par ajouter une matière pour ce cycle.</p>
+                    <div className="p-12 text-center bg-slate-50/50 dark:bg-slate-800/40 m-4 rounded-xl">
+                        <BookOpen size={40} className="mx-auto text-slate-400 mb-3" />
+                        <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Catalogue vide</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Commencez par ajouter une matière pour ce cycle.</p>
                     </div>
                 )}
             </div>
 
+            {/* Modal */}
             {showSubjectModal && (
-                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-2xl max-h-[90vh] flex flex-col ] shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
-
-                        {/* Header fixe */}
-                        <div className="p-8 pb-6   flex justify-between items-center shrink-0 bg-white">
+                <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden">
+                        <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-850/50">
                             <div>
-                                <h3 className="text-2xl font-black text-slate-800 tracking-tight">{isEditing ? "Modifier la Matière" : "Nouvelle Matière"}</h3>
-                                <p className="text-slate-400 text-sm mt-1">{isEditing ? "Ajustez les détails de l'enseignement." : "Ajoutez une discipline au programme."}</p>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{isEditing ? "Modifier la Matière" : "Nouvelle Matière"}</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{isEditing ? "Ajustez les détails de l'enseignement." : "Ajoutez une discipline au programme."}</p>
                             </div>
-                            <button onClick={() => setShowSubjectModal(false)} className="w-10 h-10 bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600  flex items-center justify-center transition-colors"><X size={20} /></button>
+                            <button onClick={() => setShowSubjectModal(false)} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><X size={18} /></button>
                         </div>
 
-                        {/* Corps scrollable */}
-                        <div className="p-8 overflow-y-auto scrollbar-hide space-y-8 flex-1 bg-slate-50/30">
-
-                            <div className="bg-white p-6 ]   shadow-sm space-y-6">
-                                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-2">
-                                    <BookOpen size={14} className="text-blue-500" /> Informations Générales
+                        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+                            <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700 space-y-4">
+                                <h4 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <BookOpen size={14} /> Informations Générales
                                 </h4>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Intitulé de l'enseignement</label>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Intitulé de l'enseignement</label>
                                     <input
                                         type="text"
                                         placeholder="Ex: Mathématiques, SVT, Anglais..."
-                                        className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 focus:bg-white focus: focus:ring-4 focus:ring-blue-400/10 outline-none transition-all"
+                                        className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                         value={newSubject.name}
                                         onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })}
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Cycle d'enseignement</label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Cycle d'enseignement</label>
                                         <select
-                                            className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus: focus:ring-4 focus:ring-blue-400/10 appearance-none cursor-pointer transition-all"
+                                            className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                             value={newSubject.cycle.id}
                                             onChange={(e) => {
                                                 const val = e.target.value;
@@ -274,10 +269,10 @@ const Subjects: React.FC = () => {
                                         </select>
                                     </div>
                                     {institutionType !== 'ECOLE' && (
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Catégorie</label>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Catégorie</label>
                                             <select
-                                                className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus: focus:ring-4 focus:ring-blue-400/10 appearance-none cursor-pointer transition-all"
+                                                className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                                 value={newSubject.category}
                                                 onChange={(e) => setNewSubject({ ...newSubject, category: e.target.value })}
                                             >
@@ -290,10 +285,10 @@ const Subjects: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-white p-6 ]   shadow-sm space-y-4">
-                                <div className="flex justify-between items-end mb-2">
-                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                        Vérification d'Affectation
+                            <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700 space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                                        Affectation des Classes
                                     </h4>
                                     {newSubject.cycle.id && classes.filter(c => newSubject.cycle.id === 'all' || String(c.cycle?.id) === String(newSubject.cycle.id)).length > 0 && (
                                         <button
@@ -307,17 +302,17 @@ const Subjects: React.FC = () => {
                                                     setNewSubject({ ...newSubject, classeIds: Array.from(new Set([...newSubject.classeIds, ...cycleClasses])) });
                                                 }
                                             }}
-                                            className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline bg-blue-50 px-3 py-1.5 "
+                                            className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase hover:underline"
                                         >
                                             {classes.filter(c => newSubject.cycle.id === 'all' || String(c.cycle?.id) === String(newSubject.cycle.id)).every(c => newSubject.classeIds.includes(String(c.id))) ? "Tout décocher" : "Tout cocher"}
                                         </button>
                                     )}
                                 </div>
-                                <p className="text-[10px] text-slate-400 font-medium pb-2">Sélectionnez les classes qui suivront cette matière. Laissez vide pour l'assigner au tronc commun de tout le cycle.</p>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400">Sélectionnez les classes qui suivront cette matière (Laissez vide pour le tronc commun).</p>
 
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                                     {classes.filter(c => newSubject.cycle.id && newSubject.cycle.id !== 'all' ? String(c.cycle?.id) === String(newSubject.cycle.id) : true).map(c => (
-                                        <label key={c.id} className={`flex items-center gap-3 p-3.5  cursor-pointer  transition-all shadow-sm ${newSubject.classeIds.includes(String(c.id)) ? 'bg-blue-50  text-blue-700' : 'bg-white  text-slate-600 hover:'}`}>
+                                        <label key={c.id} className={`flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition-colors ${newSubject.classeIds.includes(String(c.id)) ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}>
                                             <input
                                                 type="checkbox"
                                                 className="hidden"
@@ -327,50 +322,46 @@ const Subjects: React.FC = () => {
                                                     else setNewSubject({ ...newSubject, classeIds: newSubject.classeIds.filter((id: string) => id !== String(c.id)) });
                                                 }}
                                             />
-                                            <div className={`w-5 h-5 shrink-0 ]  flex items-center justify-center transition-all ${newSubject.classeIds.includes(String(c.id)) ? 'bg-blue-600 ' : 'bg-slate-100 '}`}>
-                                                {newSubject.classeIds.includes(String(c.id)) && <CheckCircle2 size={12} className="text-white" />}
+                                            <div className={`w-4 h-4 rounded flex items-center justify-center ${newSubject.classeIds.includes(String(c.id)) ? 'bg-blue-600 text-white' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                                                {newSubject.classeIds.includes(String(c.id)) && <CheckCircle2 size={12} />}
                                             </div>
-                                            <span className="text-xs font-black uppercase tracking-tight truncate">{c.name}</span>
+                                            <span className="text-xs font-bold truncate">{c.name}</span>
                                         </label>
                                     ))}
-                                    {classes.filter(c => newSubject.cycle.id && newSubject.cycle.id !== 'all' ? String(c.cycle?.id) === String(newSubject.cycle.id) : true).length === 0 && (
-                                        <div className="col-span-full py-6 text-center bg-slate-50    ">
-                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest italic">Aucune classe disponible.</p>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Footer fixe */}
-                        <div className="p-8 pt-6   shrink-0 bg-white">
+                        <div className="p-5 border-t border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-850/50 flex justify-end gap-2">
                             <button
                                 onClick={handleCreateOrUpdateSubject}
                                 disabled={loading || !newSubject.name || !newSubject.cycle.id}
-                                className="w-full py-4 bg-blue-600 text-white  font-black shadow-lg shadow-blue-600/20 hover:scale-[1.02] hover:shadow-blue-600/40 active:scale-95 transition-all outline-none focus:ring-4 focus:ring-blue-600/30 disabled:opacity-50 disabled:hover:scale-100"
+                                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all disabled:opacity-50"
                             >
-                                {loading ? 'Traitement en cours...' : isEditing ? 'Appliquer les modifications' : 'Enregistrer la matière'}
+                                {loading ? 'Traitement...' : isEditing ? 'Appliquer les modifications' : 'Enregistrer la matière'}
                             </button>
                         </div>
-
                     </div>
                 </div>
             )}
 
+            {/* Confirm Dialog */}
             {confirmDialog.isOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-sm ] p-10 shadow-2xl animate-in zoom-in-95 duration-200 text-center">
-                        <div className="w-16 h-16 bg-red-50 text-red-500  flex items-center justify-center mx-auto mb-6 transition-transform hover:scale-110 ease-out duration-500"><AlertCircle size={32} /></div>
-                        <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2">{confirmDialog.title}</h3>
-                        <p className="text-slate-500 text-sm mb-10 leading-relaxed">{confirmDialog.message}</p>
-                        <div className="flex gap-4">
-                            <button onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })} className="flex-1 py-4  font-bold bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">Annuler</button>
-                            <button onClick={() => { confirmDialog.onConfirm(); setConfirmDialog({ ...confirmDialog, isOpen: false }); }} className="flex-1 py-4  font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all">Confirmer</button>
+                <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm p-6 rounded-2xl shadow-2xl text-center">
+                        <div className="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto mb-3">
+                            <AlertCircle size={24} />
+                        </div>
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">{confirmDialog.title}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">{confirmDialog.message}</p>
+                        <div className="flex gap-2">
+                            <button onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })} className="flex-1 py-2 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Annuler</button>
+                            <button onClick={() => { confirmDialog.onConfirm(); setConfirmDialog({ ...confirmDialog, isOpen: false }); }} className="flex-1 py-2 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-700 text-white shadow-md transition-all">Confirmer</button>
                         </div>
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 };
 

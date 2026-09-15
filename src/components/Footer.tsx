@@ -25,142 +25,152 @@ const Footer: React.FC = () => {
     };
 
     return (
-        <footer className="bg-slate-950 text-slate-300 pt-20 pb-8 border-t-4 border-blue-600 relative overflow-hidden">
+        <footer className="bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-300 pt-16 pb-8 border-t border-slate-200 dark:border-slate-800/80 relative overflow-hidden transition-colors duration-300">
             {/* Subtle background glow effect */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-32 bg-blue-600/10 blur-[100px] pointer-events-none"></div>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-32 bg-sky-500/10 blur-[100px] pointer-events-none"></div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 mb-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12">
 
                     {/* Brand Section */}
                     <div className="col-span-1">
-                        <div className="flex items-center mb-6">
-                            <div className="shadow-lg rounded-full inline-block">
-                                <img src={logo} alt="Logo" className="h-48 w-48 object-contain rounded-full" />
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-1 bg-transparent dark:bg-white rounded-xl transition-transform duration-300">
+                                <img
+                                    src={logo}
+                                    alt="Logo Academia Connect"
+                                    className="h-10 w-10 object-contain rounded-lg"
+                                />
                             </div>
+                            <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                                Academia<span className="text-sky-500">Connect</span>
+                            </span>
                         </div>
-                        <p className="text-slate-400 mb-8 leading-relaxed font-medium">
-                            Digitaliser la passion d'apprendre. Une solution complète et premium pour la gestion des établissements scolaires modernes.
+                        <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed mb-6 font-normal">
+                            Digitaliser la passion d'apprendre. Une solution complète et intuitive pour la gestion des établissements scolaires modernes.
                         </p>
-                        <div className="flex gap-4">
-                            <a href="#" className="p-3 bg-slate-900 border border-slate-800 hover:bg-blue-600 hover:border-blue-600 hover:-translate-y-1 transition-all duration-300 text-white"><Facebook size={18} /></a>
-                            <a href="#" className="p-3 bg-slate-900 border border-slate-800 hover:bg-blue-600 hover:border-blue-600 hover:-translate-y-1 transition-all duration-300 text-white"><Twitter size={18} /></a>
-                            <a href="https://www.instagram.com/reel/DZ_DDHpu2Nu/?igsh=MTZtcWd0YnB1YjIxOA==" className="p-3 bg-slate-900 border border-slate-800 hover:bg-blue-600 hover:border-blue-600 hover:-translate-y-1 transition-all duration-300 text-white"><Instagram size={18} /></a>
-                            <a href="#" className="p-3 bg-slate-900 border border-slate-800 hover:bg-blue-600 hover:border-blue-600 hover:-translate-y-1 transition-all duration-300 text-white"><Linkedin size={18} /></a>
+                        <div className="flex gap-2.5">
+                            <a href="#" className="p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-xl hover:bg-sky-600 hover:border-sky-600 hover:-translate-y-0.5 transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-white"><Facebook size={16} /></a>
+                            <a href="#" className="p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-xl hover:bg-sky-600 hover:border-sky-600 hover:-translate-y-0.5 transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-white"><Twitter size={16} /></a>
+                            <a href="https://www.instagram.com/reel/DZ_DDHpu2Nu/?igsh=MTZtcWd0YnB1YjIxOA==" className="p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-xl hover:bg-sky-600 hover:border-sky-600 hover:-translate-y-0.5 transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-white"><Instagram size={16} /></a>
+                            <a href="#" className="p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-xl hover:bg-sky-600 hover:border-sky-600 hover:-translate-y-0.5 transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-white"><Linkedin size={16} /></a>
                         </div>
                     </div>
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="text-white font-black text-lg mb-6 uppercase tracking-wider">Liens Utiles</h3>
-                        <ul className="space-y-4 font-semibold">
-                            <li><Link to={ROUTES.HOME} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-2 group"><ArrowRight size={14} className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-4 group-hover:ml-0" /> Accueil</Link></li>
-                            <li><Link to={ROUTES.FEATURES} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-2 group"><ArrowRight size={14} className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-4 group-hover:ml-0" /> Fonctionnalités</Link></li>
-                            <li><Link to={ROUTES.PRICING} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-2 group"><ArrowRight size={14} className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-4 group-hover:ml-0" /> Tarif Abonnement</Link></li>
-                            <li><Link to={ROUTES.SUPPORT} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-2 group"><ArrowRight size={14} className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-4 group-hover:ml-0" /> Support Client</Link></li>
-                            <li><Link to={ROUTES.PRIVACY} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-2 group"><ArrowRight size={14} className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-4 group-hover:ml-0" /> Confidentialité</Link></li>
+                        <h3 className="text-slate-900 dark:text-white font-bold text-sm mb-4 tracking-tight">Liens utiles</h3>
+                        <ul className="space-y-2.5 text-xs font-normal">
+                            <li><Link to={ROUTES.HOME} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1.5 group"><ArrowRight size={13} className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-3 group-hover:ml-0" /> Accueil</Link></li>
+                            <li><Link to={ROUTES.FEATURES} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1.5 group"><ArrowRight size={13} className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-3 group-hover:ml-0" /> Fonctionnalités</Link></li>
+                            <li><Link to={ROUTES.PRICING} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1.5 group"><ArrowRight size={13} className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-3 group-hover:ml-0" /> Tarif abonnement</Link></li>
+                            <li><Link to={ROUTES.SUPPORT} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1.5 group"><ArrowRight size={13} className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-3 group-hover:ml-0" /> Support client</Link></li>
+                            <li><Link to={ROUTES.TERMS} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1.5 group"><ArrowRight size={13} className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-3 group-hover:ml-0" /> Conditions d'utilisation</Link></li>
+                            <li><Link to={ROUTES.PRIVACY} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1.5 group"><ArrowRight size={13} className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-3 group-hover:ml-0" /> Confidentialité</Link></li>
+                            <li><Link to={ROUTES.COOKIES} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1.5 group"><ArrowRight size={13} className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-3 group-hover:ml-0" /> Cookies</Link></li>
+                            <li><Link to={ROUTES.CONTACT} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1.5 group"><ArrowRight size={13} className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity -ml-3 group-hover:ml-0" />Contactez-nous</Link></li>
                         </ul>
                     </div>
 
                     {/* Contact Info */}
                     <div>
-                        <h3 className="text-white font-black text-lg mb-6 uppercase tracking-wider">Contactez-nous</h3>
-                        <ul className="space-y-5 font-medium">
-                            <li className="flex items-start gap-4 text-slate-400 group">
-                                <div className="p-2 bg-slate-900 border border-slate-800 group-hover:bg-blue-600/20 group-hover:border-blue-500 transition-colors">
-                                    <MapPin size={20} className="text-blue-500" />
+                        <h3 className="text-slate-900 dark:text-white font-bold text-sm mb-4 tracking-tight">Contactez-nous</h3>
+                        <ul className="space-y-3.5 text-xs font-normal">
+                            <li className="flex items-start gap-3 text-slate-600 dark:text-slate-400 group">
+                                <div className="p-1.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg group-hover:bg-sky-500/20 group-hover:border-sky-500 transition-colors">
+                                    <MapPin size={16} className="text-sky-500 dark:text-sky-400" />
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=Tchad,Benin,Cameroun" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors mt-1">Tchad, Benin, Cameroun</a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Tchad,Benin,Cameroun" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors mt-0.5">Tchad, Bénin, Cameroun</a>
                             </li>
-                            <li className="flex items-start gap-4 text-slate-400 group">
-                                <div className="p-2 bg-slate-900 border border-slate-800 group-hover:bg-emerald-500/20 group-hover:border-emerald-500 transition-colors">
-                                    <MessageSquare size={20} className="text-emerald-500" />
+                            <li className="flex items-start gap-3 text-slate-600 dark:text-slate-400 group">
+                                <div className="p-1.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg group-hover:bg-emerald-500/20 group-hover:border-emerald-500 transition-colors">
+                                    <MessageSquare size={16} className="text-emerald-600 dark:text-emerald-400" />
                                 </div>
-                                <div className="mt-1">
-                                    WhatsApp : <a href="https://wa.me/237686013300" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">(+237 6 86 01 33 00)</a> / <a href="https://wa.me/22967004961" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">(+229 67 00 49 61)</a>
+                                <div className="mt-0.5">
+                                    WhatsApp : <a href="https://wa.me/237696731837" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors">(+237 6 96 73 18 37)</a> / <a href="https://wa.me/22967004961" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors">(+229 67 00 49 61)</a>
                                 </div>
                             </li>
-                            <li className="flex items-start gap-4 text-slate-400 group">
-                                <div className="p-2 bg-slate-900 border border-slate-800 group-hover:bg-blue-600/20 group-hover:border-blue-500 transition-colors">
-                                    <Mail size={20} className="text-blue-500" />
+                            <li className="flex items-start gap-3 text-slate-600 dark:text-slate-400 group">
+                                <div className="p-1.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg group-hover:bg-sky-500/20 group-hover:border-sky-500 transition-colors">
+                                    <Mail size={16} className="text-sky-500 dark:text-sky-400" />
                                 </div>
-                                <a href="mailto:academiaconnects@gmail.com" className="hover:text-white transition-colors mt-1 break-all">academiaconnects@gmail.com</a>
+                                <a href="mailto:academiaconnects@gmail.com" className="hover:text-slate-900 dark:hover:text-white transition-colors mt-0.5 break-all">academiaconnects@gmail.com</a>
                             </li>
                         </ul>
                     </div>
 
-                    {/* Newsletter (New) */}
+                    {/* Newsletter */}
                     <div>
-                        <h3 className="text-white font-black text-lg mb-6 uppercase tracking-wider">Newsletter</h3>
-                        <p className="text-slate-400 mb-4 font-medium">Restez informé de nos dernières nouveautés et mises à jour.</p>
-                        <form className="flex flex-col gap-3" onSubmit={handleSubscribe}>
+                        <h3 className="text-slate-900 dark:text-white font-bold text-sm mb-4 tracking-tight">Newsletter</h3>
+                        <p className="text-slate-600 dark:text-slate-400 text-xs mb-3.5 font-normal">Restez informé de nos dernières nouveautés et mises à jour.</p>
+                        <form className="flex flex-col gap-2.5" onSubmit={handleSubscribe}>
                             <input
                                 type="email"
                                 placeholder="Votre adresse email"
                                 required
                                 value={email}
                                 onChange={(e) => { setEmail(e.target.value); setStatus('idle'); }}
-                                className="w-full px-4 py-3 bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white text-xs placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-sky-500 transition-colors"
                             />
                             <button
                                 type="submit"
                                 disabled={status === 'loading'}
-                                className="w-full px-4 py-3 bg-blue-600 text-white font-bold uppercase tracking-wider hover:bg-blue-500 transition-colors flex items-center justify-center gap-2 disabled:bg-slate-700 disabled:cursor-not-allowed"
+                                className="w-full px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-2 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed shadow-sm"
                             >
-                                {status === 'loading' ? <Loader2 size={18} className="animate-spin" /> : <>S'abonner <ArrowRight size={18} /></>}
+                                {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <>S'abonner <ArrowRight size={15} /></>}
                             </button>
-                            {status === 'success' && <p className="text-green-400 text-sm font-semibold">Merci ! Vous êtes maintenant abonné.</p>}
-                            {status === 'error' && <p className="text-red-400 text-sm font-semibold">Erreur lors de l'abonnement.</p>}
+                            {status === 'success' && <p className="text-emerald-600 dark:text-green-400 text-xs font-medium">Merci ! Vous êtes maintenant abonné.</p>}
+                            {status === 'error' && <p className="text-red-500 dark:text-red-400 text-xs font-medium">Erreur lors de l'abonnement.</p>}
                         </form>
                     </div>
 
                 </div>
 
                 {/* Flags Marquee */}
-                <div className="w-full overflow-hidden mt-8 pt-6 pb-6 border-b border-slate-800 bg-slate-950/50">
-                    <div className="animate-marquee gap-8 items-center cursor-default text-slate-500 font-semibold">
-                        <div className="flex gap-8 whitespace-nowrap px-4">
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇨🇲 Cameroun</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇹🇩 Tchad</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇧🇯 Bénin</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇸🇳 Sénégal</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇨🇮 Côte d'Ivoire</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇲🇱 Mali</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇧🇫 Burkina Faso</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇹🇬 Togo</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇬🇳 Guinée</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇳🇪 Niger</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇨🇬 Congo</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇨🇩 RDC</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇬🇦 Gabon</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇲🇬 Madagascar</span>
+                <div className="w-full overflow-hidden mt-6 pt-5 pb-5 border-y border-slate-200 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-950/40">
+                    <div className="animate-marquee gap-8 items-center cursor-default text-slate-600 dark:text-slate-400 font-normal">
+                        <div className="flex gap-8 whitespace-nowrap px-4 text-xs">
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇨🇲 Cameroun</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇹🇩 Tchad</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇧🇯 Bénin</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇸🇳 Sénégal</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇨🇮 Côte d'Ivoire</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇲🇱 Mali</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇧🇫 Burkina Faso</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇹🇬 Togo</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇬🇳 Guinée</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇳🇪 Niger</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇨🇬 Congo</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇨🇩 RDC</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇬🇦 Gabon</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇲🇬 Madagascar</span>
                         </div>
-                        <div className="flex gap-8 whitespace-nowrap px-4">
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇨🇲 Cameroun</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇹🇩 Tchad</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇧🇯 Bénin</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇸🇳 Sénégal</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇨🇮 Côte d'Ivoire</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇲🇱 Mali</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇧🇫 Burkina Faso</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇹🇬 Togo</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇬🇳 Guinée</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇳🇪 Niger</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇨🇬 Congo</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇨🇩 RDC</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇬🇦 Gabon</span>
-                            <span className="text-lg flex items-center gap-2 hover:text-white transition-colors">🇲🇬 Madagascar</span>
+                        <div className="flex gap-8 whitespace-nowrap px-4 text-xs">
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇨🇲 Cameroun</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇹🇩 Tchad</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇧🇯 Bénin</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇸🇳 Sénégal</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇨🇮 Côte d'Ivoire</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇲🇱 Mali</span>
+                            <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇧🇫 Burkina Faso</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇹🇬 Togo</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇬🇳 Guinée</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇳🇪 Niger</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇨🇬 Congo</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇨🇩 RDC</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇬🇦 Gabon</span>
+                            <span className="text-xs flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors">🇲🇬 Madagascar</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm font-semibold text-slate-500 pt-8">
-                    <p className="m-0">© 2026 ACADEMIA CONNECT. Tous droits réservés.</p>
-                    <div className="flex gap-6">
-                        <Link to={ROUTES.TERMS} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">Conditions</Link>
-                        <Link to={ROUTES.PRIVACY} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">Confidentialité</Link>
-                        <Link to={ROUTES.COOKIES} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">Cookies</Link>
+                <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-xs font-normal text-slate-500 dark:text-slate-400 pt-6">
+                    <p className="m-0">© 2026 Academia Connect. Tous droits réservés.</p>
+                    <div className="flex gap-5">
+                        <Link to={ROUTES.TERMS} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Conditions</Link>
+                        <Link to={ROUTES.PRIVACY} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Confidentialité</Link>
+                        <Link to={ROUTES.COOKIES} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Cookies</Link>
                     </div>
                 </div>
             </div>

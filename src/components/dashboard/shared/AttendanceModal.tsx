@@ -56,13 +56,12 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
                 api.get(`/attendances/session`, { params: { classeId, date, timetableEntryId } })
             ]);
 
-            const stds = studentsRes.data;
+            const stds = studentsRes.data || [];
             setStudents(stds);
 
             const fetchedAttendances = attendanceRes.data || [];
             const attMap: Record<number, AttendanceRecord> = {};
 
-            // default everyone to PRESENT if no record exists
             stds.forEach((s: Student) => {
                 const existing = fetchedAttendances.find((a: any) => a.student?.id === s.id);
                 if (existing) {
@@ -128,7 +127,7 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
             setMessage({ type: 'success', text: "L'appel a été enregistré avec succès." });
             setTimeout(() => {
                 onClose();
-            }, 1500);
+            }, 1200);
         } catch (error) {
             console.error("Failed to save attendances", error);
             setMessage({ type: 'error', text: "Erreur lors de l'enregistrement de l'appel." });
@@ -140,91 +139,87 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-0 sm:p-4">
-            <div className="bg-white w-full h-full sm:h-auto max-w-4xl sm:max-h-[95vh] flex flex-col sm:rounded-[32px] shadow-2xl animate-in sm:zoom-in-95 duration-200 overflow-hidden">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden">
                 {/* Header */}
-                <div className="p-5 sm:p-8 pb-4 sm:pb-6 flex justify-between items-start sm:items-center shrink-0 bg-white border-b border-slate-100">
+                <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-850/50 shrink-0">
                     <div>
-                        <h3 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2 sm:gap-3">
-                            <UserCheck className="text-blue-600" size={24} />
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <UserCheck className="text-blue-600 dark:text-blue-400" size={20} />
                             Faire l'Appel
                         </h3>
-                        <p className="text-slate-500 font-medium mt-1 text-xs sm:text-sm">
-                            {subjectName} • {classeName} • Séance du {new Date(date).toLocaleDateString('fr-FR')}
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                            {subjectName} • {classeName} • Séance du {date ? new Date(date).toLocaleDateString('fr-FR') : 'Date non définie'}
                         </p>
                     </div>
-                    <button onClick={onClose} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition-colors">
+                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                         <X size={18} />
                     </button>
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-50/50">
+                <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/50 dark:bg-slate-950/50">
                     {message.text && (
-                        <div className={`p-4  mb-6 font-bold flex items-center gap-3 animate-in fade-in ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600  ' : 'bg-red-50 text-red-600  '}`}>
-                            {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                        <div className={`p-4 rounded-xl font-bold text-xs flex items-center gap-2.5 ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400'}`}>
+                            {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
                             {message.text}
                         </div>
                     )}
 
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-20">
-                            <Loader2 className="animate-spin text-blue-600 mb-4" size={40} />
-                            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement des élèves...</p>
+                        <div className="flex flex-col items-center justify-center py-16">
+                            <Loader2 className="animate-spin text-blue-600 dark:text-blue-400 mb-3" size={36} />
+                            <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-xs">Chargement des élèves...</p>
                         </div>
                     ) : (
-                        <div className="bg-white sm:rounded-3xl shadow-sm overflow-hidden sm:border border-slate-100">
-                            <div className="p-4 sm:p-5 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Effectif: {students.length} élèves</span>
-                                <div className="flex gap-2">
-                                    <button onClick={() => markAllAs('PRESENT')} className="px-4 py-2 bg-emerald-100 rounded-xl text-emerald-700 hover:bg-emerald-200 text-xs font-bold transition-colors">Tous Présents</button>
-                                </div>
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Effectif: {students.length} élèves</span>
+                                <button onClick={() => markAllAs('PRESENT')} className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-xs font-bold transition-colors">Tous Présents</button>
                             </div>
-                            <div className="divide-y divide-slate-50">
+                            <div className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {students.map((student) => {
                                     const att = attendances[student.id];
                                     if (!att) return null;
 
                                     return (
-                                        <div key={student.id} className="p-4 flex flex-col gap-3 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
-                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 w-full">
+                                        <div key={student.id} className="p-4 flex flex-col gap-3 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 w-full">
                                                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-sm shrink-0">
-                                                        {student.firstName[0]}{student.lastName[0]}
+                                                    <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
+                                                        {student.firstName?.[0]}{student.lastName?.[0]}
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <p className="font-black text-slate-800 text-sm truncate">{student.lastName} {student.firstName}</p>
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">{student.gender === 'F' ? 'Fille' : 'Garçon'}</p>
+                                                        <p className="font-bold text-slate-900 dark:text-white text-xs truncate">{student.lastName} {student.firstName}</p>
+                                                        <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">{student.gender === 'F' ? 'Fille' : 'Garçon'}</p>
                                                     </div>
                                                 </div>
 
-                                                <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:pb-0 scrollbar-hide shrink-0">
-                                                    <div className="flex items-center gap-2 shrink-0 min-w-max">
-                                                        <button
-                                                            onClick={() => handleStatusChange(student.id, 'PRESENT')}
-                                                            className={`px-3 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${att.status === 'PRESENT' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
-                                                        >
-                                                            <Check size={14} /> Présent
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleStatusChange(student.id, 'ABSENT')}
-                                                            className={`px-3 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${att.status === 'ABSENT' ? 'bg-red-500 text-white shadow-md shadow-red-500/20' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
-                                                        >
-                                                            <UserX size={14} /> Absent
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleStatusChange(student.id, 'LATE')}
-                                                            className={`px-3 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${att.status === 'LATE' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
-                                                        >
-                                                            <Clock size={14} /> Retard
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleStatusChange(student.id, 'EXCUSED')}
-                                                            className={`px-3 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${att.status === 'EXCUSED' ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
-                                                        >
-                                                            <Info size={14} /> Excusé
-                                                        </button>
-                                                    </div>
+                                                <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                                                    <button
+                                                        onClick={() => handleStatusChange(student.id, 'PRESENT')}
+                                                        className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition-all ${att.status === 'PRESENT' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                                    >
+                                                        <Check size={14} /> Présent
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleStatusChange(student.id, 'ABSENT')}
+                                                        className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition-all ${att.status === 'ABSENT' ? 'bg-red-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                                    >
+                                                        <UserX size={14} /> Absent
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleStatusChange(student.id, 'LATE')}
+                                                        className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition-all ${att.status === 'LATE' ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                                    >
+                                                        <Clock size={14} /> Retard
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleStatusChange(student.id, 'EXCUSED')}
+                                                        className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition-all ${att.status === 'EXCUSED' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                                    >
+                                                        <Info size={14} /> Excusé
+                                                    </button>
                                                 </div>
                                             </div>
 
@@ -233,7 +228,7 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
                                                     <input
                                                         type="text"
                                                         placeholder="Motif (optionnel)"
-                                                        className="w-full px-4 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                                                        className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                                         value={att.comment}
                                                         onChange={(e) => handleCommentChange(student.id, e.target.value)}
                                                     />
@@ -247,13 +242,13 @@ const AttendanceModal: React.FC<AttendanceModalProps> = ({
                     )}
                 </div>
 
-                <div className="p-4 sm:p-6 bg-white border-t border-slate-100 flex justify-end shrink-0">
+                <div className="p-4 sm:p-5 bg-slate-50/50 dark:bg-slate-850/50 border-t border-slate-100 dark:border-slate-800 flex justify-end shrink-0">
                     <button
                         onClick={handleSave}
                         disabled={loading || saving}
-                        className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 rounded-2xl text-white font-black shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                        {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                        {saving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                         {saving ? 'Enregistrement...' : 'Valider l\'appel'}
                     </button>
                 </div>

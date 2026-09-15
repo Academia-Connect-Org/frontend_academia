@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
     Bell,
     Search,
@@ -16,7 +17,17 @@ import {
     Check,
     MapPin,
     Users,
-    Heart
+    Heart,
+    GraduationCap,
+    BookOpen,
+    Clock,
+    DollarSign,
+    UserPlus,
+    School,
+    Calendar,
+    LayoutDashboard,
+    ArrowRight,
+    SearchX
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,6 +49,42 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [unreadMessages, setUnreadMessages] = useState<number>(0);
 
+    // Global Search State
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchResults, setSearchResults] = useState<{
+        students: any[];
+        teachers: any[];
+        classes: any[];
+        navigation: any[];
+    }>({ students: [], teachers: [], classes: [], navigation: [] });
+
+    const searchRef = useRef<HTMLDivElement>(null);
+
+    const instId = typeof user?.institution === 'object' ? user?.institution?.id : user?.institution;
+
+    const getRolePath = () => {
+        const r = role.toLowerCase();
+        if (r === 'pdg') return 'pdg';
+        if (r === 'direction' || r === 'provisoriat') return 'direction';
+        if (r === 'secretariat') return 'secretariat';
+        if (r === 'enseignant') return 'teacher';
+        if (r === 'parent' || r === 'parents') return 'parent';
+        return 'student';
+    };
+
+    const navigationShortcuts = [
+        { label: 'Tableau de bord', path: `/dashboard/${getRolePath()}`, category: 'Navigation', icon: LayoutDashboard },
+        { label: 'Dossiers Élèves', path: `/dashboard/${getRolePath()}/students`, category: 'Navigation', icon: GraduationCap },
+        { label: 'Gestion des Inscriptions', path: `/dashboard/${getRolePath()}/enroll`, category: 'Navigation', icon: UserPlus },
+        { label: 'Finances & Scolarité', path: `/dashboard/${getRolePath()}/finances`, category: 'Navigation', icon: DollarSign },
+        { label: 'Présences & Appels', path: `/dashboard/${getRolePath()}/attendance`, category: 'Navigation', icon: Clock },
+        { label: 'Messagerie & Chat', path: `/dashboard/${getRolePath()}/messages`, category: 'Navigation', icon: Mail },
+        { label: 'Emploi du Temps', path: `/dashboard/${getRolePath()}/schedule`, category: 'Navigation', icon: Calendar },
+        { label: 'Gestion des Classes', path: `/dashboard/${getRolePath()}/classes`, category: 'Navigation', icon: School },
+    ];
+
     const fetchUnreadCount = async () => {
         if (!user?.id) return;
         try {
@@ -48,7 +95,7 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
         }
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         fetchUnreadCount();
         const handleRead = () => fetchUnreadCount();
         window.addEventListener('chat_read', handleRead);
@@ -59,47 +106,287 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
         };
     }, [user?.id]);
 
+    // Handle Click Outside Search Input
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+                setIsSearchFocused(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Perform Global Search on Query Change
+    useEffect(() => {
+        const query = searchQuery.trim().toLowerCase();
+        if (!query) {
+            setSearchResults({ students: [], teachers: [], classes: [], navigation: [] });
+            setSearchLoading(false);
+            return;
+        }
+
+        // Filter navigation shortcuts
+        const matchedNav = navigationShortcuts.filter(nav =>
+            nav.label.toLowerCase().includes(query)
+        );
+
+        if (query.length < 2) {
+            setSearchResults({ students: [], teachers: [], classes: [], navigation: matchedNav });
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            setSearchLoading(true);
+            try {
+                const params = instId ? { params: { institutionId: instId } } : {};
+                const [studentsRes, teachersRes, classesRes] = await Promise.all([
+                    api.get('/students', params).catch(() => ({ data: [] })),
+                    api.get('/teachers', params).catch(() => ({ data: [] })),
+                    api.get('/classes', params).catch(() => ({ data: [] }))
+                ]);
+
+                const matchedStudents = (studentsRes.data || []).filter((s: any) =>
+                    `${s.firstName} ${s.lastName}`.toLowerCase().includes(query) ||
+                    (s.studentIdNumber && s.studentIdNumber.toLowerCase().includes(query))
+                ).slice(0, 5);
+
+                const matchedTeachers = (teachersRes.data || []).filter((t: any) =>
+                    `${t.firstName} ${t.lastName}`.toLowerCase().includes(query) ||
+                    (t.email && t.email.toLowerCase().includes(query))
+                ).slice(0, 4);
+
+                const matchedClasses = (classesRes.data || []).filter((c: any) =>
+                    c.name?.toLowerCase().includes(query)
+                ).slice(0, 4);
+
+                setSearchResults({
+                    navigation: matchedNav,
+                    students: matchedStudents,
+                    teachers: matchedTeachers,
+                    classes: matchedClasses
+                });
+            } catch (err) {
+                console.error("Global search error:", err);
+            } finally {
+                setSearchLoading(false);
+            }
+        }, 250);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery, instId]);
+
+    const hasResults = searchResults.navigation.length > 0 ||
+        searchResults.students.length > 0 ||
+        searchResults.teachers.length > 0 ||
+        searchResults.classes.length > 0;
+
     const hasParentInfo = user?.fatherFirstName || user?.motherFirstName || user?.parent || user?.fatherAccount || user?.motherAccount;
 
     return (
-        <header className="h-20 bg-white dark:bg-slate-900   dark: flex items-center justify-between px-8 sticky top-0 z-30 transition-colors">
-            <div className="flex items-center gap-4 lg:gap-6 flex-1">
+        <header className="h-16 sm:h-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-30 transition-colors">
+            <div className="flex items-center gap-3 lg:gap-5 flex-1">
                 <button
                     onClick={onMenuClick}
-                    className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400  transition-all lg:hidden"
+                    className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-xl transition-all lg:hidden"
                     title="Ouvrir le menu"
                 >
-                    <Menu size={20} />
+                    <Menu size={18} />
                 </button>
 
                 <Link
                     to="/"
-                    className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400  transition-all hover:scale-105 active:scale-95"
+                    className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200 dark:hover:bg-slate-700/80 rounded-xl transition-all hover:scale-105 active:scale-95"
                     title="Retour à l'accueil"
                 >
-                    <Home size={20} />
+                    <Home size={18} />
                 </Link>
 
-                <h2 className="text-xl font-black text-blue-900 dark:text-blue-400 whitespace-nowrap hidden sm:block">{title}</h2>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white whitespace-nowrap hidden sm:block tracking-tight">{title}</h2>
 
-                <div className="hidden md:flex items-center gap-3 bg-slate-100 dark:bg-slate-800 px-4 py-2.5  w-full max-w-md group focus-within:ring-2 focus-within:ring-blue-500 transition-all   focus-within:bg-white dark:focus-within:bg-slate-900 focus-within: dark:focus-within:">
-                    <Search className="text-slate-400 group-focus-within:text-blue-500" size={18} />
-                    <input
-                        type="text"
-                        placeholder="Rechercher..."
-                        className="bg-transparent border-none outline-none text-slate-600 dark:text-slate-300 placeholder-slate-400 text-sm w-full"
-                    />
+                {/* Interactive Global Search Input */}
+                <div ref={searchRef} className="relative hidden md:block w-full max-w-sm">
+                    <div className={`flex items-center gap-2.5 px-3.5 py-2 rounded-xl transition-all border ${
+                        isSearchFocused 
+                            ? 'bg-white dark:bg-slate-900 border-blue-500 ring-2 ring-blue-500/20 shadow-md' 
+                            : 'bg-slate-100 dark:bg-slate-800/80 border-slate-200/50 dark:border-slate-700/50'
+                    }`}>
+                        <Search className={`shrink-0 transition-colors ${isSearchFocused ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`} size={16} />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onFocus={() => setIsSearchFocused(true)}
+                            placeholder="Rechercher un élève, enseignant, classe ou page..."
+                            className="bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder-slate-400 text-xs font-bold w-full"
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => { setSearchQuery(''); setSearchResults({ students: [], teachers: [], classes: [], navigation: [] }); }}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-white shrink-0"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Global Search Dropdown Overlay */}
+                    <AnimatePresence>
+                        {isSearchFocused && searchQuery.trim().length > 0 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                                transition={{ duration: 0.15 }}
+                                className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-[75vh] flex flex-col"
+                            >
+                                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Résultats de recherche</span>
+                                    {searchLoading && <div className="w-3.5 h-3.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />}
+                                </div>
+
+                                <div className="p-3 overflow-y-auto custom-scrollbar space-y-4 flex-1">
+                                    {!searchLoading && !hasResults ? (
+                                        <div className="py-8 text-center text-slate-400">
+                                            <SearchX size={28} className="mx-auto mb-1.5 text-slate-300 dark:text-slate-600" />
+                                            <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Aucun résultat trouvé</p>
+                                            <p className="text-[11px] text-slate-400 mt-0.5">Essayez avec un nom, prénom ou mot-clé différent.</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {/* Navigation Shortcuts */}
+                                            {searchResults.navigation.length > 0 && (
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 mb-1">Raccourcis Navigation</p>
+                                                    {searchResults.navigation.map((nav, idx) => {
+                                                        const IconComp = nav.icon;
+                                                        return (
+                                                            <div
+                                                                key={idx}
+                                                                onClick={() => {
+                                                                    navigate(nav.path);
+                                                                    setIsSearchFocused(false);
+                                                                }}
+                                                                className="p-2.5 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950/40 cursor-pointer flex items-center justify-between transition-colors group"
+                                                            >
+                                                                <div className="flex items-center gap-2.5">
+                                                                    <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                                                        <IconComp size={14} />
+                                                                    </div>
+                                                                    <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                                                        {nav.label}
+                                                                    </span>
+                                                                </div>
+                                                                <ArrowRight size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+
+                                            {/* Student Results */}
+                                            {searchResults.students.length > 0 && (
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 mb-1">Élèves ({searchResults.students.length})</p>
+                                                    {searchResults.students.map((st) => (
+                                                        <div
+                                                            key={st.id}
+                                                            onClick={() => {
+                                                                navigate(`/dashboard/${getRolePath()}/students?studentId=${st.id}`);
+                                                                setIsSearchFocused(false);
+                                                            }}
+                                                            className="p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer flex items-center justify-between transition-colors group"
+                                                        >
+                                                            <div className="flex items-center gap-2.5">
+                                                                <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
+                                                                    {st.firstName?.[0]}{st.lastName?.[0]}
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-xs font-bold text-slate-900 dark:text-white">{st.firstName} {st.lastName}</p>
+                                                                    <p className="text-[10px] text-slate-400">Classe: {st.classe?.name || 'N/A'}</p>
+                                                                </div>
+                                                            </div>
+                                                            <span className="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
+                                                                Voir Dossier
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Teacher Results */}
+                                            {searchResults.teachers.length > 0 && (
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 mb-1">Enseignants ({searchResults.teachers.length})</p>
+                                                    {searchResults.teachers.map((t) => (
+                                                        <div
+                                                            key={t.id}
+                                                            onClick={() => {
+                                                                navigate(`/dashboard/${getRolePath()}/teachers`);
+                                                                setIsSearchFocused(false);
+                                                            }}
+                                                            className="p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer flex items-center justify-between transition-colors group"
+                                                        >
+                                                            <div className="flex items-center gap-2.5">
+                                                                <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
+                                                                    {t.firstName?.[0]}{t.lastName?.[0]}
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-xs font-bold text-slate-900 dark:text-white">{t.firstName} {t.lastName}</p>
+                                                                    <p className="text-[10px] text-slate-400">{t.email || 'Enseignant'}</p>
+                                                                </div>
+                                                            </div>
+                                                            <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+                                                                Enseignant
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Class Results */}
+                                            {searchResults.classes.length > 0 && (
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 mb-1">Classes ({searchResults.classes.length})</p>
+                                                    {searchResults.classes.map((cls) => (
+                                                        <div
+                                                            key={cls.id}
+                                                            onClick={() => {
+                                                                navigate(`/dashboard/${getRolePath()}/classes`);
+                                                                setIsSearchFocused(false);
+                                                            }}
+                                                            className="p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer flex items-center justify-between transition-colors group"
+                                                        >
+                                                            <div className="flex items-center gap-2.5">
+                                                                <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                                                    <School size={14} />
+                                                                </div>
+                                                                <p className="text-xs font-bold text-slate-900 dark:text-white">{cls.name}</p>
+                                                            </div>
+                                                            <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
+                                                                Classe
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
 
-            <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
                 {/* Theme Toggle */}
                 <button
                     onClick={toggleTheme}
-                    className="p-3 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20  transition-all"
+                    className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-all"
                     title={isDark ? "Mode clair" : "Mode sombre"}
                 >
-                    {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                    {isDark ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
 
                 {/* Messages */}
@@ -115,13 +402,13 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                         else if (r === 'eleve') path = '/dashboard/student/messages';
                         navigate(path);
                     }}
-                    className="p-3 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20  transition-all relative"
+                    className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-all relative"
                     title="Messagerie"
                 >
-                    <Mail size={20} />
+                    <Mail size={18} />
                     {unreadMessages > 0 && (
-                        <span className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 bg-blue-600 text-white    dark: text-[10px] font-black flex items-center justify-center shadow-lg">
-                            {unreadMessages > 9 ? '9+' : unreadMessages}
+                        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center shadow-md">
+                            {unreadMessages > 99 ? '99+' : unreadMessages}
                         </span>
                     )}
                 </button>
@@ -129,277 +416,211 @@ const Topbar: React.FC<TopbarProps> = ({ role, title, onMenuClick }) => {
                 {/* Help */}
                 <button
                     onClick={() => navigate(ROUTES.SUPPORT)}
-                    className="hidden sm:flex p-3 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20  transition-all"
+                    className="hidden sm:flex p-2.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-all"
                     title="Support & Guide"
                 >
-                    <HelpCircle size={20} />
+                    <HelpCircle size={18} />
                 </button>
 
-                <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 mx-2"></div>
+                <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1 sm:mx-2"></div>
 
                 {/* User Profile Trigger */}
                 <div
                     onClick={() => setIsProfileOpen(true)}
-                    className="flex items-center gap-3 pl-2 group cursor-pointer"
+                    className="flex items-center gap-3 pl-1 sm:pl-2 group cursor-pointer"
                 >
                     <div className="text-right hidden sm:block">
-                        <p className="text-sm font-black text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors tracking-tight leading-none mb-1">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tracking-tight leading-none mb-1">
                             {user ? `${user.firstName} ${user.lastName}` : 'Utilisateur'}
                         </p>
-                        <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">{role}</p>
+                        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">{role}</p>
                     </div>
                     <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700  flex items-center justify-center text-white shadow-xl shadow-blue-500/20 group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">
-                            <User size={24} />
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-all duration-200">
+                            <User size={20} />
                         </div>
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500   dark: "></div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white dark:ring-slate-900" />
                     </div>
                 </div>
             </div>
 
-            {/* Profile Detail Modal */}
-            <AnimatePresence mode="wait">
-                {isProfileOpen && (
-                    <motion.div
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
+            {/* Profile Detail Modal (Rendered via Portal to overlay ALL pages and sidebars) */}
+            {typeof document !== 'undefined' && createPortal(
+                <AnimatePresence mode="wait">
+                    {isProfileOpen && (
                         <motion.div
-                            className="absolute inset-0 bg-slate-900/30 backdrop-blur-xl transition-all"
+                            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-slate-950/60 backdrop-blur-md overflow-y-auto"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            onClick={() => setIsProfileOpen(false)}
-                        />
-                        <motion.div
-                            layoutId="profile-modal"
-                            className="bg-white/95 dark:bg-slate-900/98 backdrop-blur-3xl w-full max-w-2xl max-h-[85vh] ] shadow-2xl overflow-hidden relative   dark: flex flex-col"
-                            initial={{ scale: 0.98, y: 15, opacity: 0 }}
-                            animate={{ scale: 1, y: 0, opacity: 1 }}
-                            exit={{ scale: 0.98, y: 15, opacity: 0 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
                         >
-                            {/* Scrollable Content Container */}
-                            <div className="flex-1 overflow-y-auto custom-scrollbar">
-                                {/* Decorative Header with Hero Section */}
-                                <div className="h-44 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 relative">
-                                    <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
-                                    <div className="absolute -bottom-px left-0 right-0 h-16 bg-gradient-to-t from-white/95 dark:from-slate-900/98 to-transparent"></div>
-
+                            <div
+                                className="fixed inset-0"
+                                onClick={() => setIsProfileOpen(false)}
+                            />
+                            <motion.div
+                                className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl w-full max-w-xl max-h-[90vh] shadow-2xl overflow-hidden relative flex flex-col z-10 my-auto"
+                                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                                animate={{ scale: 1, opacity: 1, y: 0 }}
+                                exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            >
+                                {/* Modal Banner Header */}
+                                <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-6 sm:p-8 text-white relative shrink-0">
                                     <button
                                         onClick={() => setIsProfileOpen(false)}
-                                        className="absolute top-8 right-8 p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white  transition-all hover:rotate-90   z-10"
+                                        className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all shadow-sm"
+                                        title="Fermer"
                                     >
                                         <X size={18} />
                                     </button>
 
-                                    <div className="absolute -bottom-10 left-12 flex items-end gap-6">
-                                        <div className="relative">
-                                            <div className="w-32 h-32 bg-white dark:bg-slate-900 p-2 ] shadow-2xl transition-transform hover:scale-105">
-                                                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 ] flex items-center justify-center text-white shadow-inner">
-                                                    <User size={56} className="drop-shadow-lg" />
+                                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+                                        <div className="relative shrink-0">
+                                            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/20 backdrop-blur-md p-1.5 shadow-xl">
+                                                <div className="w-full h-full rounded-xl bg-white text-blue-600 dark:bg-slate-800 dark:text-blue-400 flex items-center justify-center font-bold">
+                                                    <User size={36} />
                                                 </div>
                                             </div>
-                                            <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-2 ]   dark: shadow-xl">
-                                                <Check size={18} strokeWidth={4} />
+                                            <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-full border-2 border-white dark:border-slate-900 shadow-md">
+                                                <Check size={12} strokeWidth={3} />
                                             </div>
                                         </div>
 
-                                        <div className="pb-3">
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 15 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: 0.2 }}
-                                                className="flex flex-col gap-1"
-                                            >
-                                                <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none outline-none">
-                                                    {user?.firstName} {user?.lastName}
-                                                </h3>
-                                                <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-1 flex items-center gap-2 tracking-tight">
-                                                    <MapPin size={14} /> {user?.institution?.name || 'Établissement Principal'}
-                                                </p>
-                                            </motion.div>
+                                        <div className="space-y-1.5 pt-1">
+                                            <span className="px-2.5 py-0.5 rounded-lg bg-white/20 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider inline-block">
+                                                {user?.role || role}
+                                            </span>
+                                            <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-tight">
+                                                {user?.firstName} {user?.lastName}
+                                            </h3>
+                                            <p className="text-xs text-blue-100 flex items-center justify-center sm:justify-start gap-1 font-medium">
+                                                <MapPin size={12} /> {user?.institution?.name || 'Établissement Principal'}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Main Hub Content */}
-                                <div className="pt-16 p-12 space-y-12">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                        <div className="md:col-span-2">
-                                            <ProfileInfoCard icon={Mail} label="Adresse Email Officielle" value={user?.email || 'Non renseigné'} color="blue" delay={0.3} />
+                                {/* Main Scrollable Info */}
+                                <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar space-y-6 flex-1">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <div className="sm:col-span-2">
+                                            <ProfileInfoCard icon={Mail} label="Adresse Email" value={user?.email || 'Non renseigné'} color="blue" />
                                         </div>
-                                        <ProfileInfoCard icon={Phone} label="Contact Téléphonique" value={user?.phone || 'Non renseigné'} color="indigo" delay={0.4} />
-                                        <ProfileInfoCard icon={Shield} label="Rôle & Accès" value={user?.role || role} color="purple" delay={0.5} />
+                                        <ProfileInfoCard icon={Phone} label="Téléphone" value={user?.phone || 'Non renseigné'} color="indigo" />
+                                        <ProfileInfoCard icon={Shield} label="Rôle & Accès" value={user?.role || role} color="purple" />
 
                                         {user?.classe && (
-                                            <ProfileInfoCard icon={Users} label="Ma Classe" value={user.classe.name || 'Classe Assignée'} color="emerald" delay={0.6} />
+                                            <ProfileInfoCard icon={Users} label="Classe" value={user.classe.name || 'Classe Assignée'} color="emerald" />
                                         )}
                                         {user?.address && (
-                                            <div className="md:col-span-2">
-                                                <ProfileInfoCard icon={MapPin} label="Localisation" value={user.address} color="amber" delay={0.7} />
+                                            <div className="sm:col-span-2">
+                                                <ProfileInfoCard icon={MapPin} label="Adresse" value={user.address} color="amber" />
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* Legal Guardians / Parents Section (No finance info here) */}
+                                    {/* Parent Contacts Section */}
                                     {hasParentInfo && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: 0.8 }}
-                                            className="bg-slate-50 dark:bg-slate-800/40 ] p-8   dark: space-y-8"
-                                        >
-                                            <h4 className="flex items-center gap-3 text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
-                                                <Heart size={18} className="text-rose-500" /> Contacts Responsables Légaux
+                                        <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 space-y-4">
+                                            <h4 className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                                                <Heart size={16} className="text-rose-500" /> Contacts Responsables Légaux
                                             </h4>
 
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                {/* Father Column */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                {/* Father */}
                                                 {(user?.fatherFirstName || user?.fatherAccount || (user?.parent && user.parent.firstName)) && (
-                                                    <div className="space-y-4">
-                                                        <div className="px-4 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400  text-[9px] font-black uppercase tracking-widest inline-block">Père / Tuteur</div>
-                                                        <div className="space-y-3">
-                                                            <div className="flex gap-3">
-                                                                <div className="w-8 h-8  bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><User size={14} /></div>
-                                                                <div>
-                                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Nom</p>
-                                                                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                                                        {user.fatherFirstName || user.fatherAccount?.firstName || user.parent?.firstName} {user.fatherLastName || user.fatherAccount?.lastName || user.parent?.lastName}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex gap-3">
-                                                                <div className="w-8 h-8  bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><Phone size={14} /></div>
-                                                                <div>
-                                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Téléphone</p>
-                                                                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">{user.fatherPhone || user.fatherAccount?.phone || user.parent?.phone || 'N/A'}</p>
-                                                                </div>
-                                                            </div>
+                                                    <div className="space-y-3">
+                                                        <div className="px-3 py-1 bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-lg text-[10px] font-bold uppercase tracking-wider inline-block">Père / Tuteur</div>
+                                                        <div className="space-y-2 text-xs">
+                                                            <p className="font-bold text-slate-900 dark:text-white">
+                                                                {user.fatherFirstName || user.fatherAccount?.firstName || user.parent?.firstName} {user.fatherLastName || user.fatherAccount?.lastName || user.parent?.lastName}
+                                                            </p>
+                                                            <p className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                                                <Phone size={12} className="text-blue-500" /> {user.fatherPhone || user.fatherAccount?.phone || user.parent?.phone || 'Non renseigné'}
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 )}
 
-                                                {/* Mother Column */}
+                                                {/* Mother */}
                                                 {(user?.motherFirstName || user?.motherAccount) && (
-                                                    <div className="space-y-4   dark: md:pl-8">
-                                                        <div className="px-4 py-1.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400  text-[9px] font-black uppercase tracking-widest inline-block">Mère / Tutrice</div>
-                                                        <div className="space-y-3">
-                                                            <div className="flex gap-3">
-                                                                <div className="w-8 h-8  bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><User size={14} /></div>
-                                                                <div>
-                                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Nom</p>
-                                                                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                                                        {user.motherFirstName || user.motherAccount?.firstName} {user.motherLastName || user.motherAccount?.lastName}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex gap-3">
-                                                                <div className="w-8 h-8  bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 shrink-0"><Phone size={14} /></div>
-                                                                <div>
-                                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Téléphone</p>
-                                                                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">{user.motherPhone || user.motherAccount?.phone || 'N/A'}</p>
-                                                                </div>
-                                                            </div>
+                                                    <div className="space-y-3">
+                                                        <div className="px-3 py-1 bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-lg text-[10px] font-bold uppercase tracking-wider inline-block">Mère / Tutrice</div>
+                                                        <div className="space-y-2 text-xs">
+                                                            <p className="font-bold text-slate-900 dark:text-white">
+                                                                {user.motherFirstName || user.motherAccount?.firstName} {user.motherLastName || user.motherAccount?.lastName}
+                                                            </p>
+                                                            <p className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                                                <Phone size={12} className="text-rose-500" /> {user.motherPhone || user.motherAccount?.phone || 'Non renseigné'}
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 )}
                                             </div>
-                                        </motion.div>
+                                        </div>
                                     )}
                                 </div>
-                            </div>
 
-                            {/* Footer Sticky Buttons (Removed any finance links) */}
-                            <div className="p-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl   dark: flex items-center justify-between gap-5 px-12 group/footer">
-                                <motion.button
-                                    whileHover={{ scale: 1.01 }}
-                                    whileTap={{ scale: 0.99 }}
-                                    onClick={() => {
-                                        setIsProfileOpen(false);
-                                        navigate(ROUTES.PROFILE);
-                                    }}
-                                    className="flex-1 py-4.5 bg-slate-900 dark:bg-indigo-600 text-white ] font-black shadow-xl shadow-indigo-600/10 hover:shadow-indigo-600/30 transition-all text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3  "
-                                >
-                                    Mon Compte <User size={14} />
-                                </motion.button>
+                                {/* Modal Footer */}
+                                <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 shrink-0">
+                                    <button
+                                        onClick={() => {
+                                            setIsProfileOpen(false);
+                                            navigate(ROUTES.PROFILE);
+                                        }}
+                                        className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-colors flex items-center justify-center gap-2 uppercase tracking-wider"
+                                    >
+                                        Mon Compte <User size={14} />
+                                    </button>
 
-                                <motion.button
-                                    whileHover={{ scale: 1.01 }}
-                                    whileTap={{ scale: 0.99 }}
-                                    onClick={() => {
-                                        setIsProfileOpen(false);
-                                        logout();
-                                    }}
-                                    className="px-8 py-4.5 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 ] font-black hover:bg-red-600 hover:text-white transition-all text-[10px] uppercase tracking-widest   dark:"
-                                >
-                                    <LogOut size={18} />
-                                </motion.button>
-                            </div>
+                                    <button
+                                        onClick={() => {
+                                            setIsProfileOpen(false);
+                                            logout();
+                                        }}
+                                        className="px-4 py-2.5 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-600 hover:text-white text-rose-600 dark:text-rose-400 rounded-xl font-bold text-xs transition-colors flex items-center gap-2"
+                                        title="Déconnexion"
+                                    >
+                                        <LogOut size={16} /> Déconnexion
+                                    </button>
+                                </div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
 
             <style>
                 {`
                     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
                     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; -radius: 10px; }
-                    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; }
+                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+                    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
                 `}
             </style>
         </header>
     );
 };
 
-const ProfileInfoCard = ({ icon: Icon, label, value, color, delay }: { icon: any, label: string, value: string, color: string, delay: number }) => {
+const ProfileInfoCard = ({ icon: Icon, label, value, color }: { icon: any, label: string, value: string, color: string }) => {
     const colors: Record<string, string> = {
-        blue: 'text-blue-500 bg-blue-50 dark:bg-blue-900/20  dark:',
-        indigo: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20  dark:',
-        purple: 'text-purple-500 bg-purple-50 dark:bg-purple-900/20  dark:',
-        emerald: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20  dark:',
-        amber: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20  dark:',
+        blue: 'text-blue-600 bg-blue-50 dark:bg-blue-950/40 border-blue-100 dark:border-blue-900/40',
+        indigo: 'text-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 border-indigo-100 dark:border-indigo-900/40',
+        purple: 'text-purple-600 bg-purple-50 dark:bg-purple-950/40 border-purple-100 dark:border-purple-900/40',
+        emerald: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-100 dark:border-emerald-900/40',
+        amber: 'text-amber-600 bg-amber-50 dark:bg-amber-950/40 border-amber-100 dark:border-amber-900/40',
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay, duration: 0.4 }}
-            className="p-5 bg-white dark:bg-slate-900/40 ]   dark: shadow-sm transition-all"
-        >
-            <div className={`w-10 h-10  flex items-center justify-center mb-3 ${colors[color]}`}>
+        <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm space-y-1">
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-2 border ${colors[color]}`}>
                 <Icon size={16} />
             </div>
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">{label}</p>
-            <p className="text-[11px] font-bold text-slate-800 dark:text-slate-100 tracking-tight break-all">{value}</p>
-        </motion.div>
-    );
-};
-
-const ShortcutButton = ({ icon: Icon, label, sub, color, onClick }: { icon: any, label: string, sub: string, color: string, onClick?: () => void }) => {
-    const iconColors: Record<string, string> = {
-        blue: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30',
-        emerald: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30',
-        slate: 'text-slate-600 bg-slate-50 dark:bg-slate-800/30',
-    };
-
-    return (
-        <button
-            onClick={onClick}
-            className="flex-1 flex items-center gap-4 p-4 bg-white dark:bg-slate-900/30 ]   dark: hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group/btn"
-        >
-            <div className={`w-10 h-10  flex items-center justify-center shrink-0 ${iconColors[color]}`}>
-                <Icon size={16} />
-            </div>
-            <div className="text-left">
-                <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none mb-0.5">{label}</p>
-                <p className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{sub}</p>
-            </div>
-        </button>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</p>
+            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{value}</p>
+        </div>
     );
 };
 

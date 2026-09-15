@@ -84,22 +84,38 @@ body {
         display: none !important;
     }
 
-    .print-section {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        background: white !important;
-        z-index: 9999;
-    }
-
     body * {
-        visibility: hidden;
+        visibility: hidden !important;
     }
 
     .print-section,
-    .print-section * {
-        visibility: visible;
+    .print-section *,
+    #printable-receipt-area,
+    #printable-receipt-area * {
+        visibility: visible !important;
+        color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .print-section,
+    #printable-receipt-area {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 10px !important;
+        background: white !important;
+        box-shadow: none !important;
+        border: none !important;
+        z-index: 99999 !important;
+    }
+
+    @page {
+        size: auto;
+        margin: 0mm;
     }
 }
 

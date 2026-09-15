@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Plus, Layers, School, Trash2, CheckCircle2, AlertCircle, X, Save, Loader2 } from 'lucide-react';
+import { CreditCard, Plus, Layers, School, Trash2, CheckCircle2, AlertCircle, X, Save, Loader2, Copy, Calendar, History, RefreshCw } from 'lucide-react';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,6 +17,7 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
     const [classes, setClasses] = useState<any[]>([]);
     const [academicYears, setAcademicYears] = useState<any[]>([]);
     const [currentYear, setCurrentYear] = useState<any>(null);
+    const [selectedYearId, setSelectedYearId] = useState<number | null>(null);
     const [institution, setInstitution] = useState<any>(null);
     const [isSavingFee, setIsSavingFee] = useState(false);
     const [isSubmittingPlan, setIsSubmittingPlan] = useState(false);
@@ -27,17 +28,22 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
     const [confirmDelete, setConfirmDelete] = useState<{ isOpen: boolean, id: number | null }>({ isOpen: false, id: null });
     const [confirmDeleteFeeType, setConfirmDeleteFeeType] = useState<{ isOpen: boolean, id: number | null }>({ isOpen: false, id: null });
 
+    // State for Duplication Modal
+    const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+    const [sourceYearId, setSourceYearId] = useState<string>('');
+    const [isDuplicating, setIsDuplicating] = useState(false);
+
     const [feeTypes, setFeeTypes] = useState<any[]>([]);
     const [feeTypeForm, setFeeTypeForm] = useState<{ id: number | null, name: string, description: string }>({ id: null, name: '', description: '' });
 
-    // Form state
     const [formData, setFormData] = useState({
         name: '',
         description: '',
         totalAmount: 0,
-        targetType: 'CLASSE', // 'CYCLE' or 'CLASSE'
+        targetType: 'CLASSE',
         cycleId: '',
         classeId: '',
+        targetStudentCategory: 'ALL',
         fees: [{ feeTypeId: '', amount: 0, startDate: '', dueDate: '' }]
     });
 
@@ -50,7 +56,7 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
     const fetchFeeTypes = async () => {
         try {
             const res = await api.get('/finance/fee-types', { params: { institutionId: activeInstitutionId } });
-            setFeeTypes(res.data);
+            setFeeTypes(res.data || []);
         } catch (error) {
             console.error(error);
         }
@@ -68,12 +74,22 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
             ]);
 
             setInstitution(instRes.data);
-            const activeYear = yearsRes.data.find((y: any) => y.isActive || y.isCurrent || y.current);
+            const years = yearsRes.data || [];
+            const activeYear = years.find((y: any) => y.isActive || y.isCurrent || y.current) || years[0];
             setCurrentYear(activeYear);
-            setAcademicYears(yearsRes.data);
-            setCycles(cyclesRes.data);
-            setClasses(classesRes.data);
-            setFeeTypes(feeTypesRes.data);
+            if (activeYear) {
+                setSelectedYearId(activeYear.id);
+            }
+            setAcademicYears(years);
+            setCycles(cyclesRes.data || []);
+            setClasses(classesRes.data || []);
+            setFeeTypes(feeTypesRes.data || []);
+
+            // Default source year for duplication modal (first year that is not current)
+            const previousYear = years.find((y: any) => y.id !== activeYear?.id);
+            if (previousYear) {
+                setSourceYearId(String(previousYear.id));
+            }
 
             if (activeYear) {
                 fetchPlans(activeYear.id);
@@ -82,6 +98,34 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
             console.error(error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDuplicatePlans = async () => {
+        const targetId = selectedYearId || currentYear?.id;
+        if (!sourceYearId || !targetId) return;
+        
+        setIsDuplicating(true);
+        try {
+            const res = await api.post('/finance/plans/duplicate', null, {
+                params: {
+                    institutionId: activeInstitutionId,
+                    sourceAcademicYearId: sourceYearId,
+                    targetAcademicYearId: targetId
+                }
+            });
+            const count = res.data?.length || 0;
+            if (count > 0) {
+                setMessage({ type: 'success', text: `${count} plan(s) de paiement ont été dupliqués avec succès pour l'année sélectionnée.` });
+            } else {
+                setMessage({ type: 'error', text: "Tous les plans de l'année sélectionnée existent déjà ou l'année source ne contient aucun plan." });
+            }
+            setIsDuplicateModalOpen(false);
+            fetchPlans(targetId);
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.response?.data?.message || 'Erreur lors de la duplication des plans.' });
+        } finally {
+            setIsDuplicating(false);
         }
     };
 
@@ -126,7 +170,7 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
             const res = await api.get('/finance/plans', {
                 params: { institutionId: activeInstitutionId, academicYearId: yearId }
             });
-            setPlans(res.data);
+            setPlans(res.data || []);
         } catch (error) {
             console.error(error);
         }
@@ -147,7 +191,6 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
         const newFees = [...formData.fees];
         newFees[index] = { ...newFees[index], [field]: value };
 
-        // Auto update total
         const newTotal = newFees.reduce((sum, f) => sum + Number(f.amount || 0), 0);
 
         setFormData(prev => ({
@@ -175,13 +218,14 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
         setFormData({
             name: plan.name,
             description: plan.description || '',
-            totalAmount: plan.totalAmount,
+            totalAmount: plan.totalAmount || 0,
             targetType: plan.classe ? 'CLASSE' : 'CYCLE',
             cycleId: plan.cycle?.id || '',
             classeId: plan.classe?.id || '',
+            targetStudentCategory: plan.targetStudentCategory || 'ALL',
             fees: plan.fees?.map((f: any) => ({
                 feeTypeId: f.feeType?.id || '',
-                amount: f.amount,
+                amount: f.amount || 0,
                 startDate: formatDateForInput(f.startDate),
                 dueDate: formatDateForInput(f.dueDate)
             })) || []
@@ -231,6 +275,7 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
                 name: formData.name,
                 description: formData.description,
                 totalAmount: formData.totalAmount,
+                targetStudentCategory: formData.targetStudentCategory || 'ALL',
                 institution: { id: activeInstitutionId },
                 academicYear: { id: currentYear.id },
                 cycle: formData.targetType === 'CYCLE' && formData.cycleId ? { id: formData.cycleId } : null,
@@ -258,7 +303,7 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
             setEditingPlanId(null);
             fetchPlans(currentYear.id);
             setFormData({
-                name: '', description: '', totalAmount: 0, targetType: 'CLASSE', cycleId: '', classeId: '',
+                name: '', description: '', totalAmount: 0, targetType: 'CLASSE', cycleId: '', classeId: '', targetStudentCategory: 'ALL',
                 fees: [{ feeTypeId: '', amount: 0, startDate: '', dueDate: '' }]
             });
         } catch (error) {
@@ -287,111 +332,132 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
         setMessage({ type: '', text: '' });
         setEditingPlanId(null);
         setFormData({
-            name: '',
-            description: '',
-            totalAmount: 0,
-            targetType: 'CLASSE',
-            cycleId: '',
-            classeId: '',
+            name: '', description: '', totalAmount: 0, targetType: 'CLASSE', cycleId: '', classeId: '', targetStudentCategory: 'ALL',
             fees: [{ feeTypeId: '', amount: 0, startDate: '', dueDate: '' }]
         });
         setIsModalOpen(true);
     };
 
     return (
-        <>
-            {!hideLayout && (
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                {!hideLayout ? (
                     <div>
-                        <h2 className="text-3xl font-black text-slate-800 tracking-tight">Frais de scolarité</h2>
-                        <p className="text-slate-500 font-medium mt-1">Gérez les plans de paiement et les tranches par classe.</p>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Frais de scolarité</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gérez les plans de paiement et les tranches par classe.</p>
                     </div>
+                ) : <div />}
+                <div className="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
+                    {academicYears.length > 0 && (
+                        <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-2 rounded-xl shadow-sm">
+                            <Calendar size={14} className="text-blue-600 dark:text-blue-400" />
+                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Année :</span>
+                            <select
+                                value={selectedYearId || currentYear?.id || ''}
+                                onChange={(e) => {
+                                    const yearId = Number(e.target.value);
+                                    setSelectedYearId(yearId);
+                                    fetchPlans(yearId);
+                                }}
+                                className="bg-transparent text-xs font-bold text-slate-900 dark:text-white outline-none cursor-pointer"
+                            >
+                                {academicYears.map((ay: any) => (
+                                    <option key={ay.id} value={ay.id} className="dark:bg-slate-900">
+                                        {ay.name} {ay.isCurrent || ay.isActive ? '(En cours)' : ''}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                    {academicYears.length > 1 && (
+                        <button
+                            onClick={() => {
+                                const targetId = selectedYearId || currentYear?.id;
+                                const otherYear = academicYears.find((y: any) => y.id !== targetId);
+                                if (otherYear) setSourceYearId(String(otherYear.id));
+                                setIsDuplicateModalOpen(true);
+                            }}
+                            className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all shadow-sm"
+                        >
+                            <Copy size={15} className="text-blue-600 dark:text-blue-400" /> Dupliquer d'une année
+                        </button>
+                    )}
                     <button
                         onClick={handleOpenNewPlan}
-                        className="bg-indigo-600 text-white px-6 py-3 font-bold flex items-center gap-2 hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md transition-all"
                     >
-                        <Plus size={20} /> Nouveau Plan de Paiement
+                        <Plus size={16} /> Nouveau Plan
                     </button>
                 </div>
-            )}
-            {hideLayout && (
-                <div className="flex justify-end mb-6">
-                    <button
-                        onClick={handleOpenNewPlan}
-                        className="bg-indigo-600 text-white px-6 py-3 font-bold flex items-center gap-2 hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20"
-                    >
-                        <Plus size={20} /> Nouveau Plan de Paiement
-                    </button>
-                </div>
-            )}
+            </div>
 
             {/* Fee Types Management */}
-            <div className="bg-white p-6 md:p-8 shadow-lg shadow-slate-200/50 mb-10 border-l-4 border-indigo-600">
-                <div className="mb-6">
-                    <h3 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                        <Layers size={24} className="text-indigo-600" />
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+                <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Layers size={20} className="text-blue-600 dark:text-blue-400" />
                         Types de Frais
                     </h3>
-                    <p className="text-slate-500 font-medium text-sm mt-1">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         Définissez les différents types de frais (ex: Frais d'inscription, Frais de scolarité, Tenue de sport).
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-1 bg-slate-50 p-5 rounded-xl border border-slate-200">
-                        <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            {feeTypeForm.id ? <><CreditCard size={18} /> Modifier le type</> : <><Plus size={18} /> Nouveau type</>}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="lg:col-span-1 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700">
+                        <h4 className="font-bold text-xs text-slate-900 dark:text-white mb-3 flex items-center gap-1.5">
+                            {feeTypeForm.id ? <><CreditCard size={14} /> Modifier le type</> : <><Plus size={14} /> Nouveau type</>}
                         </h4>
-                        <form onSubmit={handleSaveFeeType} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 mb-1">Nom du frais</label>
+                        <form onSubmit={handleSaveFeeType} className="space-y-3">
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Nom du frais</label>
                                 <input type="text" required value={feeTypeForm.name} onChange={e => setFeeTypeForm({ ...feeTypeForm, name: e.target.value })}
-                                    placeholder="ex: Frais d'inscription" className="w-full p-2.5 bg-white border border-slate-200 focus:ring-2 focus:ring-indigo-600 transition-all text-sm font-bold text-slate-700" />
+                                    placeholder="ex: Frais d'inscription" className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20" />
                             </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 mb-1">Description (Optionnel)</label>
-                                <textarea rows={3} value={feeTypeForm.description} onChange={e => setFeeTypeForm({ ...feeTypeForm, description: e.target.value })}
-                                    placeholder="Courte description" className="w-full p-2.5 bg-white border border-slate-200 focus:ring-2 focus:ring-indigo-600 transition-all text-sm resize-none custom-scrollbar" />
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Description (Optionnel)</label>
+                                <textarea rows={2} value={feeTypeForm.description} onChange={e => setFeeTypeForm({ ...feeTypeForm, description: e.target.value })}
+                                    placeholder="Courte description" className="w-full p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white outline-none resize-none" />
                             </div>
-                            <div className="flex gap-3 pt-2">
+                            <div className="flex gap-2 pt-1">
                                 {feeTypeForm.id && (
-                                    <button type="button" onClick={() => setFeeTypeForm({ id: null, name: '', description: '' })} className="flex-1 px-4 py-2.5 text-xs font-bold text-slate-600 bg-slate-200 hover:bg-slate-300 transition-colors">
+                                    <button type="button" onClick={() => setFeeTypeForm({ id: null, name: '', description: '' })} className="flex-1 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 rounded-xl hover:bg-slate-300 transition-colors">
                                         Annuler
                                     </button>
                                 )}
-                                <button type="submit" className="flex-1 px-4 py-2.5 text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20">
-                                    <Save size={16} /> {feeTypeForm.id ? 'Mettre à jour' : 'Enregistrer'}
+                                <button type="submit" className="flex-1 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-md">
+                                    <Save size={14} /> {feeTypeForm.id ? 'Mettre à jour' : 'Enregistrer'}
                                 </button>
                             </div>
                         </form>
                     </div>
 
                     <div className="lg:col-span-2">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {feeTypes.map(ft => (
-                                <div key={ft.id} className="bg-white border border-slate-200 p-4 rounded-xl flex flex-col hover:border-indigo-400 hover:shadow-md transition-all group">
-                                    <div className="flex justify-between items-start w-full">
-                                        <div className="font-black text-slate-800 break-words flex-1 min-w-0 pr-2">{ft.name}</div>
-                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                                            <button onClick={() => setFeeTypeForm(ft)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded text-xs font-bold">
+                                <div key={ft.id} className="bg-white dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 p-3.5 rounded-xl flex flex-col justify-between group">
+                                    <div className="flex justify-between items-start">
+                                        <div className="font-bold text-xs text-slate-900 dark:text-white">{ft.name}</div>
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={() => setFeeTypeForm(ft)} className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded text-xs font-bold">
                                                 Modifier
                                             </button>
-                                            <button onClick={() => handleDeleteFeeType(ft.id)} className="p-2 text-red-500 hover:bg-red-50 rounded">
-                                                <Trash2 size={16} />
+                                            <button onClick={() => handleDeleteFeeType(ft.id)} className="p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded">
+                                                <Trash2 size={14} />
                                             </button>
                                         </div>
                                     </div>
                                     {ft.description && (
-                                        <div className="text-slate-500 text-xs mt-2 font-medium leading-relaxed break-words break-all whitespace-pre-wrap">
+                                        <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 line-clamp-2">
                                             {ft.description}
-                                        </div>
+                                        </p>
                                     )}
                                 </div>
                             ))}
                             {feeTypes.length === 0 && (
-                                <div className="col-span-full py-12 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50">
-                                    <Layers size={32} className="mx-auto mb-3 text-slate-300" />
-                                    <span className="font-medium text-sm">Aucun type de frais configuré.</span>
+                                <div className="col-span-full py-8 text-center text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800/40 rounded-xl">
+                                    <Layers size={28} className="mx-auto mb-2 opacity-50" />
+                                    <span className="text-xs font-semibold">Aucun type de frais configuré.</span>
                                 </div>
                             )}
                         </div>
@@ -400,71 +466,82 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
             </div>
 
             {message.text && (
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                    className={`p-4 mb-6 font-bold flex items-center justify-between shadow-sm ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}
-                >
-                    <div className="flex items-center gap-3">
-                        {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                <div className={`p-4 rounded-xl font-bold text-xs flex items-center justify-between gap-3 ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800'}`}>
+                    <div className="flex items-center gap-2">
+                        {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
                         <span>{message.text}</span>
                     </div>
-                    <button onClick={() => setMessage({ type: '', text: '' })}><X size={20} /></button>
-                </motion.div>
+                    <button onClick={() => setMessage({ type: '', text: '' })}><X size={16} /></button>
+                </div>
             )}
 
             {loading ? (
-                <div className="flex justify-center p-20"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div></div>
+                <div className="py-16 text-center">
+                    <Loader2 className="animate-spin text-blue-600 mx-auto mb-3" size={32} />
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Chargement des plans...</p>
+                </div>
             ) : plans.length === 0 ? (
-                <div className="bg-white p-16 text-center shadow-sm">
-                    <div className="w-20 h-20 bg-slate-50 flex items-center justify-center mx-auto mb-6 text-slate-300">
-                        <CreditCard size={40} />
+                <div className="bg-white dark:bg-slate-900 p-12 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center">
+                    <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <CreditCard size={28} />
                     </div>
-                    <h3 className="text-2xl font-black text-slate-800 mb-2">Aucun plan de paiement</h3>
-                    <p className="text-slate-500">Configurez les frais de scolarité pour permettre l'inscription des élèves.</p>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Aucun plan de paiement</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Configurez les frais de scolarité pour permettre l'inscription des élèves.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {plans.map((plan) => (
-                        <div key={plan.id} className="bg-white p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                            <div className="flex justify-between items-start mb-4">
+                        <div key={plan.id} className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
+                            <div className="flex justify-between items-start mb-3">
                                 <div>
-                                    <h3 className="text-xl font-black text-slate-800">{plan.name}</h3>
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white">{plan.name}</h3>
                                     {plan.description && (
-                                        <p className="text-sm text-slate-500 mt-1">{plan.description}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{plan.description}</p>
                                     )}
-                                    <div className="text-sm font-medium text-indigo-600 flex items-center gap-1 mt-1">
-                                        {plan.classe ? <><School size={14} /> Classe: {plan.classe.name}</> : <><Layers size={14} /> Cycle: {plan.cycle?.name}</>}
+                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                        <div className="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                                            {plan.classe ? <><School size={12} /> Classe: {plan.classe.name}</> : <><Layers size={12} /> Cycle: {plan.cycle?.name}</>}
+                                        </div>
+                                        {plan.targetStudentCategory === 'NEW_STUDENT' && (
+                                            <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">Nouveaux élèves</span>
+                                        )}
+                                        {plan.targetStudentCategory === 'RETURNING_STUDENT' && (
+                                            <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300">Anciens élèves</span>
+                                        )}
+                                        {(!plan.targetStudentCategory || plan.targetStudentCategory === 'ALL') && (
+                                            <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Tous les élèves</span>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="bg-slate-100 text-slate-600 px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-full">
-                                    {plan.totalAmount.toLocaleString()} FCFA
-                                </div>
+                                <span className="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-2.5 py-1 text-xs font-bold rounded-lg uppercase">
+                                    {(plan.totalAmount || 0).toLocaleString()} FCFA
+                                </span>
                             </div>
 
-                            <div className="space-y-2 mt-6">
-                                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Tranches ({plan.fees?.length || 0})</h4>
-                                <div className="space-y-2">
+                            <div className="space-y-2 mt-4">
+                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Tranches ({plan.fees?.length || 0})</h4>
+                                <div className="space-y-1.5">
                                     {plan.fees?.map((f: any, idx: number) => (
-                                        <div key={idx} className="flex justify-between items-center text-sm font-bold bg-slate-50 p-2 rounded">
-                                            <span>Tranche {idx + 1}</span>
-                                            <span className="font-bold text-slate-900">{f.amount.toLocaleString()} FCFA</span>
+                                        <div key={idx} className="flex justify-between items-center text-xs font-semibold bg-slate-50 dark:bg-slate-800/60 p-2 rounded-lg">
+                                            <span className="text-slate-600 dark:text-slate-400">Tranche {idx + 1}</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">{(f.amount || 0).toLocaleString()} FCFA</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
-                            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-2">
+                            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
                                 <button
                                     onClick={() => handleEditPlan(plan)}
-                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-3 py-1.5 transition-colors flex items-center gap-1"
+                                    className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline px-2 py-1"
                                 >
                                     Modifier
                                 </button>
                                 <button
                                     onClick={() => setConfirmDelete({ isOpen: true, id: plan.id })}
-                                    className="text-xs font-bold text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 transition-colors flex items-center gap-1"
+                                    className="text-xs font-bold text-red-600 dark:text-red-400 hover:underline px-2 py-1 flex items-center gap-1"
                                 >
-                                    <Trash2 size={14} /> Supprimer
+                                    <Trash2 size={12} /> Supprimer
                                 </button>
                             </div>
                         </div>
@@ -472,32 +549,24 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
                 </div>
             )}
 
+            {/* Modal */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
                         >
-                            <div className="sticky top-0 bg-white z-20 border-b border-slate-100 shadow-sm">
-                                <div className="p-6 flex justify-between items-center">
-                                    <h3 className="text-xl font-black text-slate-800">{editingPlanId ? 'Modifier le Plan de Paiement' : 'Nouveau Plan de Paiement'}</h3>
-                                    <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600"><X size={24} /></button>
-                                </div>
-                                {message.text && message.type === 'error' && (
-                                    <div className="bg-red-50 text-red-600 p-4 px-6 font-bold flex items-start gap-3 border-t border-red-100">
-                                        <AlertCircle size={20} className="shrink-0 mt-0.5" />
-                                        <span>{message.text}</span>
-                                    </div>
-                                )}
+                            <div className="sticky top-0 bg-white dark:bg-slate-900 z-20 border-b border-slate-100 dark:border-slate-800 p-5 flex justify-between items-center">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">{editingPlanId ? 'Modifier le Plan de Paiement' : 'Nouveau Plan de Paiement'}</h3>
+                                <button onClick={() => setIsModalOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><X size={18} /></button>
                             </div>
 
-                            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                                
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="col-span-2">
-                                        <label className="block text-sm font-bold text-slate-700 mb-2">Nom du plan / type de frais</label>
+                            <form onSubmit={handleSubmit} className="p-5 space-y-4">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="col-span-2 space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Nom du plan / type de frais</label>
                                         <select required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                            className="w-full p-3 bg-slate-50 border-none font-medium focus:bg-white focus:ring-2 focus:ring-indigo-600 transition-all">
+                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none">
                                             <option value="">Sélectionner le type de frais principal</option>
                                             {feeTypes.map(ft => (
                                                 <option key={ft.id} value={ft.name}>{ft.name}</option>
@@ -505,36 +574,46 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
                                         </select>
                                     </div>
 
-                                    <div className="col-span-2">
-                                        <label className="block text-sm font-bold text-slate-700 mb-2">Description (Optionnel)</label>
+                                    <div className="col-span-2 space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Description (Optionnel)</label>
                                         <textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                            placeholder="ex: Concerne les frais pour la tenue de sport..." rows={2} className="w-full p-3 bg-slate-50 border-none font-medium focus:bg-white focus:ring-2 focus:ring-indigo-600 transition-all" />
+                                            placeholder="ex: Concerne les frais pour la tenue de sport..." rows={2} className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white outline-none resize-none" />
                                     </div>
 
-                                    <div>
-                                        <label className="block text-sm font-bold text-slate-700 mb-2">Appliquer à</label>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Appliquer à</label>
                                         <select value={formData.targetType} onChange={e => setFormData({ ...formData, targetType: e.target.value, cycleId: '', classeId: '' })}
-                                            className="w-full p-3 bg-slate-50 border-none font-medium focus:bg-white focus:ring-2 focus:ring-indigo-600 transition-all">
+                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none">
                                             <option value="CLASSE">Une Classe spécifique</option>
                                             <option value="CYCLE">Tout un Cycle</option>
                                         </select>
                                     </div>
 
-                                    <div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Catégorie d'élève</label>
+                                        <select value={formData.targetStudentCategory} onChange={e => setFormData({ ...formData, targetStudentCategory: e.target.value })}
+                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none">
+                                            <option value="ALL">Tous les élèves (Nouveaux & Anciens)</option>
+                                            <option value="NEW_STUDENT">Nouveaux élèves uniquement</option>
+                                            <option value="RETURNING_STUDENT">Anciens élèves uniquement</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="space-y-1">
                                         {formData.targetType === 'CLASSE' ? (
                                             <>
-                                                <label className="block text-sm font-bold text-slate-700 mb-2">Classe</label>
+                                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Classe</label>
                                                 <select required value={formData.classeId} onChange={e => setFormData({ ...formData, classeId: e.target.value })}
-                                                    className="w-full p-3 bg-slate-50 border-none font-medium focus:bg-white focus:ring-2 focus:ring-indigo-600 transition-all">
+                                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none">
                                                     <option value="">Sélectionner une classe</option>
                                                     {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                                 </select>
                                             </>
                                         ) : (
                                             <>
-                                                <label className="block text-sm font-bold text-slate-700 mb-2">Cycle</label>
+                                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Cycle</label>
                                                 <select required value={formData.cycleId} onChange={e => setFormData({ ...formData, cycleId: e.target.value })}
-                                                    className="w-full p-3 bg-slate-50 border-none font-medium focus:bg-white focus:ring-2 focus:ring-indigo-600 transition-all">
+                                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none">
                                                     <option value="">Sélectionner un cycle</option>
                                                     {cycles.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                                 </select>
@@ -543,38 +622,35 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
                                     </div>
                                 </div>
 
-                                <div className="border-t border-slate-100 pt-6">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h4 className="text-sm font-bold text-slate-800">Définition des Tranches</h4>
-                                        <div className="flex gap-2">
-                                            <button type="button" onClick={handleAddFee} className="text-emerald-600 text-sm font-bold flex items-center gap-1 hover:underline ml-4">
-                                                <Plus size={16} /> Ajouter une tranche
-                                            </button>
-                                        </div>
+                                <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Définition des Tranches</h4>
+                                        <button type="button" onClick={handleAddFee} className="text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center gap-1 hover:underline">
+                                            <Plus size={14} /> Ajouter une tranche
+                                        </button>
                                     </div>
 
-                                    <div className="space-y-4">
+                                    <div className="space-y-3">
                                         {formData.fees.map((inst, index) => (
-                                            <div key={index} className="flex items-center gap-4 bg-slate-50 p-4 border border-slate-100">
-
-                                                <div className="flex-1">
-                                                    <label className="block text-xs font-bold text-slate-500 mb-1">Montant (FCFA)</label>
+                                            <div key={index} className="flex flex-wrap items-center gap-2 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                                                <div className="flex-1 min-w-[120px]">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Montant (FCFA)</label>
                                                     <input type="number" required min="0" value={inst.amount} onChange={e => handleFeeChange(index, 'amount', e.target.value)}
-                                                        className="w-full p-2 bg-white border border-slate-200" />
+                                                        className="w-full px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-900 dark:text-white outline-none" />
                                                 </div>
-                                                <div className="flex-1">
-                                                    <label className="block text-xs font-bold text-slate-500 mb-1">Date de début (optionnel)</label>
+                                                <div className="flex-1 min-w-[120px]">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Date début</label>
                                                     <input type="date" value={inst.startDate} onChange={e => handleFeeChange(index, 'startDate', e.target.value)}
-                                                        className="w-full p-2 bg-white border border-slate-200" />
+                                                        className="w-full px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-900 dark:text-white outline-none" />
                                                 </div>
-                                                <div className="flex-1">
-                                                    <label className="block text-xs font-bold text-slate-500 mb-1">Date limite</label>
+                                                <div className="flex-1 min-w-[120px]">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Date limite</label>
                                                     <input type="date" value={inst.dueDate} onChange={e => handleFeeChange(index, 'dueDate', e.target.value)}
-                                                        className="w-full p-2 bg-white border border-slate-200" />
+                                                        className="w-full px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-900 dark:text-white outline-none" />
                                                 </div>
                                                 {formData.fees.length > 1 && (
-                                                    <button type="button" onClick={() => handleRemoveFee(index)} className="mt-5 text-red-500 hover:bg-red-50 p-2 rounded">
-                                                        <Trash2 size={18} />
+                                                    <button type="button" onClick={() => handleRemoveFee(index)} className="mt-4 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 p-1.5 rounded-lg">
+                                                        <Trash2 size={16} />
                                                     </button>
                                                 )}
                                             </div>
@@ -582,17 +658,17 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
                                     </div>
                                 </div>
 
-                                <div className="bg-indigo-50 p-4 rounded flex justify-between items-center">
-                                    <span className="font-bold text-indigo-900">Montant Total :</span>
-                                    <span className="text-xl font-black text-indigo-700">{formData.totalAmount.toLocaleString()} FCFA</span>
+                                <div className="bg-blue-50 dark:bg-blue-950/40 p-3 rounded-xl flex justify-between items-center border border-blue-100 dark:border-blue-900/50">
+                                    <span className="font-bold text-xs text-blue-900 dark:text-blue-300 uppercase">Montant Total :</span>
+                                    <span className="text-base font-bold text-blue-600 dark:text-blue-400">{formData.totalAmount.toLocaleString()} FCFA</span>
                                 </div>
 
-                                <div className="pt-6 flex justify-end gap-4">
-                                    <button type="button" onClick={() => setIsModalOpen(false)} disabled={isSubmittingPlan} className="px-6 py-3 font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                <div className="pt-2 flex justify-end gap-2">
+                                    <button type="button" onClick={() => setIsModalOpen(false)} disabled={isSubmittingPlan} className="px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors disabled:opacity-50">
                                         Annuler
                                     </button>
-                                    <button type="submit" disabled={isSubmittingPlan} className="px-6 py-3 font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        {isSubmittingPlan ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                                    <button type="submit" disabled={isSubmittingPlan} className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md transition-colors flex items-center gap-1.5 disabled:opacity-50">
+                                        {isSubmittingPlan ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                                         {isSubmittingPlan ? 'Enregistrement...' : 'Enregistrer'}
                                     </button>
                                 </div>
@@ -604,24 +680,24 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
 
             <AnimatePresence>
                 {confirmDelete.isOpen && (
-                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[60] flex items-center justify-center p-4">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-                            className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 text-center"
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center"
                         >
-                            <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <AlertCircle size={32} />
+                            <div className="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto mb-3">
+                                <AlertCircle size={24} />
                             </div>
-                            <h3 className="text-xl font-black text-slate-800 mb-2">Supprimer le plan ?</h3>
-                            <p className="text-slate-500 font-medium mb-6">
+                            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Supprimer le plan ?</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
                                 Cette action est irréversible. Les tranches associées aux élèves seront également affectées.
                             </p>
-                            <div className="flex gap-4">
+                            <div className="flex gap-2">
                                 <button onClick={() => setConfirmDelete({ isOpen: false, id: null })}
-                                    className="flex-1 py-3 font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">
+                                    className="flex-1 py-2 font-bold text-xs text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl transition-colors">
                                     Annuler
                                 </button>
                                 <button onClick={handleDeletePlan}
-                                    className="flex-1 py-3 font-bold text-white bg-red-500 hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20">
+                                    className="flex-1 py-2 font-bold text-xs text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md transition-colors">
                                     Supprimer
                                 </button>
                             </div>
@@ -629,34 +705,100 @@ const TuitionFees: React.FC<TuitionFeesProps> = ({ institutionId: propInstId, hi
                     </div>
                 )}
 
-                {/* Modal Suppression Fee Type */}
                 {confirmDeleteFeeType.isOpen && (
-                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[60] flex items-center justify-center p-4">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-                            className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 text-center"
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center"
                         >
-                            <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <AlertCircle size={32} />
+                            <div className="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto mb-3">
+                                <AlertCircle size={24} />
                             </div>
-                            <h3 className="text-xl font-black text-slate-800 mb-2">Supprimer le type de frais ?</h3>
-                            <p className="text-slate-500 font-medium mb-6">
+                            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Supprimer le type de frais ?</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
                                 Êtes-vous sûr de vouloir supprimer ce type de frais ? S'il est déjà utilisé dans des plans de paiement, la suppression pourrait échouer.
                             </p>
-                            <div className="flex gap-4">
+                            <div className="flex gap-2">
                                 <button onClick={() => setConfirmDeleteFeeType({ isOpen: false, id: null })}
-                                    className="flex-1 py-3 font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">
+                                    className="flex-1 py-2 font-bold text-xs text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl transition-colors">
                                     Annuler
                                 </button>
                                 <button onClick={executeDeleteFeeType}
-                                    className="flex-1 py-3 font-bold text-white bg-red-500 hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20">
+                                    className="flex-1 py-2 font-bold text-xs text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md transition-colors">
                                     Supprimer
                                 </button>
                             </div>
                         </motion.div>
                     </div>
                 )}
+
+                {isDuplicateModalOpen && (
+                    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6"
+                        >
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Copy className="text-blue-600 dark:text-blue-400" size={20} />
+                                    Dupliquer les plans de paiement
+                                </h3>
+                                <button onClick={() => setIsDuplicateModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                                Copiez l'ensemble des plans de paiement (et leurs tranches) d'une année scolaire précédente vers l'année scolaire sélectionnée. Les types de frais seront réutilisés et les dates d'échéance réajustées automatiquement.
+                            </p>
+
+                            <div className="space-y-4">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Année d'origine (Source) :</label>
+                                    <select
+                                        value={sourceYearId}
+                                        onChange={(e) => setSourceYearId(e.target.value)}
+                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                    >
+                                        {academicYears
+                                            .filter((ay: any) => ay.id !== (selectedYearId || currentYear?.id))
+                                            .map((ay: any) => (
+                                                <option key={ay.id} value={ay.id}>
+                                                    {ay.name} {ay.isClosed ? '(Clôturée)' : ''}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
+
+                                <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 rounded-xl text-xs text-blue-900 dark:text-blue-300 flex items-start gap-2">
+                                    <Calendar size={16} className="shrink-0 mt-0.5" />
+                                    <div>
+                                        <strong>Année de destination :</strong>{' '}
+                                        {academicYears.find((y: any) => y.id === (selectedYearId || currentYear?.id))?.name || 'Sélectionnée'}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-6 flex justify-end gap-2">
+                                <button
+                                    onClick={() => setIsDuplicateModalOpen(false)}
+                                    disabled={isDuplicating}
+                                    className="px-4 py-2 font-bold text-xs text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    onClick={handleDuplicatePlans}
+                                    disabled={isDuplicating || !sourceYearId}
+                                    className="px-4 py-2 font-bold text-xs text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                                >
+                                    {isDuplicating ? <Loader2 className="animate-spin" size={16} /> : <Copy size={16} />}
+                                    {isDuplicating ? 'Duplication...' : 'Dupliquer les plans'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
             </AnimatePresence>
-        </>
+        </div>
     );
 };
 

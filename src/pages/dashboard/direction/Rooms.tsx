@@ -3,7 +3,6 @@ import {
     Plus,
     Search,
     MapPin,
-    MoreVertical,
     Edit2,
     Trash2,
     Users,
@@ -48,7 +47,7 @@ const RoomManagement: React.FC = () => {
         setLoading(true);
         try {
             const res = await api.get(`/rooms/institution/${user?.institution?.id}`);
-            setRooms(res.data);
+            setRooms(res.data || []);
         } catch (error) {
             console.error("Failed to fetch rooms", error);
         } finally {
@@ -118,52 +117,52 @@ const RoomManagement: React.FC = () => {
     );
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                        <MapPin className="text-blue-600" size={32} />
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <MapPin className="text-blue-600 dark:text-blue-400" size={24} />
                         Gestion des Salles
                     </h2>
-                    <p className="text-slate-500 font-medium">Enregistrez et gérez les salles de votre établissement.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Enregistrez et gérez les salles de votre établissement.</p>
                 </div>
                 <button
                     onClick={() => openModal()}
-                    className="bg-blue-600 text-white px-8 py-4 ] font-black flex items-center gap-2 hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/20 active:scale-95"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md transition-all self-start md:self-auto"
                 >
-                    <Plus size={20} /> Ajouter une Salle
+                    <Plus size={16} /> Ajouter une Salle
                 </button>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div className="bg-white p-6 ] shadow-sm   flex items-center gap-5">
-                    <div className="w-14 h-14 bg-blue-50 text-blue-600  flex items-center justify-center">
-                        <DoorOpen size={28} />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center shrink-0">
+                        <DoorOpen size={24} />
                     </div>
-                    <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Salles</p>
-                        <p className="text-2xl font-black text-slate-800">{rooms.length}</p>
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Total Salles</p>
+                        <p className="text-xl font-bold text-slate-900 dark:text-white">{rooms.length}</p>
                     </div>
                 </div>
-                <div className="bg-white p-6 ] shadow-sm   flex items-center gap-5">
-                    <div className="w-14 h-14 bg-emerald-50 text-emerald-600  flex items-center justify-center">
-                        <Users size={28} />
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center shrink-0">
+                        <Users size={24} />
                     </div>
-                    <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Capacité Totale</p>
-                        <p className="text-2xl font-black text-slate-800">
-                            {rooms.reduce((acc, r) => acc + r.capacity, 0)} places
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Capacité Totale</p>
+                        <p className="text-xl font-bold text-slate-900 dark:text-white">
+                            {rooms.reduce((acc, r) => acc + (r.capacity || 0), 0)} places
                         </p>
                     </div>
                 </div>
-                <div className="bg-white p-6 ] shadow-sm   flex items-center gap-5">
-                    <div className="w-14 h-14 bg-amber-50 text-amber-600  flex items-center justify-center">
-                        <Building2 size={28} />
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center shrink-0">
+                        <Building2 size={24} />
                     </div>
-                    <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Types de Salles</p>
-                        <p className="text-2xl font-black text-slate-800">
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Types de Salles</p>
+                        <p className="text-xl font-bold text-slate-900 dark:text-white">
                             {new Set(rooms.map(r => r.type)).size}
                         </p>
                     </div>
@@ -171,12 +170,12 @@ const RoomManagement: React.FC = () => {
             </div>
 
             {/* Filter Bar */}
-            <div className="bg-white p-4 ] shadow-sm   mb-8 flex items-center gap-4">
-                <Search size={20} className="text-slate-400 ml-2" />
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
+                <Search size={18} className="text-slate-400" />
                 <input
                     type="text"
                     placeholder="Rechercher une salle par nom ou type..."
-                    className="flex-1 bg-transparent border-none outline-none font-medium text-slate-600 placeholder:text-slate-300"
+                    className="flex-1 bg-transparent border-none outline-none font-medium text-xs text-slate-900 dark:text-white placeholder:text-slate-400"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -184,161 +183,145 @@ const RoomManagement: React.FC = () => {
 
             {/* Rooms Grid */}
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-20">
-                    <Loader2 className="animate-spin text-blue-600 mb-4" size={48} />
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement des salles...</p>
+                <div className="py-16 text-center">
+                    <Loader2 className="animate-spin text-blue-600 mx-auto mb-3" size={32} />
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Chargement des salles...</p>
                 </div>
             ) : filteredRooms.length === 0 ? (
-                <div className="bg-white ] p-20 text-center   ">
-                    <div className="w-20 h-20 bg-slate-50  flex items-center justify-center mx-auto mb-6">
-                        <MapPin size={40} className="text-slate-200" />
+                <div className="bg-white dark:bg-slate-900 p-12 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center">
+                    <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <MapPin size={28} />
                     </div>
-                    <h3 className="text-xl font-black text-slate-800 mb-2">Aucune salle trouvée</h3>
-                    <p className="text-slate-400 font-medium">Commencez par ajouter votre première salle de classe.</p>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Aucune salle trouvée</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Commencez par ajouter votre première salle de classe.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <AnimatePresence>
                         {filteredRooms.map((room) => (
                             <motion.div
                                 key={room.id}
                                 layout
-                                initial={{ opacity: 0, scale: 0.9 }}
+                                initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                className="bg-white ] p-8 shadow-xl shadow-slate-200/50   group hover:scale-[1.02] transition-all duration-300 relative overflow-hidden"
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
                             >
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50  blur-3xl -mr-16 -mt-16 group-hover:bg-blue-100/50 transition-colors"></div>
-
-                                <div className="relative z-10">
-                                    <div className="flex items-start justify-between mb-6">
-                                        <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-lg shadow-blue-200">
-                                            <DoorOpen size={24} />
-                                        </div>
-                                        <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-                                            <button
-                                                onClick={() => openModal(room)}
-                                                className="p-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
-                                            >
-                                                <Edit2 size={16} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(room.id)}
-                                                className="p-2 bg-slate-50 text-slate-400 hover:text-red-600 hover:bg-red-50  transition-all"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                                        <DoorOpen size={20} />
                                     </div>
-
-                                    <h4 className="text-xl font-black text-slate-800 mb-1">{room.name}</h4>
-                                    <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-6">{room.type}</p>
-
-                                    <div className="flex items-center gap-6">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 bg-slate-50  flex items-center justify-center text-slate-400">
-                                                <Users size={16} />
-                                            </div>
-                                            <div>
-                                                <p className="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">Capacité</p>
-                                                <p className="text-sm font-black text-slate-600 leading-none">{room.capacity} places</p>
-                                            </div>
-                                        </div>
+                                    <div className="flex gap-1">
+                                        <button
+                                            onClick={() => openModal(room)}
+                                            className="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                        >
+                                            <Edit2 size={16} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(room.id)}
+                                            className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
                                     </div>
+                                </div>
+
+                                <h4 className="text-base font-bold text-slate-900 dark:text-white mb-0.5">{room.name}</h4>
+                                <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-4">{room.type}</p>
+
+                                <div className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                                    <Users size={14} className="text-slate-400" />
+                                    <span className="text-xs font-medium text-slate-600 dark:text-slate-400">{room.capacity || 0} places</span>
                                 </div>
                             </motion.div>
                         ))}
                     </AnimatePresence>
                 </div>
-
-            )
-            }
+            )}
 
             {/* Modal */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={closeModal}
-                            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+                            className="absolute inset-0 bg-slate-950/60 backdrop-blur-md"
                         />
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            initial={{ opacity: 0, scale: 0.95, y: 15 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-white ] w-full max-w-lg shadow-2xl relative z-10 overflow-hidden"
+                            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md shadow-2xl relative z-10 p-6"
                         >
-                            <div className="p-10">
-                                <div className="flex items-center justify-between mb-8">
-                                    <h3 className="text-2xl font-black text-slate-800">
-                                        {editingRoom ? 'Modifier la Salle' : 'Nouvelle Salle'}
-                                    </h3>
-                                    <button onClick={closeModal} className="p-3 bg-slate-50 text-slate-400 hover:text-slate-600  transition-all">
-                                        <X size={20} />
-                                    </button>
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                                    {editingRoom ? 'Modifier la Salle' : 'Nouvelle Salle'}
+                                </h3>
+                                <button onClick={closeModal} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Nom de la Salle</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        value={form.name}
+                                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                                        placeholder="Ex: Salle 204, Laboratoire A..."
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    />
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Nom de la Salle</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Capacité</label>
                                         <input
                                             required
-                                            type="text"
-                                            value={form.name}
-                                            onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                            placeholder="Ex: Salle 204, Laboratoire A..."
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 font-bold text-slate-600 focus:ring-2 focus:ring-blue-600 transition-all"
+                                            type="number"
+                                            value={form.capacity}
+                                            onChange={(e) => setForm({ ...form, capacity: parseInt(e.target.value) })}
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                         />
                                     </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Capacité</label>
-                                            <input
-                                                required
-                                                type="number"
-                                                value={form.capacity}
-                                                onChange={(e) => setForm({ ...form, capacity: parseInt(e.target.value) })}
-                                                className="w-full bg-slate-50 border-none  px-6 py-4 font-bold text-slate-600 focus:ring-2 focus:ring-blue-600 transition-all"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Type de Salle</label>
-                                            <select
-                                                required
-                                                value={form.type}
-                                                onChange={(e) => setForm({ ...form, type: e.target.value })}
-                                                className="w-full bg-slate-50 border-none  px-6 py-4 font-bold text-slate-600 focus:ring-2 focus:ring-blue-600 transition-all appearance-none"
-                                            >
-                                                <option>Salle de classe</option>
-                                                <option>Laboratoire</option>
-                                                <option>Informatique</option>
-                                                <option>Bibliothèque</option>
-                                                <option>Amphithéâtre</option>
-                                                <option>Terrain / Sport</option>
-                                            </select>
-                                        </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Type de Salle</label>
+                                        <select
+                                            required
+                                            value={form.type}
+                                            onChange={(e) => setForm({ ...form, type: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                        >
+                                            <option>Salle de classe</option>
+                                            <option>Laboratoire</option>
+                                            <option>Informatique</option>
+                                            <option>Bibliothèque</option>
+                                            <option>Amphithéâtre</option>
+                                            <option>Terrain / Sport</option>
+                                        </select>
                                     </div>
+                                </div>
 
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-blue-600 text-white py-5 ] font-black text-lg shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all mt-6 flex items-center justify-center gap-2"
-                                    >
-                                        {editingRoom ? <Check size={20} /> : <Plus size={20} />}
-                                        {editingRoom ? 'Mettre à jour' : 'Enregistrer la Salle'}
-                                    </button>
-                                </form>
-                            </div>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-bold text-xs shadow-md transition-all mt-4 flex items-center justify-center gap-2"
+                                >
+                                    {editingRoom ? <Check size={16} /> : <Plus size={16} />}
+                                    {editingRoom ? 'Mettre à jour' : 'Enregistrer la Salle'}
+                                </button>
+                            </form>
                         </motion.div>
                     </div>
                 )}
             </AnimatePresence>
-        </>
+        </div>
     );
 };
-
 
 export default RoomManagement;

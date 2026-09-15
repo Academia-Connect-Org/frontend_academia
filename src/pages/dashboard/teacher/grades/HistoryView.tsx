@@ -32,25 +32,32 @@ const HistoryView: React.FC<HistoryViewProps> = ({
     handleDeleteGrade
 }) => {
     const sessionCount = new Set(history.map(g => `${g.classe?.id}-${g.subject?.id}-${g.type}-${g.trimester}-${g.academicYear}`)).size;
+    
+    // Dynamic average calculation
+    const avgScore = history.length > 0
+        ? (history.reduce((acc, g) => acc + (g.value || 0), 0) / history.length).toFixed(1)
+        : '0.0';
+
+    const successRate = history.length > 0
+        ? Math.round((history.filter(g => (g.value || 0) >= (g.maxPoints || 20) / 2).length / history.length) * 100) + '%'
+        : '0%';
 
     return (
-        <div className="space-y-10 animate-in fade-in duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <MatrixCard label="Moyenne Générale" value="13.4" trend="+0.2" icon={BarChart3} color="bg-blue-600" />
-                <MatrixCard label="Evaluations faites" value={String(sessionCount)} trend="Sessions" icon={ClipboardList} color="bg-indigo-600" />
-                <MatrixCard label="Taux de réussite" value="84%" trend="+3%" icon={CheckCircle2} color="bg-emerald-600" />
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <MatrixCard label="Moyenne Générale" value={avgScore} trend="Global" icon={BarChart3} color="bg-blue-600" />
+                <MatrixCard label="Évaluations faites" value={String(sessionCount)} trend="Sessions" icon={ClipboardList} color="bg-indigo-600" />
+                <MatrixCard label="Taux de réussite" value={successRate} trend="Moyenne" icon={CheckCircle2} color="bg-emerald-600" />
             </div>
 
-            <div className="bg-white ] shadow-2xl   overflow-hidden">
-                <div className="p-8   flex items-center justify-between bg-slate-50/50">
-                    <div className="flex items-center gap-8">
-                        <h3 className="text-xl font-black text-slate-800 tracking-tight">Historique des Evaluations</h3>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 bg-white    px-3 py-1.5 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Historique des Évaluations</h3>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl">
                             <Filter size={14} className="text-slate-400" />
                             <select
-                                className="text-xs font-black text-slate-600 outline-none bg-transparent"
+                                className="text-xs font-bold text-slate-900 dark:text-white outline-none bg-transparent"
                                 value={selectedHistorySubject}
                                 onChange={(e) => setSelectedHistorySubject(e.target.value)}
                             >
@@ -60,10 +67,10 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                                 ))}
                             </select>
                         </div>
-                        <div className="flex items-center gap-2 bg-white    px-3 py-1.5 shadow-sm">
+                        <div className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl">
                             <Filter size={14} className="text-slate-400" />
                             <select
-                                className="text-xs font-black text-slate-600 outline-none bg-transparent"
+                                className="text-xs font-bold text-slate-900 dark:text-white outline-none bg-transparent"
                                 value={selectedHistoryYear}
                                 onChange={(e) => setSelectedHistoryYear(e.target.value)}
                             >
@@ -76,30 +83,30 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                         <div className="relative">
                             <button
                                 onClick={() => setShowExportMenu(!showExportMenu)}
-                                className="p-4 bg-white  text-slate-400 hover:text-blue-600 shadow-sm   transition-all flex items-center gap-2 font-black text-xs uppercase tracking-widest"
+                                className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-blue-600 rounded-xl transition-colors flex items-center gap-1.5 font-bold text-xs"
                             >
-                                <Download size={18} /> Exporter <ChevronDown size={14} />
+                                <Download size={14} /> Exporter <ChevronDown size={14} />
                             </button>
 
                             {showExportMenu && (
-                                <div className="absolute right-0 mt-3 w-56 bg-white  shadow-2xl   py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl py-2 z-50">
                                     <button
                                         onClick={() => handleExport('PDF')}
-                                        className="w-full px-6 py-3.5 text-left text-xs font-black text-slate-600 hover:bg-slate-50 flex items-center gap-3 transition-colors"
+                                        className="w-full px-4 py-2 text-left text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2"
                                     >
-                                        <FileText size={16} className="text-red-500" /> Format PDF (.pdf)
+                                        <FileText size={14} className="text-red-500" /> Format PDF (.pdf)
                                     </button>
                                     <button
                                         onClick={() => handleExport('EXCEL')}
-                                        className="w-full px-6 py-3.5 text-left text-xs font-black text-slate-600 hover:bg-slate-50 flex items-center gap-3 transition-colors"
+                                        className="w-full px-4 py-2 text-left text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2"
                                     >
-                                        <TableIcon size={16} className="text-emerald-500" /> Format EXCEL (.xlsx)
+                                        <TableIcon size={14} className="text-emerald-500" /> Format EXCEL (.xlsx)
                                     </button>
                                     <button
                                         onClick={() => handleExport('CSV')}
-                                        className="w-full px-6 py-3.5 text-left text-xs font-black text-slate-600 hover:bg-slate-50 flex items-center gap-3 transition-colors"
+                                        className="w-full px-4 py-2 text-left text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2"
                                     >
-                                        <Download size={16} className="text-blue-500" /> Format CSV (.csv)
+                                        <Download size={14} className="text-blue-500" /> Format CSV (.csv)
                                     </button>
                                 </div>
                             )}
@@ -107,20 +114,19 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                <div className="p-4 overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400  ">
-                                <th className="px-8 py-6">Évaluation</th>
-                                <th className="px-8 py-6">Classe & Matière</th>
-                                <th className="px-8 py-6">Période</th>
-                                <th className="px-8 py-6 text-center">Stats / Coeff</th>
-                                <th className="px-8 py-6 text-right">Actions</th>
+                            <tr className="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                                <th className="pb-2 font-bold">Évaluation</th>
+                                <th className="pb-2 font-bold">Classe & Matière</th>
+                                <th className="pb-2 font-bold">Période</th>
+                                <th className="pb-2 text-center font-bold">Stats / Coeff</th>
+                                <th className="pb-2 text-right font-bold">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                             {(() => {
-                                // Grouping logic
                                 const sessions: any[] = [];
                                 displayHistory.forEach(g => {
                                     const key = `${g.classe?.id}-${g.subject?.id}-${g.type}-${g.trimester}-${g.academicYear}`;
@@ -143,52 +149,49 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                                 });
 
                                 return sessions.length > 0 ? sessions.map((s) => (
-                                    <tr key={s.key} className="hover:bg-slate-50 transition-colors group">
-                                        <td className="px-8 py-5">
-                                            <div className="w-12 h-12  bg-blue-50 flex items-center justify-center text-blue-600 mb-2">
-                                                <ClipboardList size={20} />
-                                            </div>
-                                            <p className="font-black text-slate-800 uppercase text-[10px] tracking-widest">{s.type}</p>
-                                        </td>
-                                        <td className="px-8 py-5">
-                                            <p className="font-black text-slate-800 leading-none mb-1 group-hover:text-blue-600 transition-all text-sm">{s.subject?.name}</p>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">{s.classe?.name || 'N/A'}</p>
-                                        </td>
-                                        <td className="px-8 py-5">
-                                            <p className="text-xs font-bold text-slate-600">{s.trimester}</p>
-                                            <p className="text-[9px] font-black text-slate-300 uppercase">{s.academicYear}</p>
-                                        </td>
-                                        <td className="px-8 py-5 text-center">
-                                            <div className="inline-flex flex-col items-center">
-                                                <span className="text-sm font-black text-slate-800">{s.grades.length} <span className="text-[10px] text-slate-300 italic">élèves</span></span>
-                                                <span className="text-[9px] font-black text-blue-500 uppercase tracking-tighter mt-1">Coeff: {s.coefficient}</span>
+                                    <tr key={s.key} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors group">
+                                        <td className="py-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                                    <ClipboardList size={16} />
+                                                </div>
+                                                <span className="font-bold text-slate-900 dark:text-white uppercase text-[10px]">{s.type}</span>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5 text-right">
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                        <td className="py-3">
+                                            <p className="font-bold text-slate-900 dark:text-white text-xs">{s.subject?.name}</p>
+                                            <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase italic">{s.classe?.name || 'N/A'}</p>
+                                        </td>
+                                        <td className="py-3">
+                                            <p className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{s.trimester}</p>
+                                            <p className="text-[10px] text-slate-400">{s.academicYear}</p>
+                                        </td>
+                                        <td className="py-3 text-center">
+                                            <span className="font-bold text-slate-900 dark:text-white">{s.grades.length} élèves</span>
+                                            <span className="block text-[10px] font-semibold text-blue-600 dark:text-blue-400">Coeff: {s.coefficient}</span>
+                                        </td>
+                                        <td className="py-3 text-right">
+                                            <div className="flex items-center justify-end gap-1">
                                                 <button
                                                     onClick={() => handleEditGrade(s.grades[0])}
-                                                    className="p-2.5 bg-white  text-blue-400 hover:text-blue-600 hover:shadow-md   transition-all"
-                                                    title="Voir / Modifier la session"
+                                                    className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg transition-colors"
+                                                    title="Modifier"
                                                 >
-                                                    <Edit2 size={16} />
+                                                    <Edit2 size={14} />
                                                 </button>
                                                 <button
-                                                    onClick={() => {
-                                                        // Direct deletion of all grades in session is tricky, delete first one as sample or implement batch delete
-                                                        handleDeleteGrade(s.grades[0].id);
-                                                    }}
-                                                    className="p-2.5 bg-white  text-red-400 hover:text-red-600 hover:shadow-md   transition-all"
-                                                    title="Supprimer la session"
+                                                    onClick={() => handleDeleteGrade(s.grades[0].id)}
+                                                    className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors"
+                                                    title="Supprimer"
                                                 >
-                                                    <Trash2 size={16} />
+                                                    <Trash2 size={14} />
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
                                 )) : (
                                     <tr>
-                                        <td colSpan={5} className="px-8 py-20 text-center text-slate-400 font-bold italic">Aucune évaluation trouvée pour cette sélection.</td>
+                                        <td colSpan={5} className="py-12 text-center text-slate-400 italic">Aucune évaluation trouvée pour cette sélection.</td>
                                     </tr>
                                 );
                             })()}

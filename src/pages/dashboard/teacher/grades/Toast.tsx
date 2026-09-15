@@ -24,16 +24,16 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
         <AnimatePresence>
             {toast && (
                 <motion.div
-                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                    className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] px-6 py-4  shadow-2xl flex items-center gap-3  backdrop-blur-md ${toast.type === 'success'
-                        ? 'bg-emerald-500/90  text-white'
-                        : 'bg-rose-500/90  text-white'
+                    exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                    className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 backdrop-blur-md ${toast.type === 'success'
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-rose-600 text-white'
                         }`}
                 >
-                    {toast.type === 'success' ? <CheckCircle2 size={20} /> : <X size={20} />}
-                    <span className="font-black text-sm">{toast.message}</span>
+                    {toast.type === 'success' ? <CheckCircle2 size={18} /> : <X size={18} />}
+                    <span className="font-bold text-xs">{toast.message}</span>
                 </motion.div>
             )}
         </AnimatePresence>

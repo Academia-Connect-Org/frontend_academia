@@ -89,32 +89,25 @@ const Homework: React.FC = () => {
             });
             if (unique.size > 0) return Array.from(unique.values());
         }
-        // Fallback to all fetched cycles if none derived from classes
         return fetchedCycles;
     }, [classes, allClasses, fetchedCycles]);
 
     // Derived subjects based on teacher specialties and selected cycle
     const filteredSubjectsForForm = React.useMemo(() => {
         let allPossible = subjects || [];
-
-        // 1. Filter by Cycle (include subjects with no specific cycle or matching cycle)
         if (newHomework.cycleId) {
             allPossible = allPossible.filter(s => !s.cycle || String(s.cycle.id) === String(newHomework.cycleId));
         }
-
-        // 2. Filter by teacher subjects (already pre-filtered by API, but keeping logic consistent)
         return allPossible;
-    }, [subjects, newHomework.cycleId, user]);
+    }, [subjects, newHomework.cycleId]);
 
     // Filter classes based on selected cycle AND selected subject
     const filteredClasses = React.useMemo(() => {
         if (!newHomework.cycleId) return [];
         const activeClasses = (classes && classes.length > 0) ? classes : allClasses;
 
-        // Base filter by cycle
         let filtered = activeClasses.filter(c => c.cycle && String(c.cycle.id) === String(newHomework.cycleId));
 
-        // Refined filter: if a subject is selected, only show classes that have this subject
         if (newHomework.subjectId) {
             const selectedSubject = subjects.find(s => String(s.id) === String(newHomework.subjectId));
             if (selectedSubject && selectedSubject.classes) {
@@ -138,7 +131,7 @@ const Homework: React.FC = () => {
             const matchesType = !listFilterType || hw.type === listFilterType;
             return matchesSearch && matchesClasse && matchesSubject && matchesType;
         });
-    }, [homeworks, searchTerm, listFilterClasse, listFilterSubject, pendingDeleteIds]);
+    }, [homeworks, searchTerm, listFilterClasse, listFilterSubject, listFilterType, pendingDeleteIds]);
 
     React.useEffect(() => {
         if (editingHomework) {
@@ -209,8 +202,6 @@ const Homework: React.FC = () => {
         }
     };
 
-
-    // Auto-select first class when filteredClasses change
     React.useEffect(() => {
         if (filteredClasses.length > 0) {
             const currentIsValid = filteredClasses.some(c => String(c.id) === String(newHomework.classeId));
@@ -238,35 +229,14 @@ const Homework: React.FC = () => {
     const fetchMetadata = async () => {
         if (!user?.id) return;
         try {
-            const [classesRes, subjectsRes, allClassesRes, allSubjectsRes, teacherRes] = await Promise.all([
+            const [classesRes, subjectsRes, allClassesRes] = await Promise.all([
                 api.get(`/classes/teacher/${user.id}`),
                 api.get(`/subjects/teacher/${user.id}`),
-                api.get(`/classes?institutionId=${user.institution?.id || 1}`),
-                api.get(`/subjects?institutionId=${user.institution?.id || 1}`),
-                api.get(`/teachers/${user.id}`).catch(() => ({ data: {} }))
+                api.get(`/classes?institutionId=${user.institution?.id || 1}`)
             ]);
             setClasses(classesRes.data);
+            setSubjects(subjectsRes.data);
             setAllClasses(allClassesRes.data);
-
-            if (subjectsRes.data && subjectsRes.data.length > 0) {
-                setSubjects(subjectsRes.data);
-            } else {
-                const allSubjects = allSubjectsRes.data || [];
-                const teacherDetails = teacherRes.data || {};
-                const specialties = teacherDetails.specialties || (user as any)?.specialties || [];
-
-                let filteredSubjects = allSubjects;
-                if (specialties.length > 0) {
-                    const specMatches = allSubjects.filter((s: any) =>
-                        specialties.some((spec: string) =>
-                            s.name.toLowerCase().includes(spec.toLowerCase().trim()) ||
-                            spec.toLowerCase().includes(s.name.toLowerCase().trim())
-                        )
-                    );
-                    if (specMatches.length > 0) filteredSubjects = specMatches;
-                }
-                setSubjects(filteredSubjects);
-            }
         } catch (err) {
             console.error("Erreur lors du chargement des préférences:", err);
         }
@@ -304,12 +274,10 @@ const Homework: React.FC = () => {
                 type: newHomework.type
             };
 
-            // INSTANT UI: Close modal and reset form immediately
             setIsModalOpen(false);
             setEditingHomework(null);
             setNewHomework((prev: any) => ({ ...prev, title: '', description: '' }));
 
-            // OPTIMISTIC UPDATE for Edit
             if (editingHomework) {
                 setHomeworks(prev => prev.map(hw =>
                     hw.id === editingHomework.id
@@ -318,7 +286,6 @@ const Homework: React.FC = () => {
                 ));
             }
 
-            // BACKGROUND ACTION: Call API and refresh list without blocking the UI
             (async () => {
                 try {
                     if (editingHomework) {
@@ -326,10 +293,10 @@ const Homework: React.FC = () => {
                     } else {
                         await api.post('/homeworks', payload);
                     }
-                    fetchHomeworks(true); // Silent background refresh to get the full final state
+                    fetchHomeworks(true);
                 } catch (err) {
                     console.error("Erreur lors de l'enregistrement du devoir:", err);
-                    fetchHomeworks(true); // Sync back if it failed
+                    fetchHomeworks(true);
                 }
             })();
         } catch (err) {
@@ -407,7 +374,6 @@ const Homework: React.FC = () => {
                 teacherFeedback: gradeData.teacherFeedback,
                 teacherAnnotations: gradeData.teacherAnnotations
             });
-            // Update local submissions list
             setSubmissions(prev => prev.map(s => s.id === selectedSubmission.id ? { ...s, grade: parseFloat(gradeData.grade), status: 'GRADED', teacherFeedback: gradeData.teacherFeedback, teacherAnnotations: gradeData.teacherAnnotations } : s));
             setSelectedSubmission(null);
         } catch (err) {
@@ -416,14 +382,12 @@ const Homework: React.FC = () => {
     };
 
     const deleteHomework = async (id: number) => {
-        // INSTANT UI Blacklist: Hide immediately and forever until server refresh confirms
         setPendingDeleteIds(prev => new Set(prev).add(id));
         setIsDeletePopupOpen(false);
         setHomeworkToDelete(null);
 
         try {
             await api.delete(`/homeworks/${id}`);
-            // Once confirmed, prune from main list and blacklist
             setHomeworks(prev => prev.filter(hw => hw.id !== id));
             setPendingDeleteIds(prev => {
                 const next = new Set(prev);
@@ -432,7 +396,6 @@ const Homework: React.FC = () => {
             });
         } catch (err) {
             console.error("Erreur lors de la suppression:", err);
-            // On error, remove from blacklist to let it reappear, and refresh
             setPendingDeleteIds(prev => {
                 const next = new Set(prev);
                 next.delete(id);
@@ -444,46 +407,44 @@ const Homework: React.FC = () => {
 
     if (loading) {
         return (
-            <>
-                <div className="min-h-[60vh] flex flex-col items-center justify-center">
-                    <div className="w-16 h-16     animate-spin mb-4"></div>
-                    <p className="text-slate-500 font-black uppercase tracking-[0.2em] text-xs">Chargement des données...</p>
-                </div>
-            </>
+            <div className="py-16 text-center">
+                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Chargement des données...</p>
+            </div>
         );
     }
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 uppercase">Devoirs & Travaux</h2>
-                    <p className="text-slate-500 font-medium tracking-tight">Créez, publiez et corrigez les devoirs à la maison.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight uppercase">Devoirs & Travaux</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Créez, publiez et corrigez les devoirs à la maison.</p>
                 </div>
                 <button
                     onClick={() => { setEditingHomework(null); setIsModalOpen(true); }}
-                    className="bg-blue-600 text-white px-10 py-5 ] font-black flex items-center gap-3 shadow-2xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.03] active:scale-[0.97] transition-all uppercase text-xs tracking-widest whitespace-nowrap"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-colors uppercase flex items-center justify-center gap-2 tracking-wider"
                 >
-                    <Plus size={20} /> Créer un Devoir
+                    <Plus size={18} /> Créer un Devoir
                 </button>
             </div>
 
             {/* Global Filters bar for the list */}
-            <div className="bg-white p-6 ] shadow-xl   mb-8 flex flex-wrap items-center gap-6">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-wrap items-center gap-3">
                 <div className="flex-1 relative min-w-[200px]">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                     <input
                         type="text"
                         placeholder="Rechercher un devoir (titre, description)..."
-                        className="w-full bg-slate-50 border-none  pl-12 pr-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 pl-8 pr-3 py-1.5 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="flex items-center gap-4 min-w-[150px]">
-                    <Filter className="text-blue-600" size={18} />
+                <div className="flex items-center gap-2 min-w-[150px]">
+                    <Filter className="text-blue-600 dark:text-blue-400 shrink-0" size={16} />
                     <select
-                        className="bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                         value={listFilterClasse}
                         onChange={e => setListFilterClasse(e.target.value)}
                     >
@@ -495,9 +456,9 @@ const Homework: React.FC = () => {
                         )}
                     </select>
                 </div>
-                <div className="flex items-center gap-4 min-w-[150px]">
+                <div className="flex items-center gap-2 min-w-[150px]">
                     <select
-                        className="bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                         value={listFilterSubject}
                         onChange={e => setListFilterSubject(e.target.value)}
                     >
@@ -507,9 +468,9 @@ const Homework: React.FC = () => {
                         ))}
                     </select>
                 </div>
-                <div className="flex items-center gap-4 min-w-[150px]">
+                <div className="flex items-center gap-2 min-w-[150px]">
                     <select
-                        className="bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                         value={listFilterType}
                         onChange={e => setListFilterType(e.target.value)}
                     >
@@ -521,88 +482,88 @@ const Homework: React.FC = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 {/* Stats Summary */}
-                <div className="lg:col-span-1 space-y-6">
-                    <div className="bg-white p-6 ] shadow-xl  ">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Total Devoirs</p>
-                        <h4 className="text-3xl font-black text-slate-800">{homeworks.length}</h4>
+                <div className="lg:col-span-1 space-y-4">
+                    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                        <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">Total Devoirs</p>
+                        <h4 className="text-2xl font-bold text-slate-900 dark:text-white">{homeworks.length}</h4>
                     </div>
-                    <div className="bg-blue-600 p-6 ] shadow-xl shadow-blue-600/20 text-white">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-100/60 mb-2">À corriger</p>
-                        <h4 className="text-3xl font-black">{submissions.filter(s => s.status === 'PENDING').length}</h4>
+                    <div className="bg-blue-600 p-5 rounded-2xl text-white shadow-sm">
+                        <p className="text-blue-100 text-[10px] font-bold uppercase tracking-wider mb-1">À corriger</p>
+                        <h4 className="text-2xl font-bold">{submissions.filter(s => s.status === 'PENDING').length}</h4>
                     </div>
                 </div>
 
                 {/* Homework List */}
-                <div className="lg:col-span-3 space-y-6">
+                <div className="lg:col-span-3 space-y-4">
                     {homeworks.length === 0 ? (
-                        <div className="bg-white p-20 ] text-center   ">
-                            <div className="w-20 h-20 bg-slate-50  flex items-center justify-center mx-auto mb-6">
-                                <ClipboardList size={40} className="text-slate-300" />
-                            </div>
-                            <h3 className="text-xl font-black text-slate-800 mb-2">Aucun devoir créé</h3>
-                            <p className="text-slate-500 max-w-sm mx-auto">Commencez par créer votre premier devoir pour vos élèves.</p>
+                        <div className="bg-white dark:bg-slate-900 p-12 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
+                            <ClipboardList size={36} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Aucun devoir créé</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">Commencez par créer votre premier devoir pour vos élèves.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {displayHomeworks.map((hw) => (
-                                <div key={hw.id} className="bg-white p-8 ] shadow-xl   hover: transition-all group relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 p-4 flex flex-col items-end gap-2">
-                                        <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1  ${hw.published ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
-                                            {hw.published ? 'Publié' : 'Non publié'}
-                                        </span>
-                                        <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1  ${hw.type === 'EXAMEN' ? 'bg-rose-50 text-rose-600' : hw.type === 'TP' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}`}>
-                                            {hw.type || 'DEVOIR'}
-                                        </span>
-                                        {hw.gradesPublished && (
-                                            <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1  bg-blue-50 text-blue-600">
-                                                Notes Publiées
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="flex items-start gap-4 mb-6">
-                                        <div className="w-14 h-14 bg-blue-50 text-blue-600  flex items-center justify-center shrink-0">
-                                            <FileText size={24} />
+                                <div key={hw.id} className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4 relative">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                                <FileText size={20} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase line-clamp-1">{hw.title}</h4>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{hw.classe?.name} • {hw.cycle?.name}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h4 className="text-lg font-black text-slate-800 group-hover:text-blue-600 transition-colors uppercase leading-tight mb-1">{hw.title}</h4>
-                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{hw.classe?.name} • {hw.cycle?.name}</p>
+                                        <div className="flex flex-col items-end gap-1">
+                                            <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${hw.published ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+                                                {hw.published ? 'Publié' : 'Non publié'}
+                                            </span>
+                                            <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${hw.type === 'EXAMEN' ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400' : hw.type === 'TP' ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400' : 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400'}`}>
+                                                {hw.type || 'DEVOIR'}
+                                            </span>
+                                            {hw.gradesPublished && (
+                                                <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+                                                    Notes Publiées
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3 mb-8">
-                                        <div className="flex items-center gap-2 text-slate-500 font-medium text-xs">
-                                            <Calendar size={14} className="text-blue-500" />
+                                    <div className="space-y-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                        <div className="flex items-center gap-1.5">
+                                            <Calendar size={12} className="text-blue-500" />
                                             <span>Échéance: {new Date(hw.deadline).toLocaleDateString()}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-slate-500 font-medium text-xs">
-                                            <CheckCircle2 size={14} className="text-emerald-500" />
+                                        <div className="flex items-center gap-1.5">
+                                            <CheckCircle2 size={12} className="text-emerald-500" />
                                             <span>Barème: {hw.maxPoints} pts</span>
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-2 relative z-10 transition-all opacity-100">
+                                    <div className="flex gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                                         <button
                                             onClick={() => handleViewSubmissions(hw)}
-                                            className="flex-1 bg-slate-900 text-white py-4  font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20"
+                                            className="flex-1 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"
                                         >
-                                            <Eye size={14} /> Soumissions
+                                            <Eye size={12} /> Soumissions
                                         </button>
                                         <button
                                             onClick={() => { setEditingHomework(hw); setIsModalOpen(true); }}
-                                            className="w-12 h-12 bg-blue-50 text-blue-600  flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-md"
+                                            className="p-2 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-600 hover:text-white transition-colors"
                                         >
-                                            <FileEdit size={18} />
+                                            <FileEdit size={14} />
                                         </button>
                                         <button
                                             onClick={() => {
                                                 setHomeworkToDelete(hw);
                                                 setIsDeletePopupOpen(true);
                                             }}
-                                            className="p-3 bg-red-50 text-red-600  hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                            className="p-2 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-600 hover:text-white transition-colors"
                                         >
-                                            <Trash2 size={20} />
+                                            <Trash2 size={14} />
                                         </button>
                                     </div>
                                 </div>
@@ -614,48 +575,47 @@ const Homework: React.FC = () => {
 
             {/* Modal Create/Edit Homework */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { setIsModalOpen(false); setEditingHomework(null); }}></div>
-                    <div className="bg-white ] p-8 md:p-10 w-full max-w-2xl relative z-10 shadow-2xl   overflow-y-auto max-h-[90vh]">
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-2xl font-black text-slate-800">{editingHomework ? 'Modifier le Devoir' : 'Nouveau Devoir'}</h3>
-                            <button onClick={() => { setIsModalOpen(false); setEditingHomework(null); }} className="p-2 hover:bg-slate-100  transition-all"><X size={20} /></button>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto space-y-4">
+                        <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800">
+                            <h3 className="text-base font-bold text-slate-900 dark:text-white">{editingHomework ? 'Modifier le Devoir' : 'Nouveau Devoir'}</h3>
+                            <button onClick={() => { setIsModalOpen(false); setEditingHomework(null); }} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><X size={18} /></button>
                         </div>
-                        <form onSubmit={handleCreateHomework} className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Titre du devoir</label>
+                        <form onSubmit={handleCreateHomework} className="space-y-3">
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Titre du devoir</label>
                                 <input
                                     type="text"
                                     required
                                     placeholder="Ex: Analyse de texte - L'Étranger"
                                     value={newHomework.title}
                                     onChange={e => setNewHomework({ ...newHomework, title: e.target.value })}
-                                    className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Cycle</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Cycle</label>
                                     <select
                                         value={newHomework.cycleId}
                                         onChange={e => {
                                             const sel = teacherCycles.find((c: any) => String(c.id) === e.target.value);
                                             setNewHomework({ ...newHomework, cycleId: e.target.value, cycleName: sel?.name || '', subjectId: '' });
                                         }}
-                                        className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                         required
                                     >
                                         <option value="">Sélectionner un cycle...</option>
                                         {teacherCycles.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                                     </select>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Matière</label>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Matière</label>
                                     <select
                                         value={newHomework.subjectId}
                                         onChange={e => setNewHomework({ ...newHomework, subjectId: e.target.value })}
-                                        className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                         required
                                         disabled={!newHomework.cycleId}
                                     >
@@ -667,12 +627,12 @@ const Homework: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Type d'évaluation</label>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Type d'évaluation</label>
                                 <select
                                     value={newHomework.type}
                                     onChange={e => setNewHomework({ ...newHomework, type: e.target.value })}
-                                    className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                     required
                                 >
                                     <option value="DEVOIR">Devoir Maison</option>
@@ -681,12 +641,12 @@ const Homework: React.FC = () => {
                                 </select>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Classe</label>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Classe</label>
                                 <select
                                     value={newHomework.classeId}
                                     onChange={e => setNewHomework({ ...newHomework, classeId: e.target.value })}
-                                    className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none disabled:opacity-50"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none disabled:opacity-50"
                                     required
                                     disabled={!newHomework.cycleId || filteredClasses.length === 0}
                                 >
@@ -698,59 +658,59 @@ const Homework: React.FC = () => {
                                 </select>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Échéance</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Échéance</label>
                                     <input
                                         type="date"
                                         required
                                         value={newHomework.deadline}
                                         onChange={e => setNewHomework({ ...newHomework, deadline: e.target.value })}
-                                        className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Heure Limite</label>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Heure Limite</label>
                                     <input
                                         type="time"
                                         required
                                         value={newHomework.deadlineTime}
                                         onChange={e => setNewHomework({ ...newHomework, deadlineTime: e.target.value })}
-                                        className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Points Max</label>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Points Max</label>
                                 <input
                                     type="number"
                                     required
                                     value={newHomework.maxPoints}
                                     onChange={e => setNewHomework({ ...newHomework, maxPoints: parseInt(e.target.value) })}
-                                    className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Année Scolaire</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Année Scolaire</label>
                                     <select
                                         value={newHomework.academicYear}
                                         onChange={e => setNewHomework({ ...newHomework, academicYear: e.target.value })}
-                                        className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                     >
                                         <option value="2024-2025">2024-2025</option>
                                         <option value="2025-2026">2025-2026</option>
                                         <option value="2026-2027">2026-2027</option>
                                     </select>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Trimestre</label>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Trimestre</label>
                                     <select
                                         value={newHomework.trimestre}
                                         onChange={e => setNewHomework({ ...newHomework, trimestre: e.target.value })}
-                                        className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                     >
                                         <option value="1er Trimestre">1er Trimestre</option>
                                         <option value="2ème Trimestre">2ème Trimestre</option>
@@ -759,33 +719,32 @@ const Homework: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Consignes</label>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Consignes</label>
                                 <textarea
-                                    rows={6}
+                                    rows={4}
                                     placeholder="Instructions détaillées pour les élèves..."
                                     value={newHomework.description}
                                     onChange={e => setNewHomework({ ...newHomework, description: e.target.value })}
-                                    className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                 ></textarea>
                             </div>
 
-
-                            <div className="space-y-4">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Documents joints (Images, PDF, Dossiers...)</label>
+                            <div className="space-y-2">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Documents joints</label>
 
                                 {newHomework.attachmentUrls.length > 0 && (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-2">
                                         {newHomework.attachmentUrls.map((url, idx) => (
-                                            <div key={idx} className="relative group p-3 bg-blue-50    flex items-center justify-between">
-                                                <div className="flex items-center gap-2 truncate">
-                                                    <FileText size={14} className="text-blue-600 shrink-0" />
-                                                    <a href={getFileUrl(url)} target="_blank" rel="noreferrer" className="text-[9px] font-bold text-blue-900 truncate hover:underline">Doc {idx + 1}</a>
+                                            <div key={idx} className="p-2 bg-blue-50 dark:bg-blue-950/40 rounded-xl flex items-center justify-between">
+                                                <div className="flex items-center gap-1.5 truncate">
+                                                    <FileText size={14} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                                                    <a href={getFileUrl(url)} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-blue-900 dark:text-blue-300 truncate hover:underline">Doc {idx + 1}</a>
                                                 </div>
                                                 <button
                                                     type="button"
                                                     onClick={() => setNewHomework(prev => ({ ...prev, attachmentUrls: prev.attachmentUrls.filter((_, i) => i !== idx) }))}
-                                                    className="p-1 hover:bg-red-500 hover:text-white text-red-500  transition-all"
+                                                    className="p-0.5 text-red-500 hover:text-red-700 transition-colors"
                                                 >
                                                     <X size={12} />
                                                 </button>
@@ -794,47 +753,39 @@ const Homework: React.FC = () => {
                                     </div>
                                 )}
 
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-1 relative">
-                                        <input
-                                            type="file"
-                                            multiple
-                                            onChange={handleFileUpload}
-                                            className="hidden"
-                                            id="homework-files"
-                                            accept="image/*,.pdf,.doc,.docx,.zip,.rar"
-                                        />
-                                        <label
-                                            htmlFor="homework-files"
-                                            className="flex items-center justify-center gap-3 w-full bg-slate-50     px-6 py-8 cursor-pointer hover:bg-blue-50 hover: transition-all group"
-                                        >
-                                            {isUploading ? (
-                                                <div className="flex flex-col items-center gap-2">
-                                                    <div className="w-6 h-6     animate-spin"></div>
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">Envoi en cours...</span>
-                                                </div>
-                                            ) : (
-                                                <div className="flex flex-col items-center gap-2 text-slate-400 group-hover:text-blue-600">
-                                                    <Download size={32} />
-                                                    <span className="text-[10px] font-black uppercase tracking-widest">Cliquer pour ajouter des fichiers</span>
-                                                </div>
-                                            )}
-                                        </label>
-                                    </div>
+                                <div className="relative">
+                                    <input
+                                        type="file"
+                                        multiple
+                                        onChange={handleFileUpload}
+                                        className="hidden"
+                                        id="homework-files"
+                                        accept="image/*,.pdf,.doc,.docx,.zip,.rar"
+                                    />
+                                    <label
+                                        htmlFor="homework-files"
+                                        className="flex items-center justify-center gap-2 w-full bg-slate-50 dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-4 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
+                                    >
+                                        {isUploading ? (
+                                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">Envoi en cours...</span>
+                                        ) : (
+                                            <span className="text-xs font-bold text-slate-400">Choisir des fichiers joints</span>
+                                        )}
+                                    </label>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 px-4">
+                            <div className="flex items-center gap-2 pt-1">
                                 <input
                                     type="checkbox"
                                     checked={newHomework.published}
                                     onChange={e => setNewHomework({ ...newHomework, published: e.target.checked })}
-                                    className="w-5 h-5  text-blue-600 focus:ring-blue-500/20"
+                                    className="w-4 h-4 rounded text-blue-600"
                                 />
-                                <span className="text-sm font-bold text-slate-600">Publier immédiatement aux élèves</span>
+                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Publier immédiatement aux élèves</span>
                             </div>
 
-                            <button type="submit" className="w-full bg-blue-600 text-white py-5 ] font-black shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:scale-[1.02] active:scale-[0.98] transition-all tracking-widest uppercase text-xs">
+                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-bold text-xs shadow-md transition-colors uppercase tracking-wider">
                                 {editingHomework ? 'Mettre à jour le devoir' : 'Lancer le devoir'}
                             </button>
                         </form>
@@ -844,77 +795,74 @@ const Homework: React.FC = () => {
 
             {/* Modal View Submissions */}
             {isSubmissionsModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsSubmissionsModalOpen(false)}></div>
-                    <div className="bg-slate-50 ] w-full max-w-[95%] relative z-10 shadow-3xl flex flex-col h-[95vh] overflow-hidden  ">
-                        <div className="p-10 bg-white   flex justify-between items-center">
-                            <div className="flex gap-10 items-center">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] overflow-hidden flex flex-col">
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                            <div className="flex items-center gap-4">
                                 <div>
-                                    <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tight">{selectedHomework?.title}</h3>
-                                    <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">{submissions.length} / {studentsOfClass.length} Soumissions reçues</p>
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase">{selectedHomework?.title}</h3>
+                                    <p className="text-[10px] text-slate-400 font-bold">{submissions.length} / {studentsOfClass.length} Soumissions reçues</p>
                                 </div>
-                                <div className="flex bg-slate-100 p-1 ">
+                                <div className="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-xl">
                                     <button
                                         onClick={() => setActiveView('GRADE')}
-                                        className={`px-6 py-2.5  text-xs font-black uppercase tracking-widest transition-all ${activeView === 'GRADE' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                        className={`px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors ${activeView === 'GRADE' ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-300'}`}
                                     >
                                         Correction
                                     </button>
                                     <button
                                         onClick={() => setActiveView('SUMMARY')}
-                                        className={`px-6 py-2.5  text-xs font-black uppercase tracking-widest transition-all ${activeView === 'SUMMARY' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                        className={`px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors ${activeView === 'SUMMARY' ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-300'}`}
                                     >
                                         Tableau des Notes
                                     </button>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
                                 {activeView === 'SUMMARY' && (
                                     <>
                                         <button
                                             onClick={handlePublishGrades}
-                                            className={`p-4  transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest ${selectedHomework?.gradesPublished ? 'bg-blue-600 text-white shadow-lg' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                                            className={`px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1 text-xs font-bold uppercase ${selectedHomework?.gradesPublished ? 'bg-blue-600 text-white' : 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400'}`}
                                         >
-                                            <Send size={18} /> {selectedHomework?.gradesPublished ? 'Notes Publiées' : 'Publier les Notes'}
+                                            <Send size={14} /> {selectedHomework?.gradesPublished ? 'Notes Publiées' : 'Publier les Notes'}
                                         </button>
-                                        <button onClick={handleExportCSV} className="p-4 bg-emerald-50 text-emerald-600  hover:bg-emerald-100 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest">
-                                            <Download size={18} /> Excel
+                                        <button onClick={handleExportCSV} className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold flex items-center gap-1 uppercase">
+                                            <Download size={14} /> Excel
                                         </button>
-                                        <button onClick={handleExportPDF} className="p-4 bg-rose-50 text-rose-600  hover:bg-rose-100 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest no-print">
-                                            <Download size={18} /> PDF
+                                        <button onClick={handleExportPDF} className="px-3 py-1.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold flex items-center gap-1 uppercase">
+                                            <Download size={14} /> PDF
                                         </button>
                                     </>
                                 )}
-                                <button onClick={() => setIsSubmissionsModalOpen(false)} className="p-3 hover:bg-slate-100  transition-all no-print"><X size={20} /></button>
+                                <button onClick={() => setIsSubmissionsModalOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg"><X size={18} /></button>
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-hidden flex gap-0 p-0">
+                        <div className="flex-1 overflow-hidden flex">
                             {activeView === 'GRADE' ? (
                                 <>
                                     {/* List Students */}
-                                    <div className="w-1/2 overflow-y-auto   p-8 space-y-4">
+                                    <div className="w-1/2 overflow-y-auto p-4 space-y-2 border-r border-slate-100 dark:border-slate-800">
                                         {submissions.length === 0 ? (
-                                            <p className="text-slate-400 text-center py-20 font-medium">Aucune soumission pour le moment.</p>
+                                            <p className="text-slate-400 text-center py-12 text-xs italic font-semibold">Aucune soumission pour le moment.</p>
                                         ) : (
                                             submissions.map(sub => (
                                                 <div
                                                     key={sub.id}
                                                     onClick={() => { setSelectedSubmission(sub); setGradeData({ grade: sub.grade?.toString() || '', teacherFeedback: sub.teacherFeedback || '', teacherAnnotations: sub.teacherAnnotations || '' }); }}
-                                                    className={`p-6 ] cursor-pointer transition-all  ${selectedSubmission?.id === sub.id ? 'bg-white  shadow-xl shadow-blue-900/5 translate-x-3' : 'bg-white/50  hover:bg-white hover:'}`}
+                                                    className={`p-3 rounded-xl cursor-pointer border transition-colors ${selectedSubmission?.id === sub.id ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800'}`}
                                                 >
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <h5 className="font-black text-slate-800 uppercase tracking-tight text-sm">{sub.student?.firstName} {sub.student?.lastName}</h5>
-                                                        <span className={`text-[9px] font-black px-2 py-0.5  uppercase tracking-widest ${sub.status === 'GRADED' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
-                                                            {sub.status === 'GRADED' ? sub.grade + '/' + selectedHomework.maxPoints : 'À corriger'}
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <h5 className="font-bold text-xs text-slate-900 dark:text-white uppercase">{sub.student?.firstName} {sub.student?.lastName}</h5>
+                                                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${sub.status === 'GRADED' ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}`}>
+                                                            {sub.status === 'GRADED' ? `${sub.grade}/${selectedHomework.maxPoints}` : 'À corriger'}
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center gap-4">
-                                                        <p className="text-[10px] text-slate-400 font-bold flex items-center gap-1 uppercase tracking-widest">
-                                                            <Clock size={10} /> {new Date(sub.submittedAt).toLocaleString()}
-                                                        </p>
+                                                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                                                        <span className="flex items-center gap-1"><Clock size={10} /> {new Date(sub.submittedAt).toLocaleString()}</span>
                                                         {new Date(sub.submittedAt) > new Date(selectedHomework.deadline) && (
-                                                            <span className="text-[9px] font-black text-red-500 uppercase tracking-tight">En retard</span>
+                                                            <span className="text-red-500 font-bold">En retard</span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -923,140 +871,106 @@ const Homework: React.FC = () => {
                                     </div>
 
                                     {/* Grading Panel */}
-                                    <div className="w-1/2 p-10 bg-white overflow-y-auto">
+                                    <div className="w-1/2 p-4 overflow-y-auto bg-slate-50/50 dark:bg-slate-800/30">
                                         {selectedSubmission ? (
-                                            <div className="flex flex-col">
-                                                <div className="mb-10">
-                                                    <h4 className="text-xl font-black text-slate-800 mb-6 uppercase">Travail de l'élève</h4>
-                                                    <div className="bg-slate-50 p-6  min-h-[150px] mb-6">
-                                                        <p className="text-slate-600 text-sm italic">{selectedSubmission.content || "Contenu textuel non fourni."}</p>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase mb-2">Travail de l'élève</h4>
+                                                    <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 italic min-h-[100px]">
+                                                        {selectedSubmission.content || "Contenu textuel non fourni."}
                                                     </div>
                                                     {selectedSubmission.fileUrl && (
-                                                        <div className="flex flex-wrap gap-3">
+                                                        <div className="flex flex-wrap gap-2 mt-3">
                                                             {(selectedSubmission.fileUrl as string).split(',').filter(Boolean).map((url, idx) => (
-                                                                <a
+                                                                <button
                                                                     key={idx}
                                                                     onClick={(e) => {
                                                                         e.preventDefault();
                                                                         setAnnotatingFileUrl(getFileUrl(url));
                                                                     }}
-                                                                    href="#"
-                                                                    className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 transition-all text-blue-600  w-fit group   hover:shadow-lg"
-                                                                    title={url.split('/').pop()}
+                                                                    className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-900/40 text-xs font-bold"
                                                                 >
-                                                                    <div className="w-8 h-8 bg-white  flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                                                                        <FileEdit size={16} className="text-red-500" />
-                                                                    </div>
-                                                                    <div className="flex flex-col">
-                                                                        <span className="text-[10px] font-black uppercase tracking-widest text-red-600">Corriger Fichier {idx + 1}</span>
-                                                                        <span className="text-[9px] font-bold opacity-60 truncate max-w-[120px]">{url.split('/').pop()}</span>
-                                                                    </div>
-                                                                </a>
+                                                                    <FileEdit size={14} className="text-red-500" />
+                                                                    <span>Corriger Fichier {idx + 1}</span>
+                                                                </button>
                                                             ))}
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                <form onSubmit={handleGradeSubmission} className="space-y-6 bg-slate-50 p-8 ]   shadow-xl shadow-slate-200/50">
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div className="space-y-2">
-                                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Note / {selectedHomework.maxPoints}</label>
-                                                            <input
-                                                                type="number"
-                                                                max={selectedHomework.maxPoints}
-                                                                required
-                                                                value={gradeData.grade}
-                                                                onChange={e => setGradeData({ ...gradeData, grade: e.target.value })}
-                                                                placeholder="Ex: 15"
-                                                                className="w-full bg-white    px-6 py-4 text-sm font-black focus: transition-all outline-none"
-                                                            />
-                                                        </div>
+                                                <form onSubmit={handleGradeSubmission} className="space-y-3 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                                                    <div className="space-y-1">
+                                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Note / {selectedHomework.maxPoints}</label>
+                                                        <input
+                                                            type="number"
+                                                            max={selectedHomework.maxPoints}
+                                                            required
+                                                            value={gradeData.grade}
+                                                            onChange={e => setGradeData({ ...gradeData, grade: e.target.value })}
+                                                            placeholder="Ex: 15"
+                                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                                        />
                                                     </div>
-                                                    <div className="space-y-2">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Feedback enseignant</label>
+                                                    <div className="space-y-1">
+                                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Feedback enseignant</label>
                                                         <textarea
                                                             rows={3}
                                                             value={gradeData.teacherFeedback}
                                                             onChange={e => setGradeData({ ...gradeData, teacherFeedback: e.target.value })}
                                                             placeholder="Bravo, excellent travail..."
-                                                            className="w-full bg-white    px-6 py-4 text-sm font-bold focus: transition-all outline-none"
+                                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                                         ></textarea>
                                                     </div>
-                                                    <button type="submit" className="w-full bg-slate-900 text-white py-5  font-black text-xs uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-900/10">
+                                                    <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-bold text-xs shadow-md transition-colors uppercase tracking-wider">
                                                         Valider la correction
                                                     </button>
                                                 </form>
                                             </div>
                                         ) : (
                                             <div className="h-full flex flex-col items-center justify-center text-center">
-                                                <div className="w-32 h-32 bg-slate-50  flex items-center justify-center mb-6">
-                                                    <Check size={60} className="text-slate-200" />
-                                                </div>
-                                                <h4 className="text-xl font-black text-slate-800 mb-2">Sélectionnez une soumission</h4>
-                                                <p className="text-slate-400 max-w-xs mx-auto">Cliquez sur un élève à gauche pour consulter son travail et lui attribuer une note.</p>
+                                                <Check size={36} className="text-slate-300 dark:text-slate-600 mb-2" />
+                                                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">Sélectionnez une soumission</h4>
+                                                <p className="text-xs text-slate-400 max-w-xs">Cliquez sur un élève à gauche pour consulter son travail et lui attribuer une note.</p>
                                             </div>
                                         )}
                                     </div>
                                 </>
                             ) : (
-                                <div className="p-10 w-full overflow-y-auto print-section">
-                                    <table className="w-full text-left border-separate border-spacing-y-4">
+                                <div className="p-4 w-full overflow-y-auto">
+                                    <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr>
-                                                <th className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-6">Eleve</th>
-                                                <th className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-6">Statut</th>
-                                                <th className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-6">Date de Rendu</th>
-                                                <th className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-6">Note</th>
-                                                <th className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-6">Action</th>
+                                            <tr className="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                                                <th className="pb-2 font-bold">Élève</th>
+                                                <th className="pb-2 font-bold">Statut</th>
+                                                <th className="pb-2 font-bold">Date de Rendu</th>
+                                                <th className="pb-2 font-bold">Note</th>
+                                                <th className="pb-2 font-bold">Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                                             {studentsOfClass.map(student => {
                                                 const sub = submissions.find(s => s.student?.id === student.id);
                                                 return (
-                                                    <tr key={student.id} className="bg-white shadow-sm  overflow-hidden">
-                                                        <td className="px-6 py-6 first:">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-10 h-10 bg-slate-100  flex items-center justify-center font-black text-slate-500 text-xs">
-                                                                    {student.firstName[0]}{student.lastName[0]}
-                                                                </div>
-                                                                <div>
-                                                                    <p className="text-sm font-black text-slate-800 uppercase">{student.lastName} {student.firstName}</p>
-                                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{student.studentIdNumber || "Pas de matricule"}</p>
-                                                                </div>
-                                                            </div>
+                                                    <tr key={student.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                                                        <td className="py-3 font-bold text-slate-900 dark:text-white">
+                                                            {student.lastName} {student.firstName}
                                                         </td>
-                                                        <td className="px-6 py-6">
-                                                            <div className="flex flex-col gap-1.5">
-                                                                <span className={`px-4 py-1.5  text-[9px] font-black uppercase tracking-widest text-center ${sub ? (sub.status === 'GRADED' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600') : 'bg-slate-100 text-slate-400'
-                                                                    }`}>
-                                                                    {sub ? (sub.status === 'GRADED' ? 'Rendu corrigé' : 'Rendu non corrigé') : 'Non rendu'}
-                                                                </span>
-                                                                {sub && (
-                                                                    <span className={`px-4 py-1 text-[8px] font-black uppercase tracking-tighter text-center  ${new Date(sub.submittedAt) <= new Date(selectedHomework.deadline) ? 'text-emerald-500 bg-emerald-50/30' : 'text-red-500 bg-red-50/30'}`}>
-                                                                        {new Date(sub.submittedAt) <= new Date(selectedHomework.deadline) ? 'À TEMPS' : 'EN RETARD'}
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-6">
-                                                            <span className="text-xs font-bold text-slate-500">
-                                                                {sub ? new Date(sub.submittedAt).toLocaleDateString() : '-'}
+                                                        <td className="py-3">
+                                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${sub ? (sub.status === 'GRADED' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' : 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400') : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                                                                {sub ? (sub.status === 'GRADED' ? 'Rendu corrigé' : 'Rendu non corrigé') : 'Non rendu'}
                                                             </span>
                                                         </td>
-                                                        <td className="px-6 py-6">
-                                                            <div className="flex items-center gap-1">
-                                                                <span className={`text-lg font-black ${sub?.grade !== undefined ? 'text-slate-800' : 'text-slate-300'}`}>
-                                                                    {sub?.grade !== undefined ? sub.grade : '-'}
-                                                                </span>
-                                                                <span className="text-[10px] font-bold text-slate-400">/ {selectedHomework.maxPoints}</span>
-                                                            </div>
+                                                        <td className="py-3 text-slate-500">
+                                                            {sub ? new Date(sub.submittedAt).toLocaleDateString() : '-'}
                                                         </td>
-                                                        <td className="px-6 py-6 last:">
+                                                        <td className="py-3 font-bold text-slate-900 dark:text-white">
+                                                            {sub?.grade !== undefined ? `${sub.grade} / ${selectedHomework.maxPoints}` : '-'}
+                                                        </td>
+                                                        <td className="py-3">
                                                             {sub ? (
                                                                 <button
                                                                     onClick={() => { setActiveView('GRADE'); setSelectedSubmission(sub); setGradeData({ grade: sub.grade?.toString() || '', teacherFeedback: sub.teacherFeedback || '', teacherAnnotations: sub.teacherAnnotations || '' }); }}
-                                                                    className="text-blue-600 font-black text-[10px] uppercase tracking-widest hover:underline"
+                                                                    className="text-blue-600 dark:text-blue-400 font-bold text-xs hover:underline"
                                                                 >
                                                                     Voir / Noter
                                                                 </button>
@@ -1073,38 +987,32 @@ const Homework: React.FC = () => {
                     </div>
                 </div>
             )}
-            {/* Modal de Confirmation de Suppression */}
+
+            {/* Modal Confirmation Suppression */}
             {isDeletePopupOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div
-                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-                        onClick={() => setIsDeletePopupOpen(false)}
-                    ></div>
-                    <div className="bg-white ] w-full max-w-md p-10 relative z-10 shadow-2xl   animate-in fade-in zoom-in duration-300">
-                        <div className="w-20 h-20 bg-red-50 text-red-600  flex items-center justify-center mx-auto mb-8 shadow-inner">
-                            <Trash2 size={40} />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-5 text-center space-y-3">
+                        <div className="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto">
+                            <Trash2 size={24} />
                         </div>
-                        <h3 className="text-2xl font-black text-slate-800 text-center mb-4 uppercase tracking-tighter">Supprimer le devoir ?</h3>
-                        <p className="text-slate-500 text-center font-medium mb-10 leading-relaxed">
-                            Voulez-vous vraiment supprimer ce devoir ? Cette action est irréversible et supprimera également toutes les soumissions des élèves.
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase">Supprimer le devoir ?</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Cette action est irréversible et supprimera également toutes les soumissions des élèves.
                         </p>
-                        <div className="flex flex-col gap-4">
-                            <button
-                                onClick={() => homeworkToDelete && deleteHomework(homeworkToDelete.id)}
-                                className="w-full py-5 bg-red-600 text-white  font-black text-xs uppercase tracking-widest hover:bg-red-700 shadow-xl shadow-red-600/20 active:scale-95 transition-all"
-                            >
-                                Oui, Supprimer Définitivement
-                            </button>
-                            <button
-                                onClick={() => setIsDeletePopupOpen(false)}
-                                className="w-full py-5 bg-slate-100 text-slate-600  font-black text-xs uppercase tracking-widest hover:bg-slate-200 active:scale-95 transition-all"
-                            >
+                        <div className="flex gap-2 pt-2">
+                            <button onClick={() => setIsDeletePopupOpen(false)}
+                                className="flex-1 py-2 font-bold text-xs text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl transition-colors">
                                 Annuler
+                            </button>
+                            <button onClick={() => homeworkToDelete && deleteHomework(homeworkToDelete.id)}
+                                className="flex-1 py-2 font-bold text-xs text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md transition-colors">
+                                Supprimer
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+
             {annotatingFileUrl && (
                 <HomeworkAnnotationViewer
                     fileUrl={annotatingFileUrl}
@@ -1117,7 +1025,7 @@ const Homework: React.FC = () => {
                     onClose={() => setAnnotatingFileUrl(null)}
                 />
             )}
-        </>
+        </div>
     );
 };
 

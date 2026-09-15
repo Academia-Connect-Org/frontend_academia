@@ -42,25 +42,80 @@ api.interceptors.request.use(
     }
 );
 
-// Response interceptor for handling errors
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: any) => void }> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else if (token) {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
+// Response interceptor for handling errors & auto refresh
 api.interceptors.response.use(
     (response) => {
         return response;
     },
-    (error) => {
+    async (error) => {
+        const originalRequest = error.config;
         const message = error.response?.data?.message || error.message || 'Une erreur est survenue';
-        console.error(`[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url}:`, message);
+        console.error(`[API Error] ${originalRequest?.method?.toUpperCase()} ${originalRequest?.url}:`, message);
 
         // Handle unauthorized (token expired or missing)
-        if (error.response?.status === 401 && !window.location.pathname.includes(ROUTES.LOGIN)) {
-            console.warn("Session expirée. Redirection vers la connexion...");
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.setItem('logout', Date.now().toString()); // Notify other tabs
-            // Use a slight delay to ensure the log is visible and avoid rapid re-triggering if multiple requests fail
-            setTimeout(() => {
-                window.location.href = ROUTES.LOGIN;
-            }, 100);
+        if (error.response?.status === 401 && !originalRequest._retry && !window.location.pathname.includes(ROUTES.LOGIN)) {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (refreshToken && !originalRequest.url?.includes('/auth/refresh-token')) {
+                if (isRefreshing) {
+                    return new Promise((resolve, reject) => {
+                        failedQueue.push({ resolve, reject });
+                    }).then(token => {
+                        originalRequest.headers['Authorization'] = 'Bearer ' + token;
+                        return api(originalRequest);
+                    }).catch(err => Promise.reject(err));
+                }
+
+                originalRequest._retry = true;
+                isRefreshing = true;
+
+                try {
+                    const res = await axios.post(`${API_BASE_URL}/auth/refresh-token`, { refreshToken });
+                    if (res.data?.token) {
+                        const newToken = res.data.token;
+                        localStorage.setItem('token', newToken);
+                        if (res.data.refreshToken) {
+                            localStorage.setItem('refreshToken', res.data.refreshToken);
+                        }
+                        originalRequest.headers['Authorization'] = 'Bearer ' + newToken;
+                        processQueue(null, newToken);
+                        return api(originalRequest);
+                    }
+                } catch (refreshErr) {
+                    processQueue(refreshErr, null);
+                    console.warn("Session expirée. Redirection vers la connexion...");
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('user');
+                    localStorage.setItem('logout', Date.now().toString());
+                    window.location.href = ROUTES.LOGIN;
+                    return Promise.reject(refreshErr);
+                } finally {
+                    isRefreshing = false;
+                }
+            } else {
+                console.warn("Session expirée sans refresh token. Redirection vers la connexion...");
+                localStorage.removeItem('token');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('user');
+                localStorage.setItem('logout', Date.now().toString());
+                setTimeout(() => {
+                    window.location.href = ROUTES.LOGIN;
+                }, 100);
+            }
         }
 
         // Handle subscription expired

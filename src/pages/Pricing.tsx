@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, X, Clock, Zap, Crown, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
+import { Clock, Zap, Crown, ArrowRight, ShieldCheck, Loader2, Tag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ROUTES } from '../constants/routes';
 import api from '../api/axios';
@@ -16,7 +16,6 @@ const Pricing = () => {
         const fetchPlans = async () => {
             try {
                 const response = await api.get('/public/plans');
-                // Optional: Sort plans by price (monthly)
                 const sortedPlans = response.data.sort((a: any, b: any) => a.monthlyPrice - b.monthlyPrice);
                 setPlans(sortedPlans);
             } catch (error) {
@@ -39,53 +38,57 @@ const Pricing = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-20">
-            {/* Blue Header Section */}
-            <header className="bg-blue-900 pt-32 pb-20 text-white text-center mb-16 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
-                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-400 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2"></div>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500 pb-20">
+            {/* Header Section */}
+            <header className="relative bg-slate-900 dark:bg-slate-950 pt-36 pb-20 text-white text-center mb-16 overflow-hidden border-b border-slate-800">
+                <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-sky-500/15 blur-[120px] animate-pulse" />
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/15 blur-[130px] animate-pulse" />
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 relative z-10">
-                    <motion.h1
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-5xl md:text-7xl font-black mb-6 tracking-tighter uppercase"
+                        transition={{ duration: 0.5 }}
                     >
-                        Plans & <span className="text-blue-400">Tarifs</span>
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-xl text-blue-100/80 font-medium italic max-w-2xl mx-auto"
-                    >
-                        Choisissez le pack qui correspond à l'envergure de votre établissement.
-                    </motion.p>
-
-                    {!loading && plans.some(plan => plan.type !== 'FREE_TRIAL' && (plan.billingOptions === 'BOTH' || plan.billingOptions == null)) && (
-                        <div className="mt-12 flex items-center justify-center gap-4">
-                            <span className={`text-sm font-black uppercase tracking-widest ${!isYearly ? 'text-white' : 'text-white/40'}`}>Mensuel</span>
-                            <button
-                                onClick={() => setIsYearly(!isYearly)}
-                                className="w-16 h-8 bg-white/20 rounded-full p-1 relative transition-colors hover:bg-white/30"
-                            >
-                                <div className={`w-6 h-6 bg-white rounded-full shadow-md transition-transform ${isYearly ? 'translate-x-8' : 'translate-x-0'}`}></div>
-                            </button>
-                            <span className={`text-sm font-black uppercase tracking-widest ${isYearly ? 'text-white' : 'text-white/40'}`}>Annuel <small className="text-blue-400 text-[10px] ml-1">(-10%)</small></span>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-500/10 border border-sky-500/20 text-sky-300 font-semibold text-xs rounded-full mb-6">
+                            <Tag size={14} /> Transparence & Flexibilité
                         </div>
-                    )}
+
+                        <h1 className="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight">
+                            Formules & <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-400">Tarifs</span>
+                        </h1>
+                        
+                        <p className="text-xs md:text-sm text-slate-400 font-normal max-w-xl mx-auto leading-relaxed">
+                            Choisissez la formule parfaitement adaptée aux besoins et à l'envergure de votre établissement scolaire.
+                        </p>
+
+                        {!loading && plans.some(plan => plan.type !== 'FREE_TRIAL' && (plan.billingOptions === 'BOTH' || plan.billingOptions == null)) && (
+                            <div className="mt-8 flex items-center justify-center gap-3">
+                                <span className={`text-xs font-semibold ${!isYearly ? 'text-white' : 'text-slate-500'}`}>Mensuel</span>
+                                <button
+                                    onClick={() => setIsYearly(!isYearly)}
+                                    className="w-14 h-7 bg-slate-800 border border-slate-700 rounded-full p-1 relative transition-colors cursor-pointer"
+                                >
+                                    <div className={`w-5 h-5 bg-sky-500 rounded-full shadow-md transition-transform ${isYearly ? 'translate-x-7' : 'translate-x-0'}`} />
+                                </button>
+                                <span className={`text-xs font-semibold ${isYearly ? 'text-white' : 'text-slate-500'}`}>
+                                    Annuel <small className="text-sky-400 font-bold ml-0.5">(-10%)</small>
+                                </span>
+                            </div>
+                        )}
+                    </motion.div>
                 </div>
             </header>
 
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {loading ? (
                     <div className="flex justify-center items-center py-20">
-                        <Loader2 className="animate-spin text-blue-500" size={48} />
+                        <Loader2 className="animate-spin text-sky-500" size={40} />
                     </div>
                 ) : (
-                    <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto">
+                    <div className="flex flex-wrap justify-center items-stretch gap-6 sm:gap-8 max-w-7xl mx-auto">
                         {plans.map((plan) => {
                             let effectiveIsYearly = isYearly;
                             if (plan.billingOptions === 'MONTHLY_ONLY') effectiveIsYearly = false;
@@ -117,24 +120,30 @@ const Pricing = () => {
                     </div>
                 )}
 
-                <div className="mt-20 p-12 bg-white rounded-3xl shadow-2xl shadow-slate-200/50 flex flex-col md:flex-row items-center justify-between gap-10">
-                    <div className="flex gap-6 items-center">
-                        <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
-                            <ShieldCheck size={32} />
+                {/* Custom Quote Banner */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="mt-16 p-6 sm:p-10 bg-white dark:bg-slate-900/80 backdrop-blur-md rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6"
+                >
+                    <div className="flex gap-4 sm:gap-5 items-center">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center shrink-0 border border-emerald-200/50 dark:border-emerald-900/50">
+                            <ShieldCheck size={26} />
                         </div>
                         <div>
-                            <h4 className="text-2xl font-black text-slate-800 tracking-tight">Besoin d'un devis personnalisé ?</h4>
-                            <p className="text-slate-500 font-medium italic">Pour les grands groupes scolaires de plus de 5 établissements.</p>
+                            <h4 className="text-base sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">Besoin d'un devis sur-mesure ?</h4>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">Pour les groupes scolaires complexes de plus de 5 établissements.</p>
                         </div>
                     </div>
                     <button 
                         onClick={() => navigate(ROUTES.CONTACT)}
-                        className="px-10 py-5 bg-slate-900 text-white font-black uppercase text-xs tracking-widest rounded-xl flex items-center gap-3 hover:bg-slate-800 transition-all group"
+                        className="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-semibold text-xs rounded-xl shadow-lg shadow-sky-500/20 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group shrink-0"
                     >
                         Contactez-nous
-                        <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                        <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                     </button>
-                </div>
+                </motion.div>
             </div>
         </div>
     );

@@ -90,77 +90,71 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ teacher, onClose, o
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-8">
-            {/* Overlay - No blur here to keep it crisp */}
-            <div className="absolute inset-0 bg-[#0F172A]/80 transition-opacity animate-in fade-in duration-300" onClick={onClose}></div>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200" onClick={onClose} />
 
-            {/* Modal Container */}
-            <div className="relative w-full max-w-5xl bg-white ] shadow-[0_32px_128px_rgba(0,0,0,0.4)] overflow-hidden animate-in slide-in-from-bottom-8 duration-500  ">
-
-                {/* Close Button UI */}
+            <div className="relative w-full max-w-5xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 sm:top-8 sm:right-8 w-10 h-10 sm:w-12 sm:h-12 bg-slate-50 text-slate-400  flex items-center justify-center hover:text-slate-900 hover:rotate-90 hover:bg-slate-100 transition-all z-50 group shadow-sm"
+                    className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors z-50"
                 >
-                    <X size={20} className="sm:w-6 sm:h-6" />
+                    <X size={18} />
                 </button>
 
-                <div className="flex flex-col lg:flex-row h-full max-h-[90vh]">
-                    {/* Left Panel: Profile Sidebar */}
-                    <div className="w-full lg:w-80 bg-slate-50/50 p-6 lg:p-10 flex flex-col items-center shrink-0 border-b lg:border-b-0 lg:border-r border-slate-200/50">
+                <div className="flex flex-col lg:flex-row h-full overflow-hidden">
+                    {/* Left Sidebar */}
+                    <div className="w-full lg:w-72 bg-slate-50/50 dark:bg-slate-850/50 p-6 flex flex-col items-center shrink-0 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800">
                         <div className="flex flex-row lg:flex-col items-center gap-4 lg:gap-0 w-full lg:w-auto">
-                            <div className="w-16 h-16 lg:w-32 lg:h-32 bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center text-2xl lg:text-4xl font-black shadow-lg lg:shadow-2xl shadow-indigo-200 lg:mb-6 transition-transform hover:scale-105 duration-500 shrink-0">
+                            <div className="w-16 h-16 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-xl font-bold shadow-md lg:mb-4 shrink-0">
                                 {formData.firstName.charAt(0)}{formData.lastName.charAt(0)}
                             </div>
                             <div className="flex flex-col items-start lg:items-center min-w-0 flex-1">
-                                <h3 className="text-lg lg:text-xl font-black text-slate-900 text-left lg:text-center uppercase tracking-tight mb-1 lg:mb-2 truncate w-full">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white text-left lg:text-center uppercase tracking-tight mb-1 truncate w-full">
                                     {formData.firstName} {formData.lastName}
                                 </h3>
-                                <p className="text-[9px] lg:text-[10px] font-black text-indigo-500 bg-white px-3 py-1 lg:px-4 lg:py-1.5 uppercase tracking-[0.2em] shadow-sm">
+                                <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-3 py-1 rounded-full uppercase tracking-wider">
                                     Profil Enseignant
                                 </p>
                             </div>
                         </div>
 
-                        <div className="w-full flex flex-row lg:flex-col gap-4 lg:gap-0 lg:space-y-5 pt-6 lg:pt-10 overflow-x-auto custom-scrollbar pb-2 lg:pb-0">
+                        <div className="w-full flex flex-row lg:flex-col gap-3 lg:space-y-3 pt-6 overflow-x-auto">
                             <SidebarStat label="ID Personnel" value={`#TCH-${teacher.id}`} icon={<Layers size={14} />} />
                             <SidebarStat label="Type" value="Corps Enseignant" icon={<UserCheck size={14} />} />
                             <SidebarStat label="Email Pro" value={formData.email} icon={<Mail size={14} />} />
                         </div>
 
                         {message.text && (
-                            <div className={`mt-auto w-full p-5 ] flex items-start gap-4 animate-in slide-in-from-bottom-4 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600   shadow-lg shadow-emerald-500/10' : 'bg-red-50 text-red-600   shadow-lg shadow-red-500/10'}`}>
-                                {message.type === 'success' ? <CheckCircle2 size={20} className="shrink-0" /> : <AlertCircle size={20} className="shrink-0" />}
-                                <p className="text-[11px] font-black leading-snug uppercase tracking-wider">{message.text}</p>
+                            <div className={`mt-auto w-full p-4 rounded-xl flex items-center gap-2.5 font-bold text-xs ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400'}`}>
+                                {message.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                                <span>{message.text}</span>
                             </div>
                         )}
                     </div>
 
-                    {/* Right Panel: Scrollable Form */}
-                    <div className="flex-1 flex flex-col bg-white overflow-hidden">
-                        <div className="flex-1 overflow-y-auto p-6 sm:p-8 lg:p-12 custom-scrollbar scroll-smooth">
-                            <form id="editTeacherForm" onSubmit={handleSubmit} className="space-y-10 lg:space-y-16">
-                                {/* Identity Section */}
-                                <SectionContainer title="Identité & Coordonnées" icon={<UserCircle size={22} className="text-indigo-600" />}>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                    {/* Right Form */}
+                    <div className="flex-1 flex flex-col bg-white dark:bg-slate-900 overflow-hidden">
+                        <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                            <form id="editTeacherForm" onSubmit={handleSubmit} className="space-y-8">
+                                <SectionContainer title="Identité & Coordonnées" icon={<UserCircle size={20} className="text-blue-600 dark:text-blue-400" />}>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <EnhancedInput label="Prénom" value={formData.firstName} onChange={(e: any) => setFormData({ ...formData, firstName: e.target.value })} />
                                         <EnhancedInput label="Nom" value={formData.lastName} onChange={(e: any) => setFormData({ ...formData, lastName: e.target.value })} />
                                         <EnhancedInput label="Téléphone" value={formData.phone} onChange={(e: any) => setFormData({ ...formData, phone: e.target.value })} />
                                         <EnhancedSelect label="Sexe" options={['Masculin', 'Féminin']} value={formData.gender} onChange={(e: any) => setFormData({ ...formData, gender: e.target.value })} />
-                                        <div className="md:col-span-2">
+                                        <div className="sm:col-span-2">
                                             <EnhancedInput label="Email institutionnel" type="email" value={formData.email} onChange={(e: any) => setFormData({ ...formData, email: e.target.value })} />
                                         </div>
                                     </div>
                                 </SectionContainer>
 
-                                {/* Assignment Section */}
-                                <SectionContainer title="Cycles & Classes" icon={<BookOpen size={22} className="text-amber-600" />}>
-                                    <div className="space-y-10">
-                                        <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest flex items-center gap-3">
-                                                Cycles autorisés <div className="h-[2px] bg-slate-100 flex-1"></div>
+                                <SectionContainer title="Cycles & Classes" icon={<BookOpen size={20} className="text-amber-600 dark:text-amber-400" />}>
+                                    <div className="space-y-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                                                Cycles autorisés
                                             </label>
-                                            <div className="flex flex-wrap gap-3">
+                                            <div className="flex flex-wrap gap-2">
                                                 {cycles.map((cycle: any) => (
                                                     <TagButton
                                                         key={cycle.id}
@@ -177,12 +171,12 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ teacher, onClose, o
                                             </div>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest flex items-center gap-3">
-                                                Classes d'enseignement <div className="h-[2px] bg-slate-100 flex-1"></div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                                                Classes d'enseignement
                                             </label>
                                             {formData.cycleIds.length > 0 ? (
-                                                <div className="bg-slate-50/50 p-6 ]   flex flex-wrap gap-2.5 shadow-inner">
+                                                <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700 flex flex-wrap gap-2">
                                                     {availableClasses.map((c: any) => {
                                                         const current = formData.classes.split(',').map((s: string) => s.trim()).filter(Boolean);
                                                         const isSelected = current.includes(c.name);
@@ -202,21 +196,21 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ teacher, onClose, o
                                                         );
                                                     })}
                                                     {availableClasses.length === 0 && (
-                                                        <p className="w-full text-center py-4 text-[10px] font-bold text-slate-400 italic">Chargement des classes...</p>
+                                                        <p className="w-full text-center py-2 text-xs font-semibold text-slate-400 italic">Chargement des classes...</p>
                                                     )}
                                                 </div>
                                             ) : (
-                                                <div className="p-8    ] bg-slate-50/30 flex items-center justify-center">
-                                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center opacity-60">Sélectionnez d'abord un cycle</p>
+                                                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700 text-center">
+                                                    <p className="text-xs font-semibold text-slate-400">Sélectionnez d'abord un cycle</p>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest flex items-center gap-3">
-                                                Matières enseignées <div className="h-[2px] bg-slate-100 flex-1"></div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                                                Matières enseignées
                                             </label>
-                                            <div className="bg-white p-6 ]   shadow-xl shadow-slate-200/20 flex flex-wrap gap-2.5 min-h-[80px]">
+                                            <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700 flex flex-wrap gap-2">
                                                 {availableSubjects.map((subj: any) => {
                                                     const currentSpecs = formData.specialties.split(',').map((s: string) => s.trim()).filter(Boolean);
                                                     const isSelected = currentSpecs.includes(subj.name);
@@ -237,52 +231,45 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ teacher, onClose, o
                                                 })}
                                                 <input
                                                     type="text"
-                                                    placeholder="Taper pour ajouter manuellement..."
+                                                    placeholder="Ajouter manuellement..."
                                                     value={formData.specialties}
                                                     onChange={(e) => setFormData({ ...formData, specialties: e.target.value })}
-                                                    className="flex-1 min-w-[200px] bg-transparent outline-none text-sm font-black text-slate-700 placeholder:text-slate-300 placeholder:font-normal ml-2"
+                                                    className="flex-1 min-w-[160px] bg-transparent outline-none text-xs font-bold text-slate-900 dark:text-white placeholder:text-slate-400"
                                                 />
                                             </div>
                                         </div>
                                     </div>
                                 </SectionContainer>
 
-                                {/* Security Section */}
-                                <SectionContainer title="Sécurité du Compte" icon={<UserCheck size={22} className="text-rose-600" />}>
-                                    <div className="bg-rose-50/20 p-8 ]  ">
-                                        <EnhancedInput
-                                            label="Modifier le mot de passe"
-                                            type="password"
-                                            placeholder="••••••••••••"
-                                            description="Laisser vide si vous ne souhaitez pas modifier le mot de passe actuel de l'utilisateur"
-                                            value={formData.password}
-                                            onChange={(e: any) => setFormData({ ...formData, password: e.target.value })}
-                                        />
-                                    </div>
+                                <SectionContainer title="Sécurité du Compte" icon={<UserCheck size={20} className="text-rose-600 dark:text-rose-400" />}>
+                                    <EnhancedInput
+                                        label="Modifier le mot de passe"
+                                        type="password"
+                                        placeholder="••••••••••••"
+                                        description="Laisser vide si vous ne souhaitez pas modifier le mot de passe actuel"
+                                        value={formData.password}
+                                        onChange={(e: any) => setFormData({ ...formData, password: e.target.value })}
+                                    />
                                 </SectionContainer>
                             </form>
                         </div>
 
-                        {/* Footer UI */}
-                        <div className="p-6 lg:p-10 bg-slate-900 flex items-center justify-between gap-4">
-                            <button type="button" onClick={onClose} className="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-white transition-colors px-2 lg:px-6">
+                        <div className="p-4 sm:p-5 bg-slate-50/50 dark:bg-slate-850/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0">
+                            <button type="button" onClick={onClose} className="px-4 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors">
                                 Annuler
                             </button>
                             <button
                                 type="submit"
                                 form="editTeacherForm"
                                 disabled={loading}
-                                className="bg-white text-slate-900 px-6 py-4 lg:px-10 lg:py-5 font-black shadow-2xl hover:scale-[1.05] active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 flex items-center gap-3 lg:gap-4 group shrink-0"
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2 disabled:opacity-50"
                             >
                                 {loading ? (
-                                    <div className="w-5 h-5 animate-spin border-2 border-slate-900 border-t-transparent rounded-full"></div>
+                                    <div className="w-4 h-4 animate-spin border-2 border-white border-t-transparent rounded-full" />
                                 ) : (
                                     <>
-                                        <span className="hidden sm:inline">Sauvegarder les modifications</span>
-                                        <span className="sm:hidden">Enregistrer</span>
-                                        <div className="w-6 h-6 lg:w-8 lg:h-8 bg-indigo-600 text-white flex items-center justify-center group-hover:rotate-12 transition-transform">
-                                            <CheckCircle2 size={14} className="lg:w-4 lg:h-4" />
-                                        </div>
+                                        <span>Sauvegarder</span>
+                                        <CheckCircle2 size={16} />
                                     </>
                                 )}
                             </button>
@@ -294,70 +281,59 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ teacher, onClose, o
     );
 };
 
-// --- Crisp Styled Components ---
-
 const SectionContainer = ({ title, icon, children }: any) => (
-    <div className="space-y-6 lg:space-y-8">
-        <div className="flex items-center gap-3 lg:gap-5">
-            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-white shadow-xl shadow-slate-100 flex items-center justify-center font-black shrink-0">
+    <div className="space-y-4">
+        <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-800 dark:text-slate-200">
                 {icon}
             </div>
-            <h4 className="text-lg lg:text-2xl font-black text-slate-900 tracking-tight">{title}</h4>
+            <h4 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">{title}</h4>
         </div>
-        <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-slate-100 to-transparent opacity-20 blur-xl"></div>
-            <div className="relative bg-white p-6 lg:p-10 shadow-sm overflow-hidden">
-                {children}
-            </div>
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+            {children}
         </div>
     </div>
 );
 
 const EnhancedInput = ({ label, type = "text", placeholder, value, onChange, description }: any) => (
-    <div className="space-y-3">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">{label}</label>
+    <div className="space-y-1">
+        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">{label}</label>
         <input
             type={type}
             placeholder={placeholder}
             value={value}
             onChange={onChange}
-            className="w-full px-7 py-5 bg-slate-50   ] text-sm font-black text-slate-800 focus:bg-white focus: focus:ring-[12px] focus:ring-indigo-600/5 transition-all outline-none placeholder:text-slate-300 placeholder:font-normal shadow-sm"
+            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
         />
-        {description && <p className="text-[9px] font-bold text-slate-400 mt-3 px-2 uppercase tracking-widest leading-relaxed">{description}</p>}
+        {description && <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">{description}</p>}
     </div>
 );
 
 const EnhancedSelect = ({ label, options, value, onChange }: any) => (
-    <div className="space-y-3">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">{label}</label>
-        <div className="relative">
-            <select
-                value={value}
-                onChange={onChange}
-                className="w-full px-7 py-5 bg-slate-50   ] text-sm font-black text-slate-800 focus:bg-white focus: focus:ring-[12px] focus:ring-indigo-600/5 transition-all outline-none appearance-none cursor-pointer shadow-sm"
-            >
-                {options.map((opt: string, i: number) => (
-                    <option key={i} value={opt}>{opt}</option>
-                ))}
-            </select>
-            <div className="absolute right-7 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 font-bold text-xs uppercase tracking-widest">
-                Profil
-            </div>
-        </div>
+    <div className="space-y-1">
+        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">{label}</label>
+        <select
+            value={value}
+            onChange={onChange}
+            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
+        >
+            {options.map((opt: string, i: number) => (
+                <option key={i} value={opt}>{opt}</option>
+            ))}
+        </select>
     </div>
 );
 
 const TagButton = ({ label, active, onClick, variant = 'primary' }: any) => {
-    let activeStyles = 'bg-slate-900 text-white  shadow-[0_10px_30px_rgba(0,0,0,0.2)]';
-    if (variant === 'success') activeStyles = 'bg-emerald-600 text-white  shadow-[0_10px_30px_rgba(16,185,129,0.3)]';
-    if (variant === 'indigo') activeStyles = 'bg-indigo-600 text-white  shadow-[0_10px_30px_rgba(79,70,229,0.3)]';
+    let activeStyles = 'bg-blue-600 text-white shadow-sm';
+    if (variant === 'success') activeStyles = 'bg-emerald-600 text-white shadow-sm';
+    if (variant === 'indigo') activeStyles = 'bg-indigo-600 text-white shadow-sm';
 
     return (
         <button
             type="button"
             onClick={onClick}
-            className={`px-6 py-3  text-[10px] font-black uppercase tracking-widest transition-all 
-                ${active ? activeStyles : 'bg-white text-slate-400  hover: hover:text-slate-600 shadow-sm active:scale-95'}`}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${active ? activeStyles : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
         >
             {active ? '✓ ' : '+ '} {label}
         </button>
@@ -365,13 +341,13 @@ const TagButton = ({ label, active, onClick, variant = 'primary' }: any) => {
 };
 
 const SidebarStat = ({ label, value, icon }: any) => (
-    <div className="flex items-center gap-3 lg:gap-5 min-w-[140px] lg:w-full group shrink-0">
-        <div className="w-8 h-8 lg:w-10 lg:h-10 bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-indigo-600 transition-colors shrink-0">
+    <div className="flex items-center gap-3 w-full shrink-0">
+        <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
             {icon}
         </div>
         <div className="min-w-0">
-            <p className="text-[8px] lg:text-[9px] font-black text-slate-300 uppercase tracking-widest mb-0.5 lg:mb-1">{label}</p>
-            <p className="text-[10px] lg:text-xs font-black text-slate-800 truncate leading-tight tracking-tight">{value}</p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">{label}</p>
+            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{value}</p>
         </div>
     </div>
 );

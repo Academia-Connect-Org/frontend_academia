@@ -25,7 +25,7 @@ const Teachers: React.FC = () => {
             const qs = params.toString() ? `?${params.toString()}` : '';
 
             const res = await api.get(`/teachers${qs}`);
-            const exportData = res.data.map((t: any) => ({
+            const exportData = (res.data || []).map((t: any) => ({
                 ID: t.id,
                 Nom: t.lastName,
                 Prénom: t.firstName,
@@ -43,43 +43,43 @@ const Teachers: React.FC = () => {
     };
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                <div className="flex items-center gap-4">
+        <div className="space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
                     {institutionId && (
                         <button
                             onClick={() => navigate(ROUTES.DASHBOARD.PDG.SCHOOL_DETAILS.replace(':id', institutionId.toString()))}
-                            className="w-12 h-12 bg-white    flex items-center justify-center text-slate-400 hover:text-indigo-600 hover: transition-all shadow-sm"
+                            className="w-10 h-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm shrink-0"
                             title="Retour à l'établissement"
                         >
-                            <ArrowLeft size={20} />
+                            <ArrowLeft size={18} />
                         </button>
                     )}
                     <div>
-                        <h2 className="text-2xl font-black text-slate-800 tracking-tight">Liste des Enseignants</h2>
-                        <p className="text-slate-500 font-medium">Gérez le personnel enseignant de vos institutions.</p>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Liste des Enseignants</h2>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Gérez le personnel enseignant de vos institutions.</p>
                     </div>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-2.5">
                     <button
                         onClick={handleExport}
                         disabled={isExporting}
-                        className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
+                        className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-200 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm disabled:opacity-50"
                     >
-                        {isExporting ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                        {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
                         Export Liste
                     </button>
                     <button
                         onClick={() => navigate(`${ROUTES.DASHBOARD.PDG.ENROLL}${institutionId ? `?institutionId=${institutionId}` : ''}`)}
-                        className="bg-indigo-600 text-white px-8 py-3  font-extrabold flex items-center gap-2 shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all"
                     >
-                        <Plus size={18} /> Nouveau Enseignant
+                        <Plus size={16} /> Nouveau Enseignant
                     </button>
                 </div>
             </div>
 
             <TeacherList role="PDG" institutionId={institutionId} ceoId={user?.id} />
-        </>
+        </div>
     );
 };
 

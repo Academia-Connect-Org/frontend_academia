@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Download, CreditCard, Clock, CheckCircle, Search, Filter } from 'lucide-react';
+import { Download, CreditCard, Clock, CheckCircle, Search, Filter, User, FolderOpen, ArrowRight } from 'lucide-react';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -18,8 +18,6 @@ const Payments: React.FC = () => {
     const [filterClass, setFilterClass] = useState<string>('');
     const [filterStatus, setFilterStatus] = useState<string>('all');
 
-
-
     const [children, setChildren] = useState<any[]>([]);
     const [selectedChildForPopup, setSelectedChildForPopup] = useState<any>(null);
 
@@ -31,18 +29,18 @@ const Payments: React.FC = () => {
                     url += `?studentId=${selectedStudentId}`;
                 }
                 const res = await api.get(url);
-                setInstallments(res.data);
-                setFilteredInstallments(res.data);
+                setInstallments(res.data || []);
+                setFilteredInstallments(res.data || []);
 
                 if (user?.role === 'PARENT' || user?.role === 'PARENTS') {
                     if (user?.id) {
                         const statsRes = await api.get(`/dashboard/parent?userId=${user.id}`);
-                        setChildren(statsRes.data?.children || []);
+                        setChildren(statsRes.data?.children || statsRes.data?.childrenDetails || []);
                     }
                 }
             } catch (err) {
                 console.error("Error fetching data", err);
-                toast.error("Erreur lors du chargement des données");
+                toast.error("Erreur lors du chargement des données financières");
             } finally {
                 setLoading(false);
             }
@@ -80,12 +78,10 @@ const Payments: React.FC = () => {
     const groupedInstallments = React.useMemo(() => {
         const groups: Record<string, any> = {};
         filteredInstallments.forEach(inst => {
-            // Group by payment plan AND enrollment (student)
-            // This ensures that siblings with the same payment plan are grouped separately
-            const planId = inst.paymentPlan?.id 
-                ? `plan-${inst.paymentPlan.id}-enroll-${inst.enrollment?.id}` 
+            const planId = inst.paymentPlan?.id
+                ? `plan-${inst.paymentPlan.id}-enroll-${inst.enrollment?.id}`
                 : `fee-${inst.feeType?.id}-enroll-${inst.enrollment?.id}`;
-                
+
             if (!groups[planId]) {
                 groups[planId] = {
                     id: planId,
@@ -105,49 +101,71 @@ const Payments: React.FC = () => {
                 groups[planId].allTransactions.push(...inst.transactions);
             }
         });
-        
+
         return Object.values(groups).map(g => ({
             ...g,
             isFullyPaid: g.totalDue > 0 && g.totalDue <= g.totalPaid
         }));
     }, [filteredInstallments]);
 
-    if (loading) return <div className="flex items-center justify-center h-full">Chargement...</div>;
+    if (loading) return (
+        <div className="py-20 text-center">
+            <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Chargement des données financières...</p>
+        </div>
+    );
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="space-y-6">
+            {/* Student Details Popup */}
+            {selectedChildForPopup && (
+                <StudentDetailsPopup
+                    isOpen={!!selectedChildForPopup}
+                    onClose={() => setSelectedChildForPopup(null)}
+                    student={selectedChildForPopup}
+                    role={user?.role || 'PARENT'}
+                    onRefresh={() => { }}
+                />
+            )}
+
+            {/* Header & Filter Controls */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-800 tracking-tight">Finances & Paiements</h1>
-                    <p className="text-slate-500 font-medium mt-1">Consultez vos tranches et téléchargez vos reçus Nasaire</p>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <CreditCard size={24} className="text-blue-600 dark:text-blue-400" />
+                        Finances & Paiements
+                    </h1>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Consultez le suivi des tranches de scolarité et téléchargez vos reçus officiels.
+                    </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-                    <div className="relative w-full sm:w-auto flex-1">
-                        <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                    <div className="relative flex-1 sm:w-44">
+                        <Filter className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <input
                             type="text"
                             placeholder="Année (ex: 2026)"
                             value={filterYear}
                             onChange={(e) => setFilterYear(e.target.value)}
-                            className="w-full pl-12 pr-6 py-4 bg-white border border-slate-200 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-bold text-slate-800 placeholder-slate-400"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                         />
                     </div>
-                    <div className="relative w-full sm:w-auto flex-1">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <div className="relative flex-1 sm:w-44">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <input
                             type="text"
                             placeholder="Classe (ex: 6ème)"
                             value={filterClass}
                             onChange={(e) => setFilterClass(e.target.value)}
-                            className="w-full pl-12 pr-6 py-4 bg-white border border-slate-200 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-bold text-slate-800 placeholder-slate-400"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                         />
                     </div>
-                    <div className="relative w-full sm:w-auto flex-1">
+                    <div className="relative flex-1 sm:w-44">
                         <select
                             value={filterStatus}
                             onChange={(e) => setFilterStatus(e.target.value)}
-                            className="w-full px-6 py-4 bg-white border border-slate-200 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-bold text-slate-800 appearance-none cursor-pointer"
+                            className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-900 dark:text-white outline-none cursor-pointer"
                         >
                             <option value="all">Tous les statuts</option>
                             <option value="paid">Frais payés</option>
@@ -157,167 +175,151 @@ const Payments: React.FC = () => {
                 </div>
             </div>
 
+            {/* Children Cards Header (For Parents to quickly open student folder) */}
             {children.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    {children.map((child: any) => (
-                        <div
-                            key={child.id}
-                            onClick={() => setSelectedChildForPopup(child)}
-                            className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 dark:border-white/10 hover:border-indigo-500/50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer flex items-center gap-4 group rounded-3xl"
-                        >
-                            <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center font-black text-xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                {child.firstName?.charAt(0) || ''}{child.lastName?.charAt(0) || ''}
+                <div className="space-y-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Dossiers Financiers des Enfants</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {children.map((child: any) => (
+                            <div
+                                key={child.id}
+                                onClick={() => setSelectedChildForPopup(child.student || child)}
+                                className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:border-blue-500/50 hover:shadow-md transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                            >
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 group-hover:scale-105 transition-transform">
+                                        {child.firstName?.charAt(0) || ''}{child.lastName?.charAt(0) || ''}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <h4 className="font-bold text-slate-900 dark:text-white text-xs truncate">
+                                            {child.firstName} {child.lastName}
+                                        </h4>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                                            {child.classeName || child.classe?.name || "Élève"}
+                                        </p>
+                                    </div>
+                                </div>
+                                <span className="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold text-[11px] rounded-xl flex items-center gap-1 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                    <FolderOpen size={14} /> Dossier
+                                </span>
                             </div>
-                            <div>
-                                <h3 className="font-black text-slate-800 text-lg group-hover:text-indigo-600 transition-colors">
-                                    {child.firstName} {child.lastName}
-                                </h3>
-                                <p className="text-slate-500 text-sm font-medium">
-                                    Voir le dossier complet
-                                </p>
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             )}
 
+            {/* Installment Groups List */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {groupedInstallments.length === 0 ? (
-                    <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 dark:border-white/10 flex flex-col justify-between gap-4 transition-all opacity-80 rounded-3xl">
-                        <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 flex items-center justify-center font-black bg-slate-100 text-slate-400">
-                                    <Clock size={20} />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-black text-slate-400">Aucun plan de paiement</h3>
-                                    <span className="inline-block px-2 py-1 mt-1 text-xs font-bold rounded-sm bg-slate-100 text-slate-500">
-                                        N/A
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md p-4 border border-white/50 dark:border-white/5 space-y-2 mt-2 rounded-2xl">
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="font-bold text-slate-500">Élève</span>
-                                <span className="font-black text-slate-400">-</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="font-bold text-slate-500">Classe</span>
-                                <span className="font-black text-slate-400">-</span>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 mt-2 border-t border-slate-100 pt-4">
-                            <div>
-                                <p className="text-xs font-bold text-slate-400">Total payé</p>
-                                <p className="text-lg font-black text-slate-400">0 FCFA</p>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-xs font-bold text-slate-400">Reste à payer</p>
-                                <p className="text-lg font-black text-slate-400">0 FCFA</p>
-                            </div>
-                        </div>
+                    <div className="md:col-span-2 bg-white dark:bg-slate-900 p-12 rounded-3xl border border-slate-200/80 dark:border-slate-800 text-center space-y-3">
+                        <CreditCard size={48} className="mx-auto text-slate-300 dark:text-slate-600" />
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white">Aucun plan de paiement trouvé</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Aucun échéancier financier ne correspond à vos filtres actuels.</p>
                     </div>
                 ) : (
-                    groupedInstallments.map((group: any, idx: number) => (
-                        <div key={idx} className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 dark:border-white/10 flex flex-col justify-between gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all rounded-3xl relative overflow-hidden">
-                            <div className="flex items-start justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className={`w-12 h-12 flex items-center justify-center font-black ${group.isFullyPaid ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
-                                        {group.isFullyPaid ? <CheckCircle size={20} /> : <Clock size={20} />}
+                    groupedInstallments.map((group: any, idx: number) => {
+                        const studentObj = group.enrollment?.student;
+
+                        return (
+                            <div key={idx} className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4 flex flex-col justify-between hover:shadow-md transition-all">
+                                {/* Group Title & Fully Paid Status */}
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-bold shrink-0 ${group.isFullyPaid ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400'}`}>
+                                            {group.isFullyPaid ? <CheckCircle size={22} /> : <Clock size={22} />}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">{group.planName}</h3>
+                                            <span className={`inline-block px-2.5 py-0.5 mt-1 text-[10px] font-bold rounded-lg uppercase ${group.isFullyPaid ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900'}`}>
+                                                {group.isFullyPaid ? 'Intégralement Payé' : 'Paiement en cours'}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="text-lg font-black text-slate-800">{group.planName}</h3>
-                                        <span className={`inline-block px-2 py-1 mt-1 text-xs font-bold rounded-sm ${group.isFullyPaid ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                                            {group.isFullyPaid ? 'Intégralement Payé' : 'Paiement en cours'}
-                                        </span>
+
+                                    <div className="text-right shrink-0">
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tranches</p>
+                                        <p className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
+                                            {group.installments.filter((i: any) => i.isPaid).length} / {group.installments.length}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-xs font-bold text-slate-400">Tranches</p>
-                                    <p className="text-sm font-black text-slate-700">
-                                        {group.installments.filter((i:any) => i.isPaid).length} / {group.installments.length}
-                                    </p>
-                                </div>
-                            </div>
 
-                            <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md p-4 border border-white/50 dark:border-white/5 space-y-2 mt-2 rounded-2xl">
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="font-bold text-slate-500">Élève</span>
-                                    <span className="font-black text-slate-800">{group.enrollment?.student?.firstName} {group.enrollment?.student?.lastName}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="font-bold text-slate-500">Classe</span>
-                                    <span className="font-black text-slate-800">{group.enrollment?.classe?.name}</span>
-                                </div>
-                            </div>
+                                {/* Enrollment Info & "Voir le Dossier" button */}
+                                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                                    <div className="min-w-0 space-y-0.5">
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Élève & Classe</p>
+                                        <h4 className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                                            {studentObj?.firstName ? `${studentObj.firstName} ${studentObj.lastName}` : 'Élève rattaché'}
+                                        </h4>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                                            {group.enrollment?.classe?.name || 'Classe N/A'}
+                                        </p>
+                                    </div>
 
-                            <div className="grid grid-cols-2 gap-4 mt-2 border-t border-slate-100 pt-4">
-                                <div>
-                                    <p className="text-xs font-bold text-slate-400">Total payé</p>
-                                    <p className="text-lg font-black text-emerald-600">{group.totalPaid} FCFA</p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-xs font-bold text-slate-400">Reste à payer</p>
-                                    <p className={`text-lg font-black ${group.totalDue - group.totalPaid > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
-                                        {Math.max(0, group.totalDue - group.totalPaid)} FCFA
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Transactions & Reçus */}
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                {group.isFullyPaid ? (
-                                    <button
-                                        onClick={() => handleDownloadReceipt(null, group.installments[0], true, group)}
-                                        className="w-full flex items-center justify-center gap-2 px-3 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-sm hover:bg-emerald-100 transition-all rounded-xl shadow-sm"
-                                    >
-                                        <Download size={16} /> Reçu Global - {group.totalPaid} FCFA
-                                    </button>
-                                ) : group.allTransactions && group.allTransactions.length > 0 ? (
-                                    group.allTransactions.map((tx: any) => (
+                                    {studentObj && (
                                         <button
-                                            key={tx.id}
-                                            onClick={() => handleDownloadReceipt(tx, group.installments.find((i:any) => i.id === tx.installmentId) || group.installments[0])}
-                                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white/50 dark:bg-slate-800/40 backdrop-blur-md border border-white/60 dark:border-white/10 text-slate-700 dark:text-slate-300 font-black text-xs hover:bg-white dark:hover:bg-slate-800 transition-all rounded-xl shadow-sm"
+                                            onClick={() => setSelectedChildForPopup(studentObj)}
+                                            className="px-3 py-1.5 bg-white dark:bg-slate-900 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-blue-600 dark:text-blue-400 font-bold text-xs rounded-xl shadow-sm border border-slate-200/80 dark:border-slate-700 transition-all flex items-center gap-1 shrink-0"
                                         >
-                                            <Download size={14} /> Reçu : {tx.amount} FCFA
+                                            <FolderOpen size={14} /> Dossier <ArrowRight size={12} />
                                         </button>
-                                    ))
-                                ) : (
-                                    <div className="w-full text-center py-2 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/50 dark:border-white/5 rounded-xl">
-                                        <span className="text-xs font-bold text-slate-400 italic">Aucun reçu disponible</span>
+                                    )}
+                                </div>
+
+                                {/* Financial Amounts */}
+                                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total payé</p>
+                                        <p className="text-base font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">{group.totalPaid ? `${group.totalPaid.toLocaleString()} FCFA` : '0 FCFA'}</p>
                                     </div>
-                                )}
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Reste à payer</p>
+                                        <p className={`text-base font-bold mt-0.5 ${group.totalDue - group.totalPaid > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                            {Math.max(0, group.totalDue - group.totalPaid).toLocaleString()} FCFA
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Transactions & Receipt Download Actions */}
+                                <div className="pt-2 flex flex-wrap gap-2">
+                                    {group.isFullyPaid ? (
+                                        <button
+                                            onClick={() => handleDownloadReceipt(null, group.installments[0], true, group)}
+                                            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-600 hover:text-white border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 font-bold text-xs rounded-xl transition-all shadow-sm"
+                                        >
+                                            <Download size={14} /> Reçu Global - {group.totalPaid.toLocaleString()} FCFA
+                                        </button>
+                                    ) : group.allTransactions && group.allTransactions.length > 0 ? (
+                                        group.allTransactions.map((tx: any) => (
+                                            <button
+                                                key={tx.id}
+                                                onClick={() => handleDownloadReceipt(tx, group.installments.find((i: any) => i.id === tx.installmentId) || group.installments[0])}
+                                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-blue-600 hover:text-white border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition-all shadow-sm"
+                                            >
+                                                <Download size={14} /> Reçu : {tx.amount?.toLocaleString() || 0} FCFA
+                                            </button>
+                                        ))
+                                    ) : (
+                                        <div className="w-full text-center py-2 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800">
+                                            <span className="text-xs font-bold text-slate-400 italic">Aucun reçu individuel disponible</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
 
+            {/* Processing Toast Overlay */}
             {isProcessingAction && (
-                <div className="fixed inset-0 bg-white/70 backdrop-blur-md z-[250] flex flex-col items-center justify-center p-4 rounded-xl animate-in fade-in duration-300">
-                    <div className="relative w-24 h-24 mb-8 flex items-center justify-center">
-                        <div className="absolute inset-0 rounded-full border-[4px] border-transparent border-t-indigo-600 border-r-indigo-600 animate-spin"></div>
-                        <div className="absolute inset-3 rounded-full border-[4px] border-transparent border-b-purple-500 border-l-purple-500 animate-[spin_1.5s_linear_infinite_reverse]"></div>
-                        <div className="relative flex items-center justify-center bg-indigo-50/50 rounded-full w-12 h-12 backdrop-blur-sm">
-                            <Download className="text-indigo-600 animate-pulse" size={20} />
-                        </div>
+                <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[9999] flex flex-col items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl text-center space-y-4 max-w-sm">
+                        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Veuillez patienter</h3>
+                        <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-4 py-2 rounded-xl border border-blue-100 dark:border-blue-900">{processingMessage}</p>
                     </div>
-                    <h3 className="text-xl font-black text-slate-800 tracking-tight mb-2 uppercase">Veuillez patienter</h3>
-                    <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-4 py-2 rounded-full border border-indigo-100">{processingMessage}</p>
                 </div>
-            )}
-
-            {selectedStudentId && (
-                <StudentDetailsPopup
-                    isOpen={!!selectedStudentId}
-                    onClose={() => setSelectedStudentId('')}
-                    student={{ id: selectedStudentId }}
-                    role={user?.role || ''}
-                />
             )}
         </div>
     );

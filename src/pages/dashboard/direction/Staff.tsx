@@ -23,12 +23,10 @@ const Staff: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
-    // Filters
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCycle, setSelectedCycle] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('');
 
-    // Modals
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -59,11 +57,10 @@ const Staff: React.FC = () => {
                 api.get(`/cycles?institutionId=${institutionId}`).catch(() => ({ data: [] })),
                 api.get(`/subjects?institutionId=${institutionId}`).catch(() => ({ data: [] }))
             ]);
-            setTeachers(teachersRes.data);
-            setCycles(cyclesRes.data);
+            setTeachers(teachersRes.data || []);
+            setCycles(cyclesRes.data || []);
 
-            // Get unique subjects
-            const uniqueSubjects = Array.from(new Set(subjectsRes.data.map((s: any) => s.name)));
+            const uniqueSubjects = Array.from(new Set((subjectsRes.data || []).map((s: any) => s.name)));
             setSubjects(uniqueSubjects);
         } catch (error) {
             console.error("Error fetching data", error);
@@ -77,13 +74,12 @@ const Staff: React.FC = () => {
             const payload: any = { ...formData };
             payload.institutionId = user?.institution?.id;
 
-            // Map cycle name to cycle ID for backend compatibility
             if (formData.cycle) {
                 const found = cycles.find(c => c.name === formData.cycle);
                 if (found) payload.cycleIds = [found.id];
             }
 
-            if (!isEditing && !payload.password) payload.password = 'Pass1234'; // Default password
+            if (!isEditing && !payload.password) payload.password = 'Pass1234';
 
             if (isEditing && editingId) {
                 await api.put(`/teachers/${editingId}`, payload);
@@ -158,7 +154,7 @@ const Staff: React.FC = () => {
             lastName: teacher.lastName,
             email: teacher.email,
             phone: teacher.phone || '',
-            password: '', // Don't show password
+            password: '',
             cycle: teacher.cycle || '',
             specialties: teacher.specialties || []
         });
@@ -171,56 +167,55 @@ const Staff: React.FC = () => {
         const matchesSearch = `${t.firstName} ${t.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
             t.email.toLowerCase().includes(searchQuery.toLowerCase());
 
-        // Handle cycles array from backend
         const matchesCycle = selectedCycle === '' ||
             (t.cycles && t.cycles.some((c: any) => c.name === selectedCycle)) ||
-            (t.cycle === selectedCycle); // Fallback for old data
+            (t.cycle === selectedCycle);
 
         const matchesSubject = selectedSubject === '' || (t.specialties && t.specialties.includes(selectedSubject));
         return matchesSearch && matchesCycle && matchesSubject;
     });
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Corps Enseignant</h2>
-                    <p className="text-slate-500">Gérez les professeurs et leurs spécialités par cycle.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Corps Enseignant</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gérez les professeurs et leurs spécialités par cycle.</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-3">
                     <button
                         onClick={handleExport}
                         disabled={exporting}
-                        className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
+                        className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-50"
                     >
-                        <Download size={18} /> {exporting ? 'Exportation...' : 'Exporter Liste'}
+                        <Download size={16} /> {exporting ? 'Exportation...' : 'Exporter Liste'}
                     </button>
                     <button
                         onClick={() => { resetForm(); setShowModal(true); }}
-                        className="bg-blue-600 text-white px-8 py-3  font-extrabold flex items-center gap-2 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md transition-all self-start md:self-auto"
                     >
-                        <UserPlus size={18} /> Nouvel Enseignant
+                        <UserPlus size={16} /> Nouvel Enseignant
                     </button>
                 </div>
             </div>
 
             {message.text && (
-                <div className={`p-4  mb-6 font-bold flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600  ' : 'bg-red-50 text-red-600  '}`}>
-                    <div className="flex items-center gap-3">
-                        {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-                        {message.text}
+                <div className={`p-4 rounded-xl font-bold text-xs flex items-center justify-between gap-3 ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800'}`}>
+                    <div className="flex items-center gap-2">
+                        {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                        <span>{message.text}</span>
                     </div>
-                    <button onClick={() => setMessage({ type: '', text: '' })}><X size={18} /></button>
+                    <button onClick={() => setMessage({ type: '', text: '' })}><X size={16} /></button>
                 </div>
             )}
 
-            <div className="bg-white ] shadow-xl   overflow-hidden mb-10">
-                <div className="p-8   flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex flex-wrap items-center gap-4">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <select
                             value={selectedCycle}
                             onChange={(e) => setSelectedCycle(e.target.value)}
-                            className="bg-slate-50 border-none  px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-600/5 transition-all"
+                            className="px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                         >
                             <option value="">Tous les Cycles</option>
                             {cycles.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
@@ -228,7 +223,7 @@ const Staff: React.FC = () => {
                         <select
                             value={selectedSubject}
                             onChange={(e) => setSelectedSubject(e.target.value)}
-                            className="bg-slate-50 border-none  px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-600/5 transition-all"
+                            className="px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                         >
                             <option value="">Toutes les Matières</option>
                             {subjects.map(s => <option key={s} value={s}>{s}</option>)}
@@ -236,13 +231,13 @@ const Staff: React.FC = () => {
                     </div>
 
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <input
                             type="text"
                             placeholder="Rechercher (Nom, Email)..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-slate-50 border-none  pl-12 pr-6 py-3 text-sm focus:ring-4 focus:ring-blue-600/5 transition-all outline-none w-full md:w-[300px]"
+                            className="w-full md:w-[260px] pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                         />
                     </div>
                 </div>
@@ -250,71 +245,71 @@ const Staff: React.FC = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                <th className="px-8 py-4">Nom & Prénom</th>
-                                <th className="px-8 py-4">Cycle</th>
-                                <th className="px-8 py-4">Spécialités</th>
-                                <th className="px-8 py-4">Contact</th>
-                                <th className="px-8 py-4 text-right">Actions</th>
+                            <tr className="bg-slate-50 dark:bg-slate-800/60 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                                <th className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800">Nom & Prénom</th>
+                                <th className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800">Cycle</th>
+                                <th className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800">Spécialités</th>
+                                <th className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800">Contact</th>
+                                <th className="px-5 py-3.5 text-right border-b border-slate-100 dark:border-slate-800">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                             {filteredTeachers.map((teacher) => (
-                                <tr key={teacher.id} className="hover:bg-slate-50/30 transition-colors group">
-                                    <td className="px-8 py-5">
+                                <tr key={teacher.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                                    <td className="px-5 py-3.5">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10  bg-blue-50 text-blue-600 flex items-center justify-center font-black">
-                                                {teacher.firstName[0]}{teacher.lastName[0]}
+                                            <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
+                                                {teacher.firstName?.[0]}{teacher.lastName?.[0]}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-slate-800 uppercase text-xs">{teacher.lastName} {teacher.firstName}</p>
-                                                <p className="text-[10px] text-slate-400 font-medium">{teacher.email}</p>
+                                                <p className="font-bold text-slate-900 dark:text-white text-xs">{teacher.lastName} {teacher.firstName}</p>
+                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{teacher.email}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5">
+                                    <td className="px-5 py-3.5">
                                         <div className="flex flex-wrap gap-1">
                                             {teacher.cycles && teacher.cycles.length > 0 ? teacher.cycles.map((c: any) => (
-                                                <span key={c.id} className="px-3 py-1 bg-slate-100 text-slate-600  text-[10px] font-black uppercase">
+                                                <span key={c.id} className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md text-[10px] font-bold uppercase">
                                                     {c.name}
                                                 </span>
                                             )) : <span className="text-[10px] text-slate-400 italic">N/A</span>}
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5">
+                                    <td className="px-5 py-3.5">
                                         <div className="flex flex-wrap gap-1">
                                             {teacher.specialties?.map((s: string) => (
-                                                <span key={s} className="px-2 py-0.5 bg-blue-50 text-blue-600  text-[9px] font-bold">
+                                                <span key={s} className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-md text-[10px] font-bold">
                                                     {s}
                                                 </span>
-                                            )) || <span className="text-slate-300 italic text-[10px]">Aucune</span>}
+                                            )) || <span className="text-slate-400 italic text-[10px]">Aucune</span>}
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5">
-                                        <div className="flex items-center gap-2">
+                                    <td className="px-5 py-3.5">
+                                        <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
                                             <Mail size={14} className="text-slate-400" />
-                                            <span className="text-xs text-slate-500">{teacher.email}</span>
+                                            <span className="truncate max-w-[140px]">{teacher.email}</span>
                                         </div>
                                         {teacher.phone && (
-                                            <div className="flex items-center gap-2 mt-1">
+                                            <div className="flex items-center gap-1.5 mt-0.5 text-slate-600 dark:text-slate-400">
                                                 <Phone size={14} className="text-slate-400" />
-                                                <span className="text-xs text-slate-500">{teacher.phone}</span>
+                                                <span>{teacher.phone}</span>
                                             </div>
                                         )}
                                     </td>
-                                    <td className="px-8 py-5 text-right">
-                                        <div className="flex items-center justify-end gap-2">
+                                    <td className="px-5 py-3.5 text-right">
+                                        <div className="flex items-center justify-end gap-1">
                                             <button
                                                 onClick={() => openEditModal(teacher)}
-                                                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50  transition-all"
+                                                className="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                             >
-                                                <Edit size={18} />
+                                                <Edit size={16} />
                                             </button>
                                             <button
                                                 onClick={() => setConfirmDialog({ isOpen: true, id: teacher.id })}
-                                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50  transition-all"
+                                                className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
                                             >
-                                                <Trash2 size={18} />
+                                                <Trash2 size={16} />
                                             </button>
                                         </div>
                                     </td>
@@ -323,9 +318,9 @@ const Staff: React.FC = () => {
                         </tbody>
                     </table>
                     {filteredTeachers.length === 0 && !loading && (
-                        <div className="p-20 text-center">
-                            <SearchX size={48} className="mx-auto text-slate-200 mb-4" />
-                            <p className="text-slate-400 font-bold">Aucun enseignant trouvé correspondant aux critères.</p>
+                        <div className="py-16 text-center bg-slate-50/50 dark:bg-slate-800/40 m-4 rounded-xl">
+                            <SearchX size={40} className="mx-auto text-slate-400 mb-3" />
+                            <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">Aucun enseignant trouvé correspondant aux critères.</p>
                         </div>
                     )}
                 </div>
@@ -333,65 +328,65 @@ const Staff: React.FC = () => {
 
             {/* MODAL TEACHER */}
             {showModal && (
-                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-lg ] p-8 shadow-2xl animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-black text-slate-800">{isEditing ? "Modifier l'Enseignant" : "Inscrire un Enseignant"}</h3>
-                            <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600"><X size={24} /></button>
+                <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-lg p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]">
+                        <div className="flex justify-between items-center mb-5">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{isEditing ? "Modifier l'Enseignant" : "Inscrire un Enseignant"}</h3>
+                            <button onClick={() => setShowModal(false)} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><X size={18} /></button>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Prénom</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Prénom</label>
                                 <input
                                     type="text"
-                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     value={formData.firstName}
                                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                 />
                             </div>
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nom</label>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Nom</label>
                                 <input
                                     type="text"
-                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     value={formData.lastName}
                                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                 />
                             </div>
-                            <div className="col-span-2 space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
+                            <div className="col-span-2 space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Email</label>
                                 <input
                                     type="email"
-                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 />
                             </div>
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Téléphone</label>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Téléphone</label>
                                 <input
                                     type="text"
-                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                 />
                             </div>
                             {!isEditing && (
-                                <div className="space-y-1.5">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mot de passe</label>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Mot de passe</label>
                                     <input
                                         type="password"
                                         placeholder="Optionnel"
-                                        className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
+                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     />
                                 </div>
                             )}
-                            <div className="col-span-2 space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Cycle Principal</label>
+                            <div className="col-span-2 space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Cycle Principal</label>
                                 <select
-                                    className="w-full px-5 py-3.5 bg-slate-50    text-sm font-bold text-slate-700 outline-none focus:bg-white focus:"
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                     value={formData.cycle}
                                     onChange={(e) => setFormData({ ...formData, cycle: e.target.value })}
                                 >
@@ -399,11 +394,11 @@ const Staff: React.FC = () => {
                                     {cycles.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                 </select>
                             </div>
-                            <div className="col-span-2 space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Spécialités (Matières)</label>
-                                <div className="grid grid-cols-2 gap-2 p-4 bg-slate-50  max-h-40 overflow-y-auto">
+                            <div className="col-span-2 space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Spécialités (Matières)</label>
+                                <div className="grid grid-cols-2 gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 max-h-40 overflow-y-auto">
                                     {subjects.map(subject => (
-                                        <label key={subject} className="flex items-center gap-2 cursor-pointer group">
+                                        <label key={subject} className="flex items-center gap-2 cursor-pointer">
                                             <input
                                                 type="checkbox"
                                                 checked={formData.specialties.includes(subject)}
@@ -413,9 +408,9 @@ const Staff: React.FC = () => {
                                                         : formData.specialties.filter(s => s !== subject);
                                                     setFormData({ ...formData, specialties: updated });
                                                 }}
-                                                className="  text-blue-600 focus:ring-blue-500"
+                                                className="rounded text-blue-600 focus:ring-blue-500"
                                             />
-                                            <span className="text-[11px] font-bold text-slate-700 group-hover:text-blue-600">{subject}</span>
+                                            <span className="text-xs font-medium text-slate-800 dark:text-slate-200">{subject}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -424,7 +419,7 @@ const Staff: React.FC = () => {
                         <button
                             onClick={handleCreateOrUpdate}
                             disabled={loading || !formData.firstName || !formData.lastName || !formData.email}
-                            className="w-full mt-8 py-4 bg-blue-600 text-white  font-black shadow-xl shadow-blue-600/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                            className="w-full mt-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all disabled:opacity-50"
                         >
                             {loading ? 'Traitement...' : isEditing ? 'Mettre à jour' : 'Inscrire l\'enseignant'}
                         </button>
@@ -434,19 +429,21 @@ const Staff: React.FC = () => {
 
             {/* CONFIRM DELETE */}
             {confirmDialog.isOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-sm ] p-8 shadow-2xl animate-in zoom-in-95 duration-200 text-center">
-                        <div className="w-16 h-16 bg-red-50 text-red-500  flex items-center justify-center mx-auto mb-6"><AlertCircle size={32} /></div>
-                        <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2">Supprimer ?</h3>
-                        <p className="text-slate-500 text-sm mb-8">Êtes-vous sûr de vouloir supprimer ce compte enseignant ? Cette action est irréversible.</p>
-                        <div className="flex gap-4">
-                            <button onClick={() => setConfirmDialog({ isOpen: false, id: null })} className="flex-1 py-4  font-bold bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">Annuler</button>
-                            <button onClick={handleDelete} className="flex-1 py-4  font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all">Confirmer</button>
+                <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm p-6 rounded-2xl shadow-2xl text-center">
+                        <div className="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto mb-3">
+                            <AlertCircle size={24} />
+                        </div>
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Supprimer ?</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">Êtes-vous sûr de vouloir supprimer ce compte enseignant ? Cette action est irréversible.</p>
+                        <div className="flex gap-2">
+                            <button onClick={() => setConfirmDialog({ isOpen: false, id: null })} className="flex-1 py-2 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Annuler</button>
+                            <button onClick={handleDelete} className="flex-1 py-2 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-700 text-white shadow-md transition-all">Confirmer</button>
                         </div>
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 };
 

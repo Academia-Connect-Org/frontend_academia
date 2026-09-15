@@ -33,6 +33,7 @@ const TeacherEditScheduleModal: React.FC<TeacherEditScheduleModalProps> = ({ isO
     const [classes, setClasses] = useState<any[]>([]);
     const [subjects, setSubjects] = useState<any[]>([]);
     const [rooms, setRooms] = useState<any[]>([]);
+    const [timetableConfig, setTimetableConfig] = useState<any>(null);
 
     const [formData, setFormData] = useState<EditTimetableEntry>({
         classeId: 0,
@@ -79,15 +80,19 @@ const TeacherEditScheduleModal: React.FC<TeacherEditScheduleModalProps> = ({ isO
         setLoading(true);
         try {
             const instId = user?.institution?.id;
-            // On récupère toutes les classes et matières de l'établissement, plus le profil enseignant
-            const [classesRes, subjectsRes, roomsRes, teacherRes] = await Promise.all([
+            // On récupère toutes les classes et matières de l'établissement, plus le profil enseignant et la config
+            const [classesRes, subjectsRes, roomsRes, teacherRes, configRes] = await Promise.all([
                 api.get(`/classes`, { params: { institutionId: instId } }),
                 api.get(`/subjects`, { params: { institutionId: instId } }),
                 api.get(`/rooms/institution/${instId}`),
-                api.get(`/teachers/${user?.id}`).catch(() => null)
+                api.get(`/teachers/${user?.id}`).catch(() => null),
+                api.get(`/timetable/config/institution/${instId}`).catch(() => null)
             ]);
             setClasses(classesRes.data);
             setRooms(roomsRes.data);
+            if (configRes && configRes.data) {
+                setTimetableConfig(configRes.data);
+            }
             
             let filteredSubjects = subjectsRes.data;
             const teacherData = teacherRes?.data;
@@ -112,8 +117,23 @@ const TeacherEditScheduleModal: React.FC<TeacherEditScheduleModalProps> = ({ isO
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSaving(true);
         setMessage({ type: 'success', text: '' });
+
+        if (timetableConfig) {
+            const minTime = timetableConfig.startHour || "07:00";
+            const maxTime = timetableConfig.endHour || "18:00";
+            
+            if (formData.startTime < minTime || formData.endTime > maxTime) {
+                setMessage({ type: 'error', text: `L'heure doit être comprise entre ${minTime} et ${maxTime}.` });
+                return;
+            }
+            if (formData.startTime >= formData.endTime) {
+                setMessage({ type: 'error', text: "L'heure de début doit être antérieure à l'heure de fin." });
+                return;
+            }
+        }
+
+        setSaving(true);
 
         // Trouver le cycle de la classe sélectionnée
         const selectedClass = classes.find(c => c.id === Number(formData.classeId));

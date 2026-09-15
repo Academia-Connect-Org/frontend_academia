@@ -2,14 +2,11 @@ import React from 'react';
 import {
     Plus,
     Search,
-    Filter,
     Calendar,
     Clock,
     ChevronRight,
     FileText,
     CheckCircle2,
-    AlertCircle,
-    MoreVertical,
     History,
     X,
     Edit
@@ -28,7 +25,6 @@ const Book: React.FC = () => {
     const [searchQuery, setSearchQuery] = React.useState('');
     const [dateFilter, setDateFilter] = React.useState('');
 
-    // Form state
     const [newLesson, setNewLesson] = React.useState({
         title: '',
         content: '',
@@ -49,13 +45,11 @@ const Book: React.FC = () => {
                 api.get(`/lessons/teacher/${user.id}`),
                 api.get(`/classes/teacher/${user.id}`)
             ]);
-            console.log("Fetched Lessons:", lessonsRes.data);
-            console.log("Fetched Classes for Book:", classesRes.data);
 
-            setLessons(lessonsRes.data);
-            setClasses(classesRes.data);
+            setLessons(lessonsRes.data || []);
+            setClasses(classesRes.data || []);
 
-            if (classesRes.data.length > 0) {
+            if ((classesRes.data || []).length > 0) {
                 setNewLesson(prev => ({ ...prev, classeId: classesRes.data[0].id.toString() }));
             }
         } catch (err) {
@@ -120,106 +114,96 @@ const Book: React.FC = () => {
             return matchesSearch && matchesDate;
         });
     }, [lessons, searchQuery, dateFilter]);
+
     return (
-        <>
+        <div className="space-y-6">
             {/* Header Actions */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800">Journal de Classe</h2>
-                    <p className="text-slate-500 font-medium">Consignez vos séances et suivez l'avancement des cours.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Journal de Classe</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Consignez vos séances et suivez l'avancement des cours.</p>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-blue-600 text-white px-8 py-4  font-black flex items-center gap-3 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md transition-all self-start md:self-auto"
                 >
-                    <Plus size={20} /> Nouvelle Séance
+                    <Plus size={16} /> Nouvelle Séance
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content: Recent Lessons */}
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white p-8 ] shadow-2xl   relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50/50  blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-
-                        <div className="flex items-center justify-between mb-8 relative z-10">
-                            <h3 className="text-xl font-black text-slate-800 flex items-center gap-2">
-                                <History size={22} className="text-blue-600" /> Séances Récentes
+                <div className="lg:col-span-2 space-y-4">
+                    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <History size={18} className="text-blue-600 dark:text-blue-400" /> Séances Récentes
                             </h3>
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
                                 <div className="relative">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                                     <input
                                         type="text"
                                         placeholder="Chercher..."
                                         value={searchQuery}
                                         onChange={e => setSearchQuery(e.target.value)}
-                                        className="bg-slate-50 border-none  pl-11 pr-4 py-2.5 text-xs font-bold outline-none ring-2 ring-transparent focus:ring-blue-500/10 transition-all w-48"
+                                        className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none w-36 sm:w-44"
                                     />
                                 </div>
                                 <div className="relative">
-                                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                                     <input
                                         type="date"
                                         value={dateFilter}
                                         onChange={e => setDateFilter(e.target.value)}
-                                        className="bg-slate-50 border-none  pl-11 pr-4 py-2.5 text-[10px] font-bold outline-none ring-2 ring-transparent focus:ring-blue-500/10 transition-all"
+                                        className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                     />
                                 </div>
-                                <button
-                                    onClick={() => { setSearchQuery(''); setDateFilter(''); }}
-                                    className="p-2.5 bg-slate-50  text-slate-400 hover:text-red-600 transition-all"
-                                    title="Réinitialiser les filtres"
-                                >
-                                    <X size={18} />
-                                </button>
+                                {(searchQuery || dateFilter) && (
+                                    <button
+                                        onClick={() => { setSearchQuery(''); setDateFilter(''); }}
+                                        className="p-1.5 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-red-600 rounded-lg transition-colors"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                )}
                             </div>
                         </div>
 
-                        <div className="space-y-6">
+                        <div className="space-y-3">
                             {filteredLessons.length > 0 ? filteredLessons.map((lesson) => (
                                 <div key={lesson.id} className="group cursor-pointer" onClick={() => setViewingLesson(lesson)}>
-                                    <div className="p-6 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 relative overflow-hidden">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex gap-4 items-center">
-                                                <div className={`w-12 h-12  flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform ${lesson.status === 'Terminé' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                                                    {lesson.status === 'Terminé' ? <CheckCircle2 size={24} /> : <Clock size={24} />}
+                                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all relative">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="flex gap-3 items-center">
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${lesson.status === 'Terminé' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400'}`}>
+                                                    {lesson.status === 'Terminé' ? <CheckCircle2 size={20} /> : <Clock size={20} />}
                                                 </div>
                                                 <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <span className="px-3 py-1 bg-blue-100 text-blue-600  text-[10px] font-black uppercase tracking-widest">{lesson.classe?.name}</span>
-                                                        <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1 uppercase tracking-tighter"><Calendar size={12} /> {new Date(lesson.lessonDate).toLocaleDateString()}</span>
+                                                    <div className="flex items-center gap-2 mb-0.5">
+                                                        <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-[10px] font-bold rounded-md uppercase">{lesson.classe?.name}</span>
+                                                        <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1"><Calendar size={12} /> {new Date(lesson.lessonDate).toLocaleDateString('fr-FR')}</span>
                                                     </div>
-                                                    <h4 className="text-lg font-black text-slate-800 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{lesson.title}</h4>
+                                                    <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase truncate">{lesson.title}</h4>
                                                 </div>
                                             </div>
-                                            <button className="text-slate-300 hover:text-slate-600 transition-colors"><MoreVertical size={20} /></button>
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); handleEditClick(lesson); }} 
+                                                className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold uppercase flex items-center gap-1 transition-colors shadow-sm"
+                                            >
+                                                <Edit size={12} /> Modifier
+                                            </button>
                                         </div>
-                                        <div className="pl-16">
-                                            <p className="text-sm text-slate-500 leading-relaxed font-medium mb-4 line-clamp-3">{lesson.content}</p>
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                        <Clock size={12} /> {lesson.duration}
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                        <FileText size={12} /> Aucun document
-                                                    </div>
-                                                </div>
-                                                <button 
-                                                    onClick={(e) => { e.stopPropagation(); handleEditClick(lesson); }} 
-                                                    className="px-3 py-1.5 bg-blue-600 text-white rounded text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
-                                                >
-                                                    <Edit size={12} /> Modifier
-                                                </button>
-                                            </div>
+                                        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 mb-2">{lesson.content}</p>
+                                        <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase">
+                                            <span className="flex items-center gap-1"><Clock size={12} /> {lesson.duration}</span>
+                                            <span className="flex items-center gap-1"><FileText size={12} /> Support de cours</span>
                                         </div>
-                                        <ChevronRight className="absolute right-6 bottom-6 text-slate-200 group-hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100" />
                                     </div>
                                 </div>
                             )) : (
                                 <div className="text-center py-10">
-                                    <p className="text-slate-500 font-bold italic">Aucune séance enregistrée.</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold italic">Aucune séance enregistrée.</p>
                                 </div>
                             )}
                         </div>
@@ -227,67 +211,47 @@ const Book: React.FC = () => {
                 </div>
 
                 {/* Right Sidebar: Schedule & Quick Entry */}
-                <div className="space-y-8">
-                    <div className="bg-slate-900 p-10 ] text-white shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500/20  blur-[80px]"></div>
-                        <h3 className="text-2xl font-black mb-8 relative z-10 tracking-tight">Prochain Cours</h3>
-                        <div className="space-y-6 relative z-10 mb-10">
-                            <div className="p-6 bg-white/5    hover:bg-white/10 transition-all cursor-pointer">
-                                <div className="flex justify-between items-center mb-4">
-                                    <span className="bg-emerald-500 text-white px-3 py-1  text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/30">En cours</span>
-                                    <span className="text-blue-400 text-xs font-bold uppercase tracking-widest">Salle B4</span>
-                                </div>
-                                <h4 className="text-xl font-black mb-1 uppercase tracking-tight">Probabilités</h4>
-                                <p className="text-blue-100/60 text-xs font-bold uppercase tracking-widest mb-4">Terminal C • 2h</p>
-                                <button className="w-full bg-white text-slate-900 py-4  font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl">
-                                    Remplir le cahier
-                                </button>
+                <div className="space-y-4">
+                    <div className="bg-slate-900 dark:bg-slate-850 p-5 rounded-2xl border border-slate-800 text-white shadow-sm">
+                        <h3 className="text-sm font-bold mb-4 uppercase tracking-wider">Prochain Cours</h3>
+                        <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="bg-emerald-500 text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded-md">Séance à venir</span>
                             </div>
-
-                            <div className="p-6 bg-white/5    opacity-60">
-                                <span className="text-blue-400 text-[10px] font-black uppercase tracking-widest block mb-1">16:30 - 18:00</span>
-                                <h4 className="text-lg font-black uppercase tracking-tight">Algèbre Linéaire</h4>
-                                <p className="text-blue-100/60 text-[10px] font-bold uppercase tracking-widest">1ère D • Salle A12</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-8 ] shadow-xl  ">
-                        <h4 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
-                            <AlertCircle size={20} className="text-blue-600" /> Rappels Académiques
-                        </h4>
-                        <div className="space-y-6">
-                            <div className="p-4 bg-blue-50   ">
-                                <p className="text-xs text-blue-900 font-bold leading-relaxed">Pensez à uploader le syllabus pour la classe de Terminal C avant vendredi.</p>
-                            </div>
-                            <div className="p-4 bg-emerald-50   ">
-                                <p className="text-xs text-emerald-900 font-bold leading-relaxed">Tous vos cahiers de texte de la semaine passée sont validés. Félicitations !</p>
-                            </div>
+                            <h4 className="text-base font-bold uppercase mb-1">Séance de cours</h4>
+                            <p className="text-slate-400 text-xs mb-3">Consultez l'emploi du temps pour voir le prochain cours.</p>
+                            <button 
+                                onClick={() => setIsModalOpen(true)}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
+                            >
+                                Remplir le cahier
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+
             {/* Modal Détail Séance */}
             {viewingLesson && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setViewingLesson(null)}></div>
-                    <div className="bg-white p-8 md:p-10 w-full max-w-2xl relative z-10 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto">
-                        <button onClick={() => setViewingLesson(null)} className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
-                            <X size={20} />
+                    <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-md" onClick={() => setViewingLesson(null)} />
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 w-full max-w-xl relative z-10 shadow-2xl rounded-2xl max-h-[85vh] overflow-y-auto">
+                        <button onClick={() => setViewingLesson(null)} className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                            <X size={18} />
                         </button>
                         
-                        <div className="flex items-center gap-4 mb-6">
-                            <span className="px-3 py-1 bg-blue-100 text-blue-600 text-xs font-black uppercase tracking-widest rounded">{viewingLesson.classe?.name}</span>
-                            <span className="text-sm text-slate-500 font-bold flex items-center gap-1 uppercase"><Calendar size={14} /> {new Date(viewingLesson.lessonDate).toLocaleDateString()}</span>
-                            <span className="text-sm text-slate-500 font-bold flex items-center gap-1 uppercase"><Clock size={14} /> {viewingLesson.duration}</span>
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="px-2.5 py-0.5 bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase rounded-md">{viewingLesson.classe?.name}</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1"><Calendar size={12} /> {new Date(viewingLesson.lessonDate).toLocaleDateString('fr-FR')}</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1"><Clock size={12} /> {viewingLesson.duration}</span>
                         </div>
                         
-                        <h2 className="text-3xl font-black text-slate-800 mb-8">{viewingLesson.title}</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 uppercase">{viewingLesson.title}</h2>
                         
-                        <div>
-                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Contenu du cours</h3>
-                            <div className="bg-blue-50/50 p-6 rounded-xl border border-blue-100 min-h-[200px]">
-                                <p className="text-slate-600 leading-relaxed text-sm whitespace-pre-wrap">{viewingLesson.content || 'Aucun contenu.'}</p>
+                        <div className="space-y-2">
+                            <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Contenu du cours</h3>
+                            <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-100 dark:border-slate-800 min-h-[150px]">
+                                <p className="text-slate-700 dark:text-slate-300 text-xs leading-relaxed whitespace-pre-wrap">{viewingLesson.content || 'Aucun contenu.'}</p>
                             </div>
                         </div>
                     </div>
@@ -297,31 +261,31 @@ const Book: React.FC = () => {
             {/* Modal Nouvelle Séance */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { setIsModalOpen(false); setEditingLesson(null); }}></div>
-                    <div className="bg-white ] p-8 md:p-10 w-full max-w-lg relative z-10 shadow-2xl  ">
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-2xl font-black text-slate-800">{editingLesson ? 'Modifier la Séance' : 'Nouvelle Séance'}</h3>
-                            <button onClick={() => { setIsModalOpen(false); setEditingLesson(null); }} className="p-2 hover:bg-slate-100  transition-all"><X size={20} /></button>
+                    <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-md" onClick={() => { setIsModalOpen(false); setEditingLesson(null); }} />
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 w-full max-w-lg relative z-10 shadow-2xl rounded-2xl">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{editingLesson ? 'Modifier la Séance' : 'Nouvelle Séance'}</h3>
+                            <button onClick={() => { setIsModalOpen(false); setEditingLesson(null); }} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><X size={18} /></button>
                         </div>
-                        <form onSubmit={handleCreateLesson} className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Titre de la séance</label>
+                        <form onSubmit={handleCreateLesson} className="space-y-4">
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Titre de la séance</label>
                                 <input
                                     type="text"
                                     required
                                     placeholder="Ex: Les équations différentielles"
                                     value={newLesson.title}
                                     onChange={e => setNewLesson({ ...newLesson, title: e.target.value })}
-                                    className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                 />
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Classe</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Classe</label>
                                     <select
                                         value={newLesson.classeId}
                                         onChange={e => setNewLesson({ ...newLesson, classeId: e.target.value })}
-                                        className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none appearance-none"
+                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                         required
                                     >
                                         {classes.length === 0 ? (
@@ -331,47 +295,45 @@ const Book: React.FC = () => {
                                         )}
                                     </select>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Date</label>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Date</label>
                                     <input
                                         type="date"
                                         required
                                         value={newLesson.lessonDate}
                                         onChange={e => setNewLesson({ ...newLesson, lessonDate: e.target.value })}
-                                        className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                     />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Durée</label>
-                                    <input
-                                        type="text"
-                                        placeholder="2h"
-                                        value={newLesson.duration}
-                                        onChange={e => setNewLesson({ ...newLesson, duration: e.target.value })}
-                                        className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
-                                    />
-                                </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Durée</label>
+                                <input
+                                    type="text"
+                                    placeholder="2h"
+                                    value={newLesson.duration}
+                                    onChange={e => setNewLesson({ ...newLesson, duration: e.target.value })}
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Contenu de la séance</label>
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Contenu de la séance</label>
                                 <textarea
                                     rows={4}
                                     placeholder="Résumé du cours, exercices effectués..."
                                     value={newLesson.content}
                                     onChange={e => setNewLesson({ ...newLesson, content: e.target.value })}
-                                    className="w-full bg-slate-50 border-none  px-6 py-4 text-sm font-bold shadow-inner focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
-                                ></textarea>
+                                    className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white outline-none resize-none"
+                                />
                             </div>
-                            <button type="submit" className="w-full bg-blue-600 text-white py-5  font-black shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:scale-[1.02] active:scale-[0.98] transition-all tracking-widest uppercase text-xs">
+                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-bold text-xs shadow-md transition-all">
                                 {editingLesson ? 'Mettre à jour' : 'Enregistrer la séance'}
                             </button>
                         </form>
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 };
 

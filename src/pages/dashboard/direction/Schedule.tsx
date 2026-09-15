@@ -76,12 +76,10 @@ const Schedule: React.FC = () => {
             const m = curr % 60;
             const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 
-            // Is there a break starting exactly at 'curr'?
             const brk = timetableConfig.breaks.find(b => b.startTime === timeStr);
             if (brk) {
                 labels.add(timeStr);
                 curr += brk.duration;
-                // After adding break duration, the new 'curr' is the end of the break
                 const endH_brk = Math.floor(curr / 60);
                 const endM_brk = curr % 60;
                 labels.add(`${endH_brk.toString().padStart(2, '0')}:${endM_brk.toString().padStart(2, '0')}`);
@@ -92,7 +90,6 @@ const Schedule: React.FC = () => {
             curr += duration;
         }
 
-        // Always add the very beginning and very end
         const finalEndH = Math.floor(endTotalM / 60);
         const finalEndM = endTotalM % 60;
         labels.add(`${finalEndH.toString().padStart(2, '0')}:${finalEndM.toString().padStart(2, '0')}`);
@@ -118,7 +115,6 @@ const Schedule: React.FC = () => {
         setTimeout(() => setToast(null), 3000);
     };
 
-    // Form State
     const [form, setForm] = useState({
         classeId: '',
         subjectId: '',
@@ -133,7 +129,6 @@ const Schedule: React.FC = () => {
     const filteredSubjectsForForm = React.useMemo(() => {
         let filtered = subjects;
 
-        // Filter by Teacher specialties
         if (form.teacherId) {
             const teacher = teachers.find(t => t.id.toString() === form.teacherId);
             if (teacher && teacher.specialties && teacher.specialties.length > 0) {
@@ -145,7 +140,6 @@ const Schedule: React.FC = () => {
             }
         }
 
-        // Filter by Cycle
         if (form.cycle) {
             filtered = filtered.filter(s => !s.cycle || s.cycle.name === form.cycle);
         }
@@ -153,7 +147,6 @@ const Schedule: React.FC = () => {
         return filtered;
     }, [form.teacherId, form.cycle, subjects, teachers]);
 
-    // Reset subject if not in filtered list anymore
     useEffect(() => {
         if (form.subjectId && !filteredSubjectsForForm.some(s => s.id.toString() === form.subjectId)) {
             setForm(prev => ({ ...prev, subjectId: '' }));
@@ -190,21 +183,21 @@ const Schedule: React.FC = () => {
                 api.get(`/rooms/institution/${instId}`),
                 api.get(`/timetable/config/institution/${instId}`)
             ]);
-            setClasses(classesRes.data);
-            setTeachers(teachersRes.data);
-            setSubjects(subjectsRes.data);
-            setCycles(cyclesRes.data);
-            setRooms(roomsRes.data);
-            setTimetableConfig(timetableConfigRes.data);
+            setClasses(classesRes.data || []);
+            setTeachers(teachersRes.data || []);
+            setSubjects(subjectsRes.data || []);
+            setCycles(cyclesRes.data || []);
+            setRooms(roomsRes.data || []);
+            if (timetableConfigRes.data) setTimetableConfig(timetableConfigRes.data);
 
-            if (classesRes.data.length > 0) {
+            if ((classesRes.data || []).length > 0) {
                 setSelectedClasse(classesRes.data[0].id.toString());
             }
 
-            if (cyclesRes.data.length > 0) {
+            if ((cyclesRes.data || []).length > 0) {
                 setForm(prev => ({ ...prev, cycle: cyclesRes.data[0].name }));
             }
-            if (roomsRes.data.length > 0) {
+            if ((roomsRes.data || []).length > 0) {
                 setForm(prev => ({ ...prev, room: roomsRes.data[0].name }));
             }
         } catch (error) {
@@ -216,7 +209,7 @@ const Schedule: React.FC = () => {
         setLoading(true);
         try {
             const res = await api.get(`/timetable/classe/${id}`);
-            setEntries(res.data);
+            setEntries(res.data || []);
         } catch (error) {
             console.error(error);
         } finally {
@@ -228,7 +221,7 @@ const Schedule: React.FC = () => {
         setLoading(true);
         try {
             const res = await api.get(`/timetable/teacher/${id}`);
-            setEntries(res.data);
+            setEntries(res.data || []);
         } catch (error) {
             console.error(error);
         } finally {
@@ -241,14 +234,12 @@ const Schedule: React.FC = () => {
         setIsSubmitting(true);
         const prevEntries = [...entries];
 
-        // Optimistic UI: Close modal immediately
         setIsAddModalOpen(false);
         const isEditing = !!editingEntry;
         const currentEditId = editingEntry?.id;
 
         try {
             if (isEditing && currentEditId) {
-                // Optimistic state update for edit
                 const updated = { ...editingEntry, ...form, id: currentEditId };
                 setEntries(prev => prev.map(ent => ent.id === currentEditId ? updated as any : ent));
 
@@ -266,7 +257,7 @@ const Schedule: React.FC = () => {
             showToast(error.response?.data || "Erreur de planification", 'error');
             setEntries(prevEntries);
             refreshEntries();
-            if (isEditing) setIsAddModalOpen(true); // Re-open on error for correction
+            if (isEditing) setIsAddModalOpen(true);
         } finally {
             setIsSubmitting(false);
         }
@@ -322,7 +313,7 @@ const Schedule: React.FC = () => {
                 showToast("Session déplacée");
             } catch (error: any) {
                 showToast(error.response?.data || "Conflit détecté", 'error');
-                await refreshEntries(); // Trigger re-render to snap back
+                await refreshEntries();
             }
         } else {
             setEntries(prev => [...prev]);
@@ -354,7 +345,6 @@ const Schedule: React.FC = () => {
         setIsSubmitting(true);
         const prevEntries = [...entries];
 
-        // Optimistic delete
         setEntries(prev => prev.filter(e => e.id !== entryToDelete));
         setIsDeleteModalOpen(false);
 
@@ -392,25 +382,24 @@ const Schedule: React.FC = () => {
     };
 
     return (
-        <>
-            {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                        <Calendar className="text-purple-600" size={32} />
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <Calendar className="text-purple-600 dark:text-purple-400" size={24} />
                         Planning Académique
                     </h2>
-                    <p className="text-slate-500 font-medium">Gestion sophistiquée des emplois du temps et occupation des salles.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gestion des emplois du temps et occupation des salles.</p>
                 </div>
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-3">
                     <button
                         onClick={() => setIsConfigModalOpen(true)}
-                        className="bg-white border-2 border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"
+                        className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
                     >
-                        <Settings size={18} /> Configuration
+                        <Settings size={16} /> Configuration
                     </button>
-                    <button className="bg-white border-2 border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm hidden sm:flex">
-                        <Download size={18} /> Exporter PDF
+                    <button className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm hidden sm:flex">
+                        <Download size={16} /> Exporter PDF
                     </button>
                     <button
                         onClick={() => {
@@ -427,26 +416,26 @@ const Schedule: React.FC = () => {
                             });
                             setIsAddModalOpen(true);
                         }}
-                        className="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md transition-all self-start md:self-auto"
                     >
-                        <Plus size={20} /> Nouvelle Session
+                        <Plus size={16} /> Nouvelle Session
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Left Controls */}
-                <div className="lg:col-span-3 space-y-6">
-                    <div className="bg-white p-8 rounded-[38px] shadow-xl shadow-slate-200/50 border border-slate-100 ring-1 ring-slate-400/5">
-                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
-                            <Filter size={16} /> Filtres Vue
+                <div className="lg:col-span-3 space-y-4">
+                    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+                        <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <Filter size={14} /> Filtres Vue
                         </h3>
 
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             <div>
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3 ml-1">Par Classe</label>
+                                <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Par Classe</label>
                                 <select
-                                    className="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500/20 focus:bg-white rounded-2xl py-4 px-5 text-sm font-bold text-slate-700 transition-all outline-none appearance-none"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 dark:text-white outline-none"
                                     value={selectedClasse}
                                     onChange={(e) => {
                                         setSelectedClasse(e.target.value);
@@ -458,19 +447,14 @@ const Schedule: React.FC = () => {
                                 </select>
                             </div>
 
-                            <div className="relative">
-                                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                                    <div className="w-full border-t border-slate-100"></div>
-                                </div>
-                                <div className="relative flex justify-center text-xs uppercase font-black text-slate-300">
-                                    <span className="bg-white px-3">OU</span>
-                                </div>
+                            <div className="relative text-center">
+                                <span className="bg-white dark:bg-slate-900 px-2 text-[10px] font-bold text-slate-400 uppercase">OU</span>
                             </div>
 
                             <div>
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3 ml-1">Par Enseignant</label>
+                                <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 block mb-1">Par Enseignant</label>
                                 <select
-                                    className="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500/20 focus:bg-white rounded-2xl py-4 px-5 text-sm font-bold text-slate-700 transition-all outline-none appearance-none"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 dark:text-white outline-none"
                                     value={selectedTeacher}
                                     onChange={(e) => {
                                         setSelectedTeacher(e.target.value);
@@ -485,19 +469,18 @@ const Schedule: React.FC = () => {
                     </div>
 
                     {/* Stats Card */}
-                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-8 rounded-[40px] text-white shadow-2xl shadow-indigo-600/20 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-white/20 transition-all duration-500"></div>
-                        <h4 className="text-xl font-black mb-6 flex items-center gap-2">
-                            <Layout size={20} /> Vue d'ensemble
+                    <div className="bg-blue-600 dark:bg-blue-900/60 p-5 rounded-2xl text-white shadow-sm space-y-3">
+                        <h4 className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                            <Layout size={16} /> Vue d'ensemble
                         </h4>
-                        <div className="space-y-5">
-                            <div className="flex justify-between items-center bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/5">
-                                <span className="text-indigo-100 text-xs font-bold uppercase tracking-wider">Total Cours</span>
-                                <span className="text-2xl font-black">{entries.length}</span>
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center bg-white/10 p-3 rounded-xl">
+                                <span className="text-[11px] font-bold uppercase">Total Cours</span>
+                                <span className="text-lg font-bold">{entries.length}</span>
                             </div>
-                            <div className="flex justify-between items-center bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/5">
-                                <span className="text-indigo-100 text-xs font-bold uppercase tracking-wider">Matières</span>
-                                <span className="text-2xl font-black">{new Set(entries.map(e => e.subjectName)).size}</span>
+                            <div className="flex justify-between items-center bg-white/10 p-3 rounded-xl">
+                                <span className="text-[11px] font-bold uppercase">Matières</span>
+                                <span className="text-lg font-bold">{new Set(entries.map(e => e.subjectName)).size}</span>
                             </div>
                         </div>
                     </div>
@@ -505,22 +488,22 @@ const Schedule: React.FC = () => {
 
                 {/* Main Content: Timetable Grid */}
                 <div className="lg:col-span-9">
-                    <div className="bg-white rounded-[45px] shadow-2xl shadow-slate-200/40 border border-slate-100 overflow-hidden relative">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden relative">
                         {loading && (
-                            <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-50 flex items-center justify-center">
-                                <Loader2 className="animate-spin text-indigo-600" size={48} />
+                            <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xs z-50 flex items-center justify-center">
+                                <Loader2 className="animate-spin text-blue-600" size={36} />
                             </div>
                         )}
 
-                        <div className="overflow-x-auto custom-scrollbar">
-                            <div className="min-w-[900px] lg:min-w-0">
+                        <div className="overflow-x-auto">
+                            <div className="min-w-[800px]">
 
                         {/* Top bar with days */}
-                        <div className="bg-slate-50/50 border-b border-slate-100 p-2 flex">
-                            <div className="w-20 flex-shrink-0"></div>
+                        <div className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 p-2 flex">
+                            <div className="w-16 shrink-0" />
                             <div className="grid grid-cols-6 flex-1 text-center">
                                 {DAYS.map(day => (
-                                    <div key={day} className="py-4 font-black text-[11px] text-slate-400 uppercase tracking-widest border-l border-slate-100 first:border-0">
+                                    <div key={day} className="py-2 font-bold text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                         {day}
                                     </div>
                                 ))}
@@ -528,29 +511,28 @@ const Schedule: React.FC = () => {
                         </div>
 
                         {/* Grid Content */}
-                        <div ref={gridRef} className="flex relative" style={{ height: `${timeSlots.length * 100}px` }}>
+                        <div ref={gridRef} className="flex relative" style={{ height: `${timeSlots.length * 90}px` }}>
                             {/* Time labels */}
-                            <div className="w-20 flex-shrink-0 border-r border-slate-100/60 relative z-20 bg-white/50 backdrop-blur-sm">
+                            <div className="w-16 shrink-0 border-r border-slate-100 dark:border-slate-800 relative z-20 bg-white/50 dark:bg-slate-900/50">
                                 {timeSlots.map(time => {
-                                    const { top } = calculatePositionAndHeight(time, time); // Hack to get top only
+                                    const { top } = calculatePositionAndHeight(time, time);
                                     return (
-                                        <div key={time} style={{ top }} className="absolute inset-x-0 h-4 -mt-2 text-[10px] font-black text-slate-400 text-center flex flex-col justify-start">
-                                            <span className="bg-slate-100/50 mx-2 py-1 rounded-lg border border-slate-100 tracking-tighter shadow-sm">{time}</span>
+                                        <div key={time} style={{ top }} className="absolute inset-x-0 h-4 -mt-2 text-[10px] font-bold text-slate-400 text-center">
+                                            <span>{time}</span>
                                         </div>
                                     );
                                 })}
                             </div>
                             {/* Background Grid Lines */}
                             <div className="absolute inset-0 flex">
-                                <div className="w-20"></div>
+                                <div className="w-16" />
                                 <div className="grid grid-cols-6 flex-1">
                                     {DAYS.map((day, i) => (
-                                        <div key={i} className="border-l border-slate-100/60 h-full relative">
+                                        <div key={i} className="border-l border-slate-100 dark:border-slate-800 h-full relative">
                                             {timeSlots.slice(0, -1).map((time, j) => {
                                                 const isBreakStart = timetableConfig.breaks.some(b => b.startTime === time);
                                                 if (isBreakStart) return null;
 
-                                                // Find the next label to determine height
                                                 const nextTime = timeSlots[j + 1];
                                                 const { height } = calculatePositionAndHeight(time, nextTime);
 
@@ -559,8 +541,8 @@ const Schedule: React.FC = () => {
                                                         key={j}
                                                         onClick={() => handleGridClick(day, time)}
                                                         style={{ height }}
-                                                        className="border-b border-slate-50/80 cursor-pointer hover:bg-slate-50/50 transition-colors"
-                                                    ></div>
+                                                        className="border-b border-slate-100 dark:border-slate-800/50 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+                                                    />
                                                 );
                                             })}
                                         </div>
@@ -571,7 +553,7 @@ const Schedule: React.FC = () => {
                             {/* Entries Overlay */}
                             <div className="flex-1 grid grid-cols-6 relative z-10">
                                 {DAYS.map((day) => (
-                                    <div key={day} className="relative h-full mx-1">
+                                    <div key={day} className="relative h-full mx-0.5">
                                         {/* Render Breaks */}
                                         {timetableConfig.breaks.map((b, i) => {
                                             const { top, height } = calculatePositionAndHeight(
@@ -585,19 +567,10 @@ const Schedule: React.FC = () => {
                                             return (
                                                 <div
                                                     key={`break-${i}`}
-                                                    className="absolute inset-x-0 bg-slate-100/40 backdrop-blur-[1px] border-y border-slate-200/50 flex items-center justify-center pointer-events-none z-0"
+                                                    className="absolute inset-x-0 bg-slate-100/60 dark:bg-slate-800/60 border-y border-slate-200 dark:border-slate-700 flex items-center justify-center pointer-events-none z-0"
                                                     style={{ top, height }}
                                                 >
-                                                    <div className="flex flex-col items-center">
-                                                        <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Pause</span>
-                                                        <span className="text-[8px] font-bold text-slate-300/80">
-                                                            {b.startTime} - {(() => {
-                                                                const [h, m] = b.startTime.split(':').map(Number);
-                                                                const totalM = h * 60 + m + b.duration;
-                                                                return `${Math.floor(totalM / 60).toString().padStart(2, '0')}:${(totalM % 60).toString().padStart(2, '0')}`;
-                                                            })()}
-                                                        </span>
-                                                    </div>
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase">Pause</span>
                                                 </div>
                                             );
                                         })}
@@ -614,24 +587,23 @@ const Schedule: React.FC = () => {
                                                         dragElastic={0.05}
                                                         dragMomentum={false}
                                                         onDragEnd={(e, info) => handleDragEnd(entry, info)}
-                                                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                                                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                        exit={{ opacity: 0, scale: 0.9 }}
+                                                        initial={{ opacity: 0, scale: 0.95 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        exit={{ opacity: 0, scale: 0.95 }}
                                                         onClick={() => setDetailsEntry(entry)}
-                                                        className="absolute inset-x-0 rounded-3xl p-4 shadow-xl shadow-slate-200/50 border-l-4 overflow-hidden group hover:z-20 hover:scale-[1.03] transition-all cursor-pointer backdrop-blur-md active:z-30 active:scale-105 active:shadow-2xl"
+                                                        className="absolute inset-x-0 rounded-xl p-2.5 shadow-sm border-l-4 overflow-hidden group hover:z-20 transition-all cursor-pointer bg-white dark:bg-slate-800"
                                                         style={{
                                                             top,
                                                             height,
-                                                            backgroundColor: `${entry.subjectColor || '#6366f1'}15`,
-                                                            borderColor: entry.subjectColor || '#6366f1'
+                                                            borderColor: entry.subjectColor || '#3b82f6'
                                                         }}
                                                     >
                                                         <div className="flex flex-col h-full">
-                                                            <div className="flex justify-between items-start mb-2">
-                                                                <span className="text-[10px] font-black px-2 py-1 rounded-full bg-white/80 text-slate-600 shadow-sm uppercase tracking-tighter">
+                                                            <div className="flex justify-between items-start mb-1">
+                                                                <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400">
                                                                     {entry.startTime} - {entry.endTime}
                                                                 </span>
-                                                                <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
+                                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                                     <button
                                                                         onClick={(e) => {
                                                                             e.stopPropagation();
@@ -645,11 +617,10 @@ const Schedule: React.FC = () => {
                                                                                 room: entry.room,
                                                                                 cycle: entry.cycle
                                                                             });
-                                                                            setEditingEntry(null); // Clear editing to make it a "new" entry
+                                                                            setEditingEntry(null);
                                                                             setIsAddModalOpen(true);
                                                                         }}
-                                                                        className="p-1.5 bg-white/60 text-indigo-400 hover:text-indigo-600 rounded-lg border border-slate-100 shadow-sm transition-colors"
-                                                                        title="Dupliquer"
+                                                                        className="p-1 text-slate-400 hover:text-blue-600"
                                                                     >
                                                                         <Copy size={12} />
                                                                     </button>
@@ -658,8 +629,7 @@ const Schedule: React.FC = () => {
                                                                             e.stopPropagation();
                                                                             openEditModal(entry);
                                                                         }}
-                                                                        className="p-1.5 bg-white/60 text-indigo-400 hover:text-indigo-600 rounded-lg border border-slate-100 shadow-sm transition-colors"
-                                                                        title="Modifier"
+                                                                        className="p-1 text-slate-400 hover:text-blue-600"
                                                                     >
                                                                         <Edit2 size={12} />
                                                                     </button>
@@ -668,21 +638,20 @@ const Schedule: React.FC = () => {
                                                                             e.stopPropagation();
                                                                             confirmDelete(entry.id);
                                                                         }}
-                                                                        className="p-1.5 bg-white/60 text-slate-400 hover:text-rose-600 rounded-lg border border-slate-100 shadow-sm transition-colors"
-                                                                        title="Supprimer"
+                                                                        className="p-1 text-slate-400 hover:text-red-600"
                                                                     >
                                                                         <Trash2 size={12} />
                                                                     </button>
                                                                 </div>
                                                             </div>
-                                                            <h5 className="font-black text-slate-800 text-sm leading-tight mb-1 truncate" style={{ color: entry.subjectColor }}>
+                                                            <h5 className="font-bold text-slate-900 dark:text-white text-xs truncate" style={{ color: entry.subjectColor }}>
                                                                 {entry.subjectName}
                                                             </h5>
-                                                            <p className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1.5 mb-2 truncate">
-                                                                <User size={10} className="text-slate-300" /> {selectedTeacher ? entry.classeName : entry.teacherName}
+                                                            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                                                                {selectedTeacher ? entry.classeName : entry.teacherName}
                                                             </p>
-                                                            <div className="mt-auto flex items-center gap-2">
-                                                                <span className="text-[10px] font-black text-slate-400 flex items-center gap-1 bg-white/50 px-2 py-1 rounded-lg">
+                                                            <div className="mt-auto">
+                                                                <span className="text-[9px] font-bold text-slate-400 flex items-center gap-1">
                                                                     <MapPin size={10} /> {entry.room}
                                                                 </span>
                                                             </div>
@@ -699,12 +668,10 @@ const Schedule: React.FC = () => {
                         </div>
 
                         {!selectedClasse && !selectedTeacher && (
-                            <div className="absolute inset-0 bg-slate-50/80 backdrop-blur-sm z-40 flex flex-col items-center justify-center text-center p-10">
-                                <div className="p-8 bg-white rounded-full shadow-2xl shadow-indigo-100 mb-6 motion-safe:animate-bounce">
-                                    <SearchX size={48} className="text-indigo-200" />
-                                </div>
-                                <h3 className="text-2xl font-black text-slate-800 mb-2">Aucune sélection</h3>
-                                <p className="text-slate-500 max-w-xs font-medium">Veuillez sélectionner une classe ou un enseignant pour afficher son emploi du temps.</p>
+                            <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xs z-40 flex flex-col items-center justify-center text-center p-6">
+                                <SearchX size={40} className="text-slate-400 mb-2" />
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Aucune sélection</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs">Veuillez sélectionner une classe ou un enseignant pour afficher son emploi du temps.</p>
                             </div>
                         )}
                     </div>
@@ -719,31 +686,29 @@ const Schedule: React.FC = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+                            className="absolute inset-0 bg-slate-950/60 backdrop-blur-md"
                             onClick={() => setIsAddModalOpen(false)}
                         />
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            initial={{ scale: 0.95, opacity: 0, y: 15 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="bg-white rounded-[48px] w-full max-w-2xl overflow-hidden shadow-2xl relative z-10 border border-slate-100"
+                            exit={{ scale: 0.95, opacity: 0, y: 15 }}
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl relative z-10 p-6"
                         >
-                            <div className="p-10 border-b border-slate-100 bg-slate-50/50">
-                                <h3 className="text-3xl font-black text-slate-800 tracking-tight">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                                     {editingEntry ? 'Modifier la Session' : 'Nouvelle Session'}
                                 </h3>
-                                <p className="text-slate-500 font-medium mt-1">
-                                    {editingEntry ? 'Ajustez les détails de ce cours.' : 'Planifiez un nouveau cours dans l\'emploi du temps.'}
-                                </p>
+                                <button onClick={() => setIsAddModalOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><X size={18} /></button>
                             </div>
 
-                            <form onSubmit={handleAddEntry} className="p-10">
-                                <div className="grid grid-cols-2 gap-6 mb-8">
-                                    <div className="col-span-1">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Classe</label>
+                            <form onSubmit={handleAddEntry} className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Classe</label>
                                         <select
                                             required
-                                            className="form-input-sophisticated"
+                                            className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                             value={form.classeId}
                                             onChange={e => setForm({ ...form, classeId: e.target.value })}
                                         >
@@ -751,11 +716,11 @@ const Schedule: React.FC = () => {
                                             {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                         </select>
                                     </div>
-                                    <div className="col-span-1">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Enseignant</label>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Enseignant</label>
                                         <select
                                             required
-                                            className="form-input-sophisticated"
+                                            className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                             value={form.teacherId}
                                             onChange={e => setForm({ ...form, teacherId: e.target.value })}
                                         >
@@ -763,11 +728,11 @@ const Schedule: React.FC = () => {
                                             {teachers.map(t => <option key={t.id} value={t.id}>{t.firstName} {t.lastName}</option>)}
                                         </select>
                                     </div>
-                                    <div className="col-span-1">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Matière</label>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Matière</label>
                                         <select
                                             required
-                                            className="form-input-sophisticated"
+                                            className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                             value={form.subjectId}
                                             onChange={e => setForm({ ...form, subjectId: e.target.value })}
                                         >
@@ -775,11 +740,11 @@ const Schedule: React.FC = () => {
                                             {filteredSubjectsForForm.map(s => <option key={s.id} value={s.id}>{s.name} ({s.cycle?.name})</option>)}
                                         </select>
                                     </div>
-                                    <div className="col-span-1">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Cycle</label>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Cycle</label>
                                         <select
                                             required
-                                            className="form-input-sophisticated"
+                                            className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                             value={form.cycle}
                                             onChange={e => setForm({ ...form, cycle: e.target.value })}
                                         >
@@ -787,43 +752,42 @@ const Schedule: React.FC = () => {
                                             {cycles.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                         </select>
                                     </div>
-                                    <div className="col-span-1">
-                                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1 ml-1">Salle</label>
+                                    <div className="col-span-2 space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Salle</label>
                                         <select
                                             required
-                                            className="form-input-sophisticated"
+                                            className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                             value={form.room}
                                             onChange={e => setForm({ ...form, room: e.target.value })}
                                         >
-                                            <option value="">Sélectionner</option>
                                             {rooms.map(r => <option key={r.id} value={r.name}>{r.name} ({r.type})</option>)}
                                         </select>
                                     </div>
-                                    <div className="col-span-2 grid grid-cols-4 gap-4">
-                                        <div className="col-span-2">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Jour</label>
+                                    <div className="col-span-2 grid grid-cols-3 gap-2">
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Jour</label>
                                             <select
-                                                className="form-input-sophisticated"
+                                                className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                                 value={form.dayOfWeek}
                                                 onChange={e => setForm({ ...form, dayOfWeek: e.target.value })}
                                             >
                                                 {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
                                             </select>
                                         </div>
-                                        <div className="col-span-1">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Début</label>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Début</label>
                                             <select
-                                                className="form-input-sophisticated"
+                                                className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                                 value={form.startTime}
                                                 onChange={e => setForm({ ...form, startTime: e.target.value })}
                                             >
                                                 {timeSlots.map((t) => <option key={t} value={t}>{t}</option>)}
                                             </select>
                                         </div>
-                                        <div className="col-span-1">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Fin</label>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Fin</label>
                                             <select
-                                                className="form-input-sophisticated"
+                                                className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                                 value={form.endTime}
                                                 onChange={e => setForm({ ...form, endTime: e.target.value })}
                                             >
@@ -833,20 +797,20 @@ const Schedule: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex gap-4">
+                                <div className="flex gap-2 pt-3">
                                     <button
                                         type="button"
                                         onClick={() => setIsAddModalOpen(false)}
-                                        className="flex-1 bg-slate-100 text-slate-600 py-4 rounded-3xl font-black hover:bg-slate-200 transition-all"
+                                        className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                     >
                                         Annuler
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="flex-[2] bg-indigo-600 text-white py-4 rounded-3xl font-black shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="flex-[2] py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                     >
-                                        {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : "Enregistrer"}
+                                        {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : "Enregistrer"}
                                     </button>
                                 </div>
                             </form>
@@ -869,33 +833,33 @@ const Schedule: React.FC = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+                            className="absolute inset-0 bg-slate-950/60 backdrop-blur-md"
                             onClick={() => setIsDeleteModalOpen(false)}
                         />
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            initial={{ scale: 0.95, opacity: 0, y: 15 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="bg-white rounded-[40px] p-10 w-full max-w-md shadow-2xl relative z-10 border border-slate-100 text-center"
+                            exit={{ scale: 0.95, opacity: 0, y: 15 }}
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative z-10 text-center"
                         >
-                            <div className="w-20 h-20 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <Trash2 size={40} />
+                            <div className="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto mb-3">
+                                <Trash2 size={24} />
                             </div>
-                            <h3 className="text-2xl font-black text-slate-800 mb-2">Supprimer la session ?</h3>
-                            <p className="text-slate-500 font-medium mb-8">Cette action est irréversible. Voulez-vous vraiment continuer ?</p>
-                            <div className="flex gap-4">
+                            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Supprimer la session ?</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">Cette action est irréversible. Voulez-vous vraiment continuer ?</p>
+                            <div className="flex gap-2">
                                 <button
                                     onClick={() => setIsDeleteModalOpen(false)}
-                                    className="flex-1 bg-slate-100 text-slate-600 py-4 rounded-3xl font-black hover:bg-slate-200 transition-all"
+                                    className="flex-1 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     Annuler
                                 </button>
                                 <button
                                     onClick={handleDeleteEntry}
                                     disabled={isSubmitting}
-                                    className="flex-1 bg-rose-600 text-white py-4 rounded-3xl font-black shadow-xl shadow-rose-600/30 hover:bg-rose-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
-                                    {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : "Supprimer"}
+                                    {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : "Supprimer"}
                                 </button>
                             </div>
                         </motion.div>
@@ -910,13 +874,13 @@ const Schedule: React.FC = () => {
                         initial={{ opacity: 0, y: 50, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 rounded-3xl shadow-2xl flex items-center gap-3 border backdrop-blur-md ${toast.type === 'success'
-                            ? 'bg-emerald-500/90 border-emerald-400 text-white'
-                            : 'bg-rose-500/90 border-rose-400 text-white'
+                        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 border backdrop-blur-md text-xs font-bold ${toast.type === 'success'
+                            ? 'bg-emerald-600 border-emerald-500 text-white'
+                            : 'bg-red-600 border-red-500 text-white'
                             }`}
                     >
-                        {toast.type === 'success' ? <CheckCircle2 size={20} /> : <X size={20} />}
-                        <span className="font-black text-sm">{toast.message}</span>
+                        {toast.type === 'success' ? <CheckCircle2 size={16} /> : <X size={16} />}
+                        <span>{toast.message}</span>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -940,29 +904,7 @@ const Schedule: React.FC = () => {
                     }
                 }}
             />
-
-            <style>
-                {`
-                    .form-input-sophisticated {
-                        width: 100%;
-                        background-color: #f8fafc;
-                        border: 2px solid transparent;
-                        border-radius: 1.25rem;
-                        padding: 1rem 1.25rem;
-                        font-size: 0.875rem;
-                        font-weight: 700;
-                        color: #334155;
-                        transition: all 0.3s;
-                        outline: none;
-                    }
-                    .form-input-sophisticated:focus {
-                        border-color: #6366f133;
-                        background-color: #ffffff;
-                        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.05);
-                    }
-                `}
-            </style>
-        </>
+        </div>
     );
 };
 
@@ -990,110 +932,104 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+                className="absolute inset-0 bg-slate-950/60 backdrop-blur-md"
                 onClick={onClose}
             />
             <motion.div
-                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                initial={{ scale: 0.95, opacity: 0, y: 15 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                className="bg-white rounded-[40px] w-full max-w-xl overflow-hidden shadow-2xl relative z-10 border border-slate-100"
+                exit={{ scale: 0.95, opacity: 0, y: 15 }}
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl relative z-10"
             >
-                <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                     <div>
-                        <h3 className="text-2xl font-black text-slate-800 tracking-tight">Configuration Académique</h3>
-                        <p className="text-slate-500 font-medium text-sm">Définissez les paramètres globaux de l'établissement.</p>
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white">Configuration Académique</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Définissez les paramètres globaux de l'établissement.</p>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
-                        <X size={20} className="text-slate-400" />
+                    <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <X size={18} />
                     </button>
                 </div>
 
-                <div className="p-8 space-y-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
-                    <div className="grid grid-cols-2 gap-6">
-                        <div>
-                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Début de journée</label>
+                <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto">
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Début de journée</label>
                             <input
                                 type="time"
-                                className="form-input-sophisticated"
+                                className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                 value={localConfig.startHour}
                                 onChange={e => setLocalConfig({ ...localConfig, startHour: e.target.value })}
                             />
                         </div>
-                        <div>
-                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Fin de journée</label>
+                        <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Fin de journée</label>
                             <input
                                 type="time"
-                                className="form-input-sophisticated"
+                                className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                 value={localConfig.endHour}
                                 onChange={e => setLocalConfig({ ...localConfig, endHour: e.target.value })}
                             />
                         </div>
                     </div>
 
-                    <div>
-                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                             Durée d'un cours / créneau (minutes)
                         </label>
-                        <p className="text-[10px] text-slate-400 mb-2 ml-1 font-medium">Un créneau est la durée par défaut d'une heure de cours.</p>
                         <input
                             type="number"
-                            className="form-input-sophisticated"
+                            className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                             placeholder="60"
                             value={localConfig.slotDuration}
                             onChange={e => setLocalConfig({ ...localConfig, slotDuration: parseInt(e.target.value) })}
                         />
                     </div>
 
-                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                    <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
                         <div className="flex justify-between items-center">
-                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block ml-1">Heures de récréation / Pauses</label>
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Heures de récréation / Pauses</label>
                             <button
                                 onClick={() => setShowBreakAdd(true)}
-                                className="text-indigo-600 text-xs font-black flex items-center gap-1 hover:text-indigo-700 hover:scale-105 transition-all"
+                                className="text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center gap-1 hover:underline"
                             >
                                 <Plus size={14} /> Ajouter une pause
                             </button>
                         </div>
-                        <div className="grid gap-3">
+                        <div className="space-y-2">
                             {localConfig.breaks.map((b: any, i: number) => (
-                                <div key={i} className="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-indigo-200 hover:bg-white transition-all">
-                                    <div className="flex gap-4 items-center">
-                                        <div className="bg-indigo-600 text-white p-2 rounded-lg">
+                                <div key={i} className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                                    <div className="flex gap-3 items-center">
+                                        <div className="bg-blue-600 text-white p-1.5 rounded-lg">
                                             <Calendar size={14} />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-black text-slate-700">Début à {b.startTime}</p>
-                                            <p className="text-xs font-medium text-slate-400">Durée : {b.duration} minutes</p>
+                                            <p className="text-xs font-bold text-slate-900 dark:text-white">Début à {b.startTime}</p>
+                                            <p className="text-[10px] text-slate-500 dark:text-slate-400">Durée : {b.duration} minutes</p>
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => setLocalConfig({ ...localConfig, breaks: localConfig.breaks.filter((_: any, idx: number) => idx !== i) })}
-                                        className="p-2 text-slate-300 hover:text-rose-500 transition-colors"
+                                        className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                                     >
                                         <Trash2 size={16} />
                                     </button>
                                 </div>
                             ))}
-                            {localConfig.breaks.length === 0 && (
-                                <div className="text-center py-6 border-2 border-dashed border-slate-100 rounded-3xl">
-                                    <p className="text-slate-400 text-sm font-medium">Aucune pause définie</p>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
 
-                <div className="p-8 border-t border-slate-100 flex gap-4">
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex gap-2">
                     <button
                         onClick={onClose}
-                        className="flex-1 bg-slate-100 text-slate-600 py-4 rounded-3xl font-black hover:bg-slate-200 transition-all"
+                        className="flex-1 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                     >
                         Annuler
                     </button>
                     <button
                         onClick={() => onSave(localConfig)}
-                        className="flex-[2] bg-indigo-600 text-white py-4 rounded-3xl font-black shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="flex-[2] py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all"
                     >
                         Enregistrer
                     </button>
@@ -1107,40 +1043,40 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+                                className="absolute inset-0 bg-slate-950/60 backdrop-blur-md"
                                 onClick={() => setShowBreakAdd(false)}
                             />
                             <motion.div
-                                initial={{ scale: 0.9, opacity: 0 }}
+                                initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 0.9, opacity: 0 }}
-                                className="bg-white rounded-[32px] p-8 w-full max-w-sm shadow-2xl relative z-10 border border-slate-100"
+                                exit={{ scale: 0.95, opacity: 0 }}
+                                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl relative z-10"
                             >
-                                <h4 className="text-xl font-black text-slate-800 mb-6">Ajouter une pause</h4>
-                                <div className="space-y-4 mb-8">
-                                    <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Heure de début</label>
+                                <h4 className="text-base font-bold text-slate-900 dark:text-white mb-4">Ajouter une pause</h4>
+                                <div className="space-y-3 mb-6">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Heure de début</label>
                                         <input
                                             type="time"
-                                            className="form-input-sophisticated"
+                                            className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                             value={newBreak.startTime}
                                             onChange={e => setNewBreak({ ...newBreak, startTime: e.target.value })}
                                         />
                                     </div>
-                                    <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Durée (min)</label>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Durée (min)</label>
                                         <input
                                             type="number"
-                                            className="form-input-sophisticated"
+                                            className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
                                             value={newBreak.duration}
                                             onChange={e => setNewBreak({ ...newBreak, duration: parseInt(e.target.value) })}
                                         />
                                     </div>
                                 </div>
-                                <div className="flex gap-3">
+                                <div className="flex gap-2">
                                     <button
                                         onClick={() => setShowBreakAdd(false)}
-                                        className="flex-1 bg-slate-50 text-slate-600 py-3 rounded-2xl font-bold hover:bg-slate-100 transition-all"
+                                        className="flex-1 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-xs transition-colors"
                                     >
                                         Fermer
                                     </button>
@@ -1149,7 +1085,7 @@ const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({ isOpen, onClo
                                             setLocalConfig({ ...localConfig, breaks: [...localConfig.breaks, newBreak].sort((a, b) => a.startTime.localeCompare(b.startTime)) });
                                             setShowBreakAdd(false);
                                         }}
-                                        className="flex-[2] bg-indigo-600 text-white py-3 rounded-2xl font-black shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all"
+                                        className="flex-[2] py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all"
                                     >
                                         Confirmer
                                     </button>

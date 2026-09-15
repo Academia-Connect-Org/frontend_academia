@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../api/axios';
-import { Clock, UserX, AlertCircle, Calendar, Users as UsersIcon, ChevronRight, Plus, Download, User as UserIcon } from 'lucide-react';
+import { Clock, UserX, AlertCircle, Calendar, Users as UsersIcon, Download, User as UserIcon } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -54,7 +54,7 @@ const ParentAttendance: React.FC = () => {
         setLoading(true);
         try {
             const res = await api.get(`/attendances/student/${studentId}`);
-            const sorted = res.data.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            const sorted = (res.data || []).sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
             setAttendances(sorted);
         } catch (error) {
             console.error("Failed to fetch attendances", error);
@@ -89,10 +89,9 @@ const ParentAttendance: React.FC = () => {
         if (!child) return;
 
         const doc = new jsPDF();
-        const schoolName = user?.institution?.name || "ÉTABLISSEMENT SCOLAIRE";
+        const schoolName = user?.institution?.name || "ÉTABLISSEMENT SCOLAIRE ACADEMIA CONNECT";
 
-        // Premium Header
-        doc.setFillColor(30, 41, 59); // Slate-900
+        doc.setFillColor(30, 41, 59);
         doc.rect(0, 0, 210, 40, 'F');
 
         doc.setTextColor(255, 255, 255);
@@ -104,15 +103,13 @@ const ParentAttendance: React.FC = () => {
         doc.setFont('helvetica', 'normal');
         doc.text(schoolName.toUpperCase(), 105, 30, { align: 'center' });
 
-        // Info Section
         doc.setTextColor(30, 41, 59);
         doc.setFontSize(12);
         doc.text(`Élève: ${child.firstName} ${child.lastName}`, 14, 55);
         doc.text(`Classe: ${child.classe?.name || 'N/A'}`, 14, 62);
-        doc.text(`Parent: ${user?.firstName} ${user?.lastName}`, 14, 69);
+        doc.text(`Parent: ${user?.firstName || ''} ${user?.lastName || ''}`, 14, 69);
         doc.text(`Date d'export: ${new Date().toLocaleDateString('fr-FR')}`, 140, 55);
 
-        // Stats Summary
         doc.setDrawColor(226, 232, 240);
         doc.setFillColor(248, 250, 252);
         doc.roundedRect(14, 78, 182, 20, 3, 3, 'FD');
@@ -129,12 +126,11 @@ const ParentAttendance: React.FC = () => {
         doc.text(String(stats.absences), 85, 93);
         doc.text(String(stats.retards), 150, 93);
 
-        // Attendance Table
         const tableRows = displayAttendances.map(row => [
             new Date(row.date).toLocaleDateString('fr-FR'),
-            row.timetableEntry?.subject?.name || 'Inconnu',
-            row.status === 'LATE' ? 'Retard' : row.status === 'EXCUSED' ? 'Excusé' : 'Absent',
-            row.comment || 'N/A'
+            row.timetableEntry?.subject?.name || 'Matière non spécifiée',
+            row.status === 'LATE' ? 'Retard' : row.status === 'EXCUSED' ? 'Justifié' : 'Absent',
+            row.comment || 'Sans motif'
         ]);
 
         autoTable(doc, {
@@ -151,25 +147,25 @@ const ParentAttendance: React.FC = () => {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                        <Clock className="text-blue-600" size={32} />
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <Clock className="text-blue-600 dark:text-blue-400" size={24} />
                         Assiduité de mes Enfants
                     </h2>
-                    <p className="text-slate-500 font-medium max-w-lg mt-1">
-                        Suivez en temps réel les absences et les retards. La sélection est limitée aux classes de vos enfants inscrits.
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Suivez en temps réel les absences, retards et motifs d'assiduité scolaires.
                     </p>
                 </div>
 
                 {classes.length > 1 && (
-                    <div className="flex flex-col gap-2 w-full md:w-auto">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Filtrer par Classe</label>
+                    <div className="flex items-center gap-2">
+                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Classe:</label>
                         <select
                             value={selectedClassId}
                             onChange={(e) => setSelectedClassId(e.target.value)}
-                            className="bg-white px-6 py-3 font-bold text-slate-600 outline-none transition-all shadow-sm w-full md:w-auto"
+                            className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-xs text-slate-900 dark:text-white outline-none"
                         >
                             <option value="all">Toutes les classes</option>
                             {classes.map(c => (
@@ -181,33 +177,26 @@ const ParentAttendance: React.FC = () => {
             </div>
 
             {loading && children.length === 0 ? (
-                <div className="flex justify-center items-center h-64 bg-white ] shadow-sm">
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="w-12 h-12     animate-spin"></div>
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Synchronisation des données...</p>
-                    </div>
+                <div className="py-16 text-center">
+                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Synchronisation des données...</p>
                 </div>
             ) : children.length === 0 ? (
-                <div className="bg-white p-16 ] shadow-xl   text-center">
-                    <div className="w-20 h-20 bg-slate-50  flex items-center justify-center mx-auto mb-6">
-                        <UsersIcon size={40} className="text-slate-300" />
-                    </div>
-                    <h3 className="text-2xl font-black text-slate-900 mb-3">Aucun enfant identifié</h3>
-                    <p className="text-slate-500 max-w-md mx-auto leading-relaxed">
-                        Il semble qu'aucun compte élève ne soit actuellement lié à votre profil parent.
-                        Veuillez contacter le secrétariat pour l'affiliation.
+                <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
+                    <UsersIcon size={36} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Aucun enfant identifié</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                        Aucun compte élève ne semble être lié à votre profil parent pour le moment.
                     </p>
                 </div>
             ) : (
                 <>
-                    <div className="bg-white p-2 shadow-xl flex items-center w-full lg:w-auto max-w-md mb-6">
-                        <div className="w-10 h-10 bg-blue-50 flex items-center justify-center text-blue-600 mr-2 shrink-0">
-                            <UserIcon size={18} />
-                        </div>
+                    <div className="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-2 max-w-md">
+                        <UserIcon size={16} className="text-blue-600 dark:text-blue-400 ml-1 shrink-0" />
                         <select
                             value={selectedChildId}
                             onChange={(e) => setSelectedChildId(e.target.value)}
-                            className="bg-transparent flex-1 py-3 px-2 font-black text-xs text-slate-700 uppercase tracking-widest outline-none cursor-pointer"
+                            className="bg-transparent flex-1 font-bold text-xs text-slate-900 dark:text-white outline-none cursor-pointer"
                         >
                             {filteredChildren.map((child: any) => (
                                 <option key={child.id} value={String(child.id)}>
@@ -217,69 +206,56 @@ const ParentAttendance: React.FC = () => {
                         </select>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="md:col-span-2 space-y-8">
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2 space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <MatrixBlock label="Absences" value={stats.absences} color="rose" icon={UserX} />
                                 <MatrixBlock label="Retards" value={stats.retards} color="amber" icon={Clock} />
                                 <MatrixBlock label="Justifiées" value={stats.excused} color="indigo" icon={AlertCircle} />
                             </div>
 
-                            <div className="bg-white shadow-2xl overflow-hidden">
-                                <div className="px-6 sm:px-10 py-6 sm:py-8 bg-slate-50/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
-                                    <h3 className="text-xl font-black text-slate-900 flex items-center gap-3 italic">
-                                        <Calendar size={24} className="text-blue-600" /> Historique de Présence
+                            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                                <div className="p-5 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                    <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                        <Calendar size={18} className="text-blue-600 dark:text-blue-400" /> Historique des Incidents de Présence
                                     </h3>
-                                    <div className="px-5 py-2 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
-                                        Fidélité au cours
-                                    </div>
                                 </div>
 
-                                <div className="p-0 sm:p-4 overflow-x-auto">
-                                    <table className="w-full text-left whitespace-nowrap min-w-[600px]">
+                                <div className="p-4 overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                <th className="px-8 py-6">Période / Date</th>
-                                                <th className="px-8 py-6">Matière & Plage</th>
-                                                <th className="px-8 py-6">Statut de présence</th>
-                                                <th className="px-8 py-6">Commentaire</th>
+                                            <tr className="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                                                <th className="pb-3 px-3 font-bold">Date</th>
+                                                <th className="pb-3 px-3 font-bold">Matière & Horaires</th>
+                                                <th className="pb-3 px-3 font-bold">Statut</th>
+                                                <th className="pb-3 px-3 font-bold">Observation</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-50/50">
+                                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                                             {displayAttendances.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={4} className="py-24 text-center">
-                                                        <div className="w-16 h-16 bg-emerald-50  flex items-center justify-center mx-auto mb-4">
-                                                            <Plus className="text-emerald-500 rotate-45" size={24} />
-                                                        </div>
-                                                        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Exemplaire ! Aucun incident noté.</p>
+                                                    <td colSpan={4} className="py-12 text-center text-slate-400 font-bold italic">
+                                                        Exemplaire ! Aucun incident d'assiduité à signaler.
                                                     </td>
                                                 </tr>
                                             ) : displayAttendances.map((row: any) => (
-                                                <tr key={row.id} className="group hover:bg-slate-50/50 transition-all cursor-default">
-                                                    <td className="px-8 py-8 font-black text-slate-900 text-sm italic">
-                                                        {new Date(row.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                <tr key={row.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                                                    <td className="py-3 px-3 font-bold text-slate-900 dark:text-white">
+                                                        {new Date(row.date).toLocaleDateString('fr-FR')}
                                                     </td>
-                                                    <td className="px-8 py-8">
-                                                        <div className="flex flex-col">
-                                                            <span className="text-sm font-black text-slate-800 uppercase tracking-tight">{row.timetableEntry?.subject?.name || 'Matière'}</span>
-                                                            <span className="text-[10px] font-bold text-slate-400 uppercase mt-1">
-                                                                {row.timetableEntry?.startTime?.slice(0, 5)} - {row.timetableEntry?.endTime?.slice(0, 5)}
-                                                            </span>
-                                                        </div>
+                                                    <td className="py-3 px-3">
+                                                        <span className="font-bold text-slate-800 dark:text-slate-200 block">{row.timetableEntry?.subject?.name || 'Matière'}</span>
+                                                        <span className="text-[10px] text-slate-400 font-medium">
+                                                            {row.timetableEntry?.startTime?.slice(0, 5) || '08:00'} - {row.timetableEntry?.endTime?.slice(0, 5) || '09:00'}
+                                                        </span>
                                                     </td>
-                                                    <td className="px-8 py-8">
-                                                        <div className={`inline-flex items-center gap-3 px-6 py-2  text-[10px] font-black uppercase tracking-[0.1em] shadow-sm
-                                                            ${row.status === 'ABSENT' ? 'bg-rose-50 text-rose-500  ' :
-                                                                row.status === 'LATE' ? 'bg-amber-50 text-amber-500  ' : 'bg-indigo-50 text-indigo-500  '}`}>
-                                                            <div className={`w-1.5 h-1.5  animate-pulse ${row.status === 'ABSENT' ? 'bg-rose-500' : row.status === 'LATE' ? 'bg-amber-500' : 'bg-indigo-500'}`} />
-                                                            {row.status === 'LATE' ? 'Retardé' : row.status === 'EXCUSED' ? 'Justifié' : 'Absent'}
-                                                        </div>
+                                                    <td className="py-3 px-3">
+                                                        <span className={`px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase ${row.status === 'ABSENT' ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900' : row.status === 'LATE' ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900' : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900'}`}>
+                                                            {row.status === 'LATE' ? 'Retard' : row.status === 'EXCUSED' ? 'Justifié' : 'Absent'}
+                                                        </span>
                                                     </td>
-                                                    <td className="px-8 py-8">
-                                                        <p className="text-xs text-slate-500 font-medium max-w-[200px] group-hover:text-slate-900 transition-colors uppercase tracking-tight">
-                                                            {row.comment || 'Sans motif fourni'}
-                                                        </p>
+                                                    <td className="py-3 px-3 text-slate-500 dark:text-slate-400 italic">
+                                                        {row.comment || 'Sans motif particulier'}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -289,37 +265,34 @@ const ParentAttendance: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="space-y-6 sm:space-y-8">
-                            <div className="bg-slate-900 p-6 sm:p-10 text-white shadow-2xl relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 blur-[80px]"></div>
-                                <h4 className="text-xl font-black mb-6 sm:mb-8 relative z-10 flex items-center gap-3">
-                                    <AlertCircle size={22} className="text-blue-400" /> Alertes Directes
+                        <div className="space-y-4">
+                            <div className="bg-slate-900 dark:bg-slate-900 p-6 rounded-3xl text-white border border-slate-800 shadow-sm space-y-4">
+                                <h4 className="text-sm font-bold flex items-center gap-2">
+                                    <AlertCircle size={18} className="text-blue-400" /> Alertes Directes & Rappels
                                 </h4>
-                                <div className="space-y-6 relative z-10">
+                                <div className="space-y-2.5">
                                     {displayAttendances.slice(0, 3).map((alert, i) => (
-                                        <div key={i} className="p-6  bg-white/5   hover:bg-white/10 transition-all cursor-pointer group/alert">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{alert.status}</span>
-                                                <span className="text-[9px] text-slate-500 font-bold uppercase">{new Date(alert.date).toLocaleDateString()}</span>
+                                        <div key={i} className="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700/80 space-y-1">
+                                            <div className="flex justify-between items-center text-[10px]">
+                                                <span className="font-bold text-blue-400 uppercase">{alert.status}</span>
+                                                <span className="text-slate-400">{new Date(alert.date).toLocaleDateString()}</span>
                                             </div>
-                                            <p className="text-sm font-bold text-slate-200 group-hover/alert:text-white transition-colors">
-                                                {alert.status === 'ABSENT' ? 'Absence' : 'Retard'} détecté en {alert.timetableEntry?.subject?.name}.
+                                            <p className="text-xs font-medium text-slate-200">
+                                                {alert.status === 'ABSENT' ? 'Absence enregistrée' : 'Retard noté'} en {alert.timetableEntry?.subject?.name || 'cours'}.
                                             </p>
                                         </div>
                                     ))}
                                     {displayAttendances.length === 0 && (
-                                        <div className="py-12 text-center opacity-40">
-                                            <p className="text-xs font-black uppercase tracking-widest">Aucune alerte</p>
-                                        </div>
+                                        <p className="text-xs text-slate-400 italic text-center py-6">Aucune alerte récente.</p>
                                     )}
                                 </div>
                             </div>
 
                             <button
                                 onClick={downloadPDF}
-                                className="w-full py-6 bg-white   ] font-black text-xs uppercase tracking-[0.2em] text-slate-900 hover:bg-slate-50 hover: transition-all flex items-center justify-center gap-4 group shadow-lg"
+                                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-2xl shadow-md transition-colors flex items-center justify-center gap-2 uppercase tracking-wider"
                             >
-                                <Download size={18} className="text-blue-600" /> Télécharger PDF <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                <Download size={16} /> Télécharger Rapport PDF
                             </button>
                         </div>
                     </div>
@@ -330,21 +303,19 @@ const ParentAttendance: React.FC = () => {
 };
 
 const MatrixBlock = ({ label, value, color, icon: Icon }: any) => {
-    const colors = {
-        rose: 'text-rose-600 bg-rose-50',
-        amber: 'text-amber-600 bg-amber-50',
-        indigo: 'text-indigo-600 bg-indigo-50',
+    const colors: any = {
+        rose: 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400',
+        amber: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400',
+        indigo: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400',
     };
     return (
-        <div className="group bg-white p-4 shadow-lg border border-slate-100 rounded-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden flex items-center gap-4">
-            <div className={`w-12 h-12 flex items-center justify-center rounded-xl shadow-inner shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all ${colors[color as keyof typeof colors]}`}>
-                <Icon size={24} />
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+            <div>
+                <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">{label}</p>
+                <h4 className="text-2xl font-bold text-slate-900 dark:text-white">{value}</h4>
             </div>
-            <div className="flex-1">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-                <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-xl font-black text-slate-900 tracking-tight leading-none">{value}</h4>
-                </div>
+            <div className={`w-11 h-11 rounded-2xl ${colors[color]} flex items-center justify-center shrink-0`}>
+                <Icon size={20} />
             </div>
         </div>
     );

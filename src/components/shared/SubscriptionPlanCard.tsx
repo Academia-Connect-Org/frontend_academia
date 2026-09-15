@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Check, X, CheckCircle, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -24,7 +23,6 @@ export interface SubscriptionPlanCardProps {
 }
 
 const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({
-    planType,
     title,
     description,
     price,
@@ -46,71 +44,74 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({
 
     return (
         <motion.div
-            whileHover={{ y: -5 }}
+            whileHover={{ y: -6, scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 350, damping: 22 }}
             onClick={() => {
                 if (isSelectable && onSelect) onSelect();
             }}
-            className={`relative p-8 rounded-3xl transition-all duration-500 flex flex-col w-full flex-1 min-w-[320px] max-w-lg ${
+            className={`relative p-6 sm:p-8 rounded-3xl transition-all duration-300 flex flex-col w-full flex-1 min-w-[300px] max-w-sm ${
                 isSelectable ? 'cursor-pointer' : ''
             } ${
                 isFeatured 
-                ? 'bg-white shadow-2xl shadow-indigo-100 scale-105 z-10 border-2 border-indigo-500' 
-                : 'bg-white/50 backdrop-blur-sm shadow-xl border-2 border-transparent hover:border-indigo-300'
+                ? 'bg-white dark:bg-slate-900 border-2 border-sky-500 dark:border-sky-400 shadow-xl shadow-sky-500/10 z-10' 
+                : 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-md hover:border-sky-300 dark:hover:border-sky-700'
             } ${
-                isSelected ? 'ring-4 ring-indigo-600/20 bg-indigo-50/10' : ''
+                isSelected ? 'ring-4 ring-sky-500/20 bg-sky-50/20 dark:bg-sky-950/30' : ''
             }`}
         >
-            <div className="absolute -top-4 w-full flex justify-between px-4 left-0">
+            <div className="absolute -top-3.5 w-full flex justify-between px-4 left-0 pointer-events-none">
                 {isFeatured ? (
-                    <div className="px-6 py-1.5 bg-indigo-600 text-white text-xs font-black tracking-widest uppercase shadow-lg flex items-center gap-2 w-max rounded-full">
-                        <Crown size={14} /> {highlight || "Recommandé"}
+                    <div className="px-4 py-1 bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[11px] font-semibold tracking-wide uppercase shadow-md flex items-center gap-1.5 w-max rounded-full">
+                        <Crown size={13} /> {highlight || "Recommandé"}
                     </div>
-                ) : <div></div>}
+                ) : <div />}
                 
                 {forcedPeriod !== null && forcedPeriod !== undefined && (
-                    <div className="px-3 py-1.5 bg-red-100 text-red-600 text-[10px] font-black tracking-widest uppercase shadow-md flex items-center w-max rounded-full border border-red-200">
+                    <div className="px-3 py-1 bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-[10px] font-semibold tracking-wider uppercase flex items-center w-max rounded-full border border-red-200/50 dark:border-red-900/50">
                         {forcedPeriod ? "Annuel Uniq." : "Mensuel Uniq."}
                     </div>
                 )}
             </div>
 
             {isSelected && !isFeatured && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-slate-800 text-white text-xs font-black tracking-widest uppercase shadow-md flex items-center gap-2 w-max rounded-full">
-                    <CheckCircle size={14} /> Sélectionné
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-[11px] font-semibold tracking-wide uppercase shadow-md flex items-center gap-1.5 w-max rounded-full">
+                    <CheckCircle size={13} className="text-sky-400" /> Sélectionné
                 </div>
             )}
 
-            <div className="mt-4 mb-8">
+            <div className="mt-2 mb-6">
                 {Icon && (
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${isFeatured ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-400'}`}>
-                        <Icon size={32} />
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-colors ${
+                        isFeatured ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                    }`}>
+                        <Icon size={24} />
                     </div>
                 )}
-                <h3 className="text-3xl font-black text-slate-800 mb-2 uppercase tracking-tighter">{title}</h3>
-                {description && <p className="text-sm text-slate-500 font-medium h-10">{description}</p>}
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{title}</h3>
+                {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{description}</p>}
             </div>
             
-            <div className="flex items-baseline gap-1 mb-8 pb-8 border-b border-slate-100">
-                <span className="text-4xl font-black text-slate-900">{price}</span>
-                <span className="text-sm font-bold text-slate-400">{duration}</span>
+            <div className="flex items-baseline gap-1.5 mb-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{price}</span>
+                <span className="text-xs font-medium text-slate-400">{duration}</span>
             </div>
 
-            <div className="space-y-4 mb-10 flex-1">
-                <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-4">Inclus :</p>
+            <div className="space-y-3 mb-8 flex-1">
+                <p className="text-[11px] font-semibold uppercase text-slate-400 tracking-wider mb-2">Inclus dans la formule :</p>
                 {features?.map((f: string, i: number) => (
-                    <div key={i} className="flex gap-4">
-                        <div className="w-5 h-5 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                            <Check size={12} strokeWidth={3} />
+                    <div key={i} className="flex items-start gap-2.5">
+                        <div className="w-4 h-4 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                            <Check size={11} strokeWidth={3} />
                         </div>
-                        <span className="text-sm font-bold text-slate-600">{f}</span>
+                        <span className="text-xs font-medium text-slate-700 dark:text-slate-300 leading-snug">{f}</span>
                     </div>
                 ))}
                 {isPublic && missing?.map((m: string, i: number) => (
-                    <div key={i} className="flex gap-4 opacity-40">
-                        <div className="w-5 h-5 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                            <X size={12} strokeWidth={3} />
+                    <div key={i} className="flex items-start gap-2.5 opacity-40">
+                        <div className="w-4 h-4 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                            <X size={11} strokeWidth={3} />
                         </div>
-                        <span className="text-sm font-medium text-slate-400 italic line-through">{m}</span>
+                        <span className="text-xs font-normal text-slate-400 italic line-through leading-snug">{m}</span>
                     </div>
                 ))}
             </div>
@@ -121,12 +122,13 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({
                         e.stopPropagation();
                         onButtonClick();
                     }}
-                    className={`w-full py-5 rounded-xl font-black uppercase text-xs tracking-widest transition-all ${
+                    className={`w-full py-3 px-4 rounded-xl font-semibold text-xs transition-all duration-200 shadow-md ${
                         isFeatured
-                        ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-600/20'
-                        : 'bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-900/10'
-                    }`}>
-                    Sélectionner ce plan
+                        ? 'bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white shadow-sky-500/20 active:scale-[0.98]'
+                        : 'bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700 active:scale-[0.98]'
+                    }`}
+                >
+                    Choisir ce plan
                 </button>
             )}
         </motion.div>

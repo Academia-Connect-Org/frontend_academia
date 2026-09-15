@@ -16,12 +16,13 @@ import {
     Loader2,
     Eye,
     EyeOff,
-    Trash2
+    Trash2,
+    X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Profile: React.FC = () => {
-    const { user, login, logout } = useAuth();
+    const { user, logout } = useAuth();
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [activeTab, setActiveTab] = useState<'info' | 'security' | 'danger'>('info');
@@ -73,22 +74,32 @@ const Profile: React.FC = () => {
                 const res = await api.get('/users/profile');
                 const data = res.data;
                 setProfileForm({
-                    firstName: data.firstName || '',
-                    lastName: data.lastName || '',
-                    email: data.email || '',
-                    phone: data.phone || '',
-                    address: data.address || '',
+                    firstName: data.firstName || user?.firstName || '',
+                    lastName: data.lastName || user?.lastName || '',
+                    email: data.email || user?.email || '',
+                    phone: data.phone || user?.phone || '',
+                    address: data.address || user?.address || '',
                     gender: data.gender || ''
                 });
             } catch (err) {
                 console.error(err);
+                if (user) {
+                    setProfileForm({
+                        firstName: user.firstName || '',
+                        lastName: user.lastName || '',
+                        email: user.email || '',
+                        phone: user.phone || '',
+                        address: user.address || '',
+                        gender: (user as any).gender || ''
+                    });
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         fetchProfile();
-    }, []);
+    }, [user]);
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -164,42 +175,44 @@ const Profile: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />
+            <div className="py-16 text-center">
+                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Chargement du profil...</p>
             </div>
         );
     }
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto space-y-6">
             {/* Header Card */}
-            <div className="bg-white dark:bg-slate-900 ] p-8 md:p-12 shadow-xl shadow-slate-200/40 dark:shadow-none   dark: mb-10 flex flex-col md:flex-row items-center gap-10">
-                <div className="relative group">
-                    <div className="w-32 h-32 ] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                        <UserIcon size={56} />
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-center gap-6">
+                <div className="relative shrink-0">
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
+                        <UserIcon size={48} />
                     </div>
-                    <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2    dark: shadow-lg">
-                        <CheckCircle2 size={20} />
+                    <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-full border-2 border-white dark:border-slate-900 shadow-md">
+                        <CheckCircle2 size={16} />
                     </div>
                 </div>
 
-                <div className="text-center md:text-left flex-1">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4 mb-3">
-                        <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                <div className="text-center sm:text-left flex-1 space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center sm:justify-start">
+                        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
                             {profileForm.firstName} {profileForm.lastName}
                         </h2>
-                        <span className="px-4 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400  text-[10px] font-black uppercase tracking-widest self-center md:self-auto">
-                            {user?.role}
+                        <span className="px-3 py-1 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 rounded-xl text-[10px] font-bold uppercase tracking-wider self-center sm:self-auto">
+                            {user?.role || 'Utilisateur'}
                         </span>
                     </div>
-                    <div className="flex flex-wrap justify-center md:justify-start gap-6 text-slate-500 dark:text-slate-400 font-medium italic">
-                        <div className="flex items-center gap-2">
-                            <Mail size={16} className="text-indigo-600" />
-                            <span>{profileForm.email}</span>
+
+                    <div className="flex flex-wrap justify-center sm:justify-start gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        <div className="flex items-center gap-1.5">
+                            <Mail size={14} className="text-blue-500 shrink-0" />
+                            <span>{profileForm.email || 'Adresse email non renseignée'}</span>
                         </div>
                         {profileForm.phone && (
-                            <div className="flex items-center gap-2">
-                                <Phone size={16} className="text-indigo-600" />
+                            <div className="flex items-center gap-1.5">
+                                <Phone size={14} className="text-indigo-500 shrink-0" />
                                 <span>{profileForm.phone}</span>
                             </div>
                         )}
@@ -207,245 +220,265 @@ const Profile: React.FC = () => {
                 </div>
             </div>
 
-            {/* Tabs */}
-            <div className="flex flex-wrap gap-2 mb-10 bg-slate-100 dark:bg-slate-800/50 p-2 ] w-fit">
+            {/* Navigation Tabs */}
+            <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 flex-wrap gap-1">
                 <button
-                    onClick={() => setActiveTab('info')}
-                    className={`flex items-center gap-3 px-8 py-3.5 ] font-black transition-all ${activeTab === 'info'
-                        ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-md scale-105'
-                        : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                        }`}
+                    onClick={() => { setActiveTab('info'); setMessage(null); }}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                        activeTab === 'info'
+                            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
                 >
-                    <UserCircle size={20} />
-                    Informations
+                    <UserCircle size={16} /> Informations
                 </button>
+
                 <button
-                    onClick={() => setActiveTab('security')}
-                    className={`flex items-center gap-3 px-8 py-3.5 ] font-black transition-all ${activeTab === 'security'
-                        ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-md scale-105'
-                        : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                        }`}
+                    onClick={() => { setActiveTab('security'); setMessage(null); }}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                        activeTab === 'security'
+                            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
                 >
-                    <ShieldCheck size={20} />
-                    Sécurité
+                    <ShieldCheck size={16} /> Sécurité & Mot de passe
                 </button>
+
                 <button
-                    onClick={() => setActiveTab('danger')}
-                    className={`flex items-center gap-3 px-8 py-3.5 ] font-black transition-all ${activeTab === 'danger'
-                        ? 'bg-white dark:bg-slate-700 text-red-600 dark:text-red-400 shadow-md scale-105'
-                        : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                        }`}
+                    onClick={() => { setActiveTab('danger'); setMessage(null); }}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                        activeTab === 'danger'
+                            ? 'bg-rose-600 text-white shadow-sm'
+                            : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+                    }`}
                 >
-                    <AlertCircle size={20} />
-                    Zone Danger
+                    <AlertCircle size={16} /> Zone Danger
                 </button>
             </div>
 
             {/* Feedback Message */}
-            <AnimatePresence mode='wait'>
+            <AnimatePresence mode="wait">
                 {message && (
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className={`mb-8 p-6 ] flex items-center gap-4  ${message.type === 'success'
-                            ? 'bg-emerald-50  text-emerald-700 dark:bg-emerald-900/20 dark: dark:text-emerald-400'
-                            : 'bg-red-50  text-red-700 dark:bg-red-900/20 dark: dark:text-red-400'
-                            }`}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className={`p-4 rounded-2xl border text-xs font-bold flex items-center justify-between gap-3 ${
+                            message.type === 'success'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                                : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800'
+                        }`}
                     >
-                        {message.type === 'success' ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
-                        <p className="font-bold flex-1">{message.text}</p>
-                        <button onClick={() => setMessage(null)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 ">
-                            <Save size={18} className="rotate-45" />
+                        <div className="flex items-center gap-2">
+                            {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                            <span>{message.text}</span>
+                        </div>
+                        <button onClick={() => setMessage(null)} className="hover:opacity-75 transition-opacity">
+                            <X size={16} />
                         </button>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* Form Sections */}
-            <div className="bg-white dark:bg-slate-900 ] p-8 md:p-12 shadow-xl shadow-slate-200/40 dark:shadow-none   dark:">
+            {/* Main Section Content */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
                 {activeTab === 'info' && (
-                    <form onSubmit={handleUpdateProfile} className="space-y-8">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10  bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600">
-                                <Info size={22} />
+                    <form onSubmit={handleUpdateProfile} className="space-y-6">
+                        <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-4">
+                            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shrink-0">
+                                <Info size={18} />
                             </div>
-                            <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Détails Personnels</h3>
+                            <div>
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">Détails Personnels</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Mettez à jour vos coordonnées personnelles et informations de profil.</p>
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-5">Prénom</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Prénom</label>
                                 <div className="relative">
-                                    <UserIcon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                     <input
                                         required
                                         type="text"
                                         value={profileForm.firstName}
                                         onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-5">Nom</label>
+
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Nom</label>
                                 <div className="relative">
-                                    <UserIcon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                     <input
                                         required
                                         type="text"
                                         value={profileForm.lastName}
                                         onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-5">Adresse Email</label>
+
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Adresse Email</label>
                                 <div className="relative">
-                                    <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                     <input
                                         required
                                         type="email"
                                         value={profileForm.email}
                                         onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-5">Téléphone</label>
+
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Numéro de Téléphone</label>
                                 <div className="relative">
-                                    <Phone className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                     <input
                                         type="text"
+                                        placeholder="Ex: +225 07 00 00 00 00"
                                         value={profileForm.phone}
                                         onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-5">Adresse Résidentielle</label>
+
+                            <div className="space-y-1.5 sm:col-span-2">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Adresse Résidentielle</label>
                                 <div className="relative">
-                                    <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                     <input
                                         type="text"
+                                        placeholder="Ex: Cocody, Abidjan"
                                         value={profileForm.address}
                                         onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-5">Genre</label>
+
+                            <div className="space-y-1.5 sm:col-span-2">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Genre</label>
                                 <select
                                     value={profileForm.gender}
                                     onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
-                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] px-6 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200 appearance-none"
+                                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                 >
-                                    <option value="">Non défini</option>
+                                    <option value="">Non spécifié</option>
                                     <option value="MALE">Masculin</option>
                                     <option value="FEMALE">Féminin</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div className="pt-6">
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
                             <button
                                 disabled={updating}
                                 type="submit"
-                                className="bg-indigo-600 text-white px-10 py-4 ] font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-600/20 disabled:opacity-50"
+                                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2 disabled:opacity-50"
                             >
-                                {updating ? <Loader2 className="animate-spin" /> : <Save size={22} />}
-                                Mettre à jour le profil
+                                {updating ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
+                                Enregistrer les modifications
                             </button>
                         </div>
                     </form>
                 )}
 
                 {activeTab === 'security' && (
-                    <form onSubmit={handleChangePassword} className="space-y-8">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10  bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-600">
-                                <Lock size={22} />
+                    <form onSubmit={handleChangePassword} className="space-y-6">
+                        <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-4">
+                            <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
+                                <Lock size={18} />
                             </div>
-                            <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Changer le Mot de Passe</h3>
+                            <div>
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">Sécurité de votre Compte</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Modifiez votre mot de passe pour maintenir votre compte en sécurité.</p>
+                            </div>
                         </div>
 
-                        <div className="space-y-6 max-w-md">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-5">Mot de passe actuel</label>
+                        <div className="space-y-4 max-w-md">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Mot de passe actuel</label>
                                 <div className="relative">
-                                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                     <input
                                         required
                                         type={showCurrentPassword ? "text" : "password"}
                                         value={passwordForm.currentPassword}
                                         onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-14 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                                        className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors"
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
                                     >
-                                        {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                     </button>
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-5">Nouveau mot de passe</label>
+
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Nouveau mot de passe</label>
                                 <div className="relative">
-                                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                     <input
                                         required
                                         type={showNewPassword ? "text" : "password"}
                                         value={passwordForm.newPassword}
                                         onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-14 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowNewPassword(!showNewPassword)}
-                                        className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors"
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
                                     >
-                                        {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                     </button>
                                 </div>
-                                <p className="text-[10px] text-slate-400 font-medium ml-5 mt-1">
-                                    Contraintes: 8+ car., 1 lettre, 1 chiffre, 1 spécial (; ! : ? , & ~ / = * #)
+                                <p className="text-[11px] text-slate-400 font-medium mt-1">
+                                    Requis: au moins 8 caractères, 1 lettre, 1 chiffre et 1 symbole (; ! : ? , & ~ / = * #).
                                 </p>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-5">Confirmer le nouveau mot de passe</label>
+
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Confirmer le mot de passe</label>
                                 <div className="relative">
-                                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                     <input
                                         required
                                         type={showConfirmPassword ? "text" : "password"}
                                         value={passwordForm.confirmPassword}
                                         onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none ] pl-14 pr-14 py-4 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 dark:text-slate-200"
+                                        className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors"
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
                                     >
-                                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="pt-6">
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
                             <button
                                 disabled={updating}
                                 type="submit"
-                                className="bg-indigo-600 text-white px-10 py-4 ] font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-600/20 disabled:opacity-50"
+                                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2 disabled:opacity-50"
                             >
-                                {updating ? <Loader2 className="animate-spin" /> : <Save size={22} />}
+                                {updating ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                                 Mettre à jour le mot de passe
                             </button>
                         </div>
@@ -453,27 +486,29 @@ const Profile: React.FC = () => {
                 )}
 
                 {activeTab === 'danger' && (
-                    <div className="space-y-8">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10  bg-red-50 dark:bg-red-900/30 flex items-center justify-center text-red-600">
-                                <Trash2 size={22} />
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-4">
+                            <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold shrink-0">
+                                <Trash2 size={18} />
                             </div>
-                            <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Zone de Danger</h3>
+                            <div>
+                                <h3 className="text-base font-bold text-rose-600 dark:text-rose-400">Zone de Danger</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Actions irréversibles relatives à la fermeture de votre compte.</p>
+                            </div>
                         </div>
 
-                        <div className="bg-red-50 dark:bg-red-950/20   dark: p-8 ]">
-                            <h4 className="text-red-800 dark:text-red-400 font-black text-lg mb-4 uppercase tracking-tight">Supprimer définitivement le compte</h4>
-                            <p className="text-red-600 dark:text-red-400/70 font-medium mb-8 leading-relaxed">
-                                En supprimant votre compte, vous perdrez l'accès à toutes vos données, y compris vos messages, vos préférences et vos informations liées à ACADEMIA CONNECT. <br />
-                                <strong>Cette action est irréversible et immédiate.</strong>
+                        <div className="bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 rounded-2xl p-6 space-y-4">
+                            <h4 className="text-sm font-bold text-rose-900 dark:text-rose-300">Supprimer définitivement le compte</h4>
+                            <p className="text-xs text-rose-700 dark:text-rose-400/80 leading-relaxed">
+                                En supprimant votre compte, vous perdrez l'accès à toutes vos données, messages et paramètres. Cette action est <strong>irréversible</strong>.
                             </p>
 
                             <button
                                 onClick={() => setShowDeleteModal(true)}
                                 disabled={updating}
-                                className="bg-red-600 hover:bg-red-700 text-white px-10 py-4 ] font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-red-600/20 disabled:opacity-50"
+                                className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 disabled:opacity-50"
                             >
-                                <Trash2 size={22} />
+                                <Trash2 size={16} />
                                 Supprimer mon compte
                             </button>
                         </div>
@@ -484,38 +519,39 @@ const Profile: React.FC = () => {
             {/* Delete Account Modal */}
             <AnimatePresence>
                 {showDeleteModal && (
-                    <div className="fixed inset-0 z-[500] flex items-center justify-center p-6 backdrop-blur-xl bg-slate-900/60 animate-in fade-in duration-300">
+                    <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md">
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
+                            initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white dark:bg-slate-900 w-full max-w-md ] p-10 shadow-2xl text-center  dark:"
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl w-full max-w-md p-6 sm:p-8 shadow-2xl text-center space-y-4"
                         >
-                            <div className="w-20 h-20 bg-red-50 dark:bg-red-900/30 text-red-500  flex items-center justify-center mx-auto mb-6">
-                                <Trash2 size={40} />
+                            <div className="w-14 h-14 rounded-2xl bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-sm">
+                                <Trash2 size={28} />
                             </div>
-                            <h3 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight mb-2 uppercase">Supprimer le compte ?</h3>
-                            <p className="text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">
-                                Êtes-vous sûr de vouloir supprimer votre compte définitivement ? <br />
-                                <strong className="text-red-500 uppercase">Toutes vos données seront perdues.</strong> Cette action est irréversible.
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="space-y-1">
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Supprimer le compte ?</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                    Êtes-vous sûr de vouloir supprimer votre compte définitivement ? Toutes vos données seront effacées et cette action ne peut pas être annulée.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-3 pt-2">
                                 <button
                                     onClick={() => setShowDeleteModal(false)}
-                                    className="flex-1 py-4 ] font-black bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all uppercase tracking-widest text-xs"
+                                    className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition-all"
                                     disabled={updating}
                                 >
                                     Annuler
                                 </button>
                                 <button
                                     onClick={handleDeleteAccount}
-                                    className="flex-1 py-4 ] font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:bg-red-600 transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
+                                    className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
                                     disabled={updating}
                                 >
                                     {updating ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                     ) : (
-                                        "Confirmer la suppression"
+                                        "Confirmer"
                                     )}
                                 </button>
                             </div>

@@ -3,16 +3,23 @@ import { Calculator, ClipboardList, Save, Check, TrendingUp } from 'lucide-react
 import { useAuth } from '../../../../context/AuthContext';
 
 interface AveragesViewProps {
+    classes: any[];
+    subjects: any[];
     selectedClass: any;
+    handleClassChange: (clsId: string) => void;
     selectedSubject: any;
+    setSelectedSubject: (sub: any) => void;
     trimester: string;
+    setTrimester: (val: string) => void;
+    academicYear: string;
+    setAcademicYear: (val: string) => void;
     coefficient: number;
     setCoefficient: (val: number) => void;
     setView: (view: any) => void;
     allEvaluations: any[];
     selectedEvalIds: Set<string>;
     setSelectedEvalIds: (ids: Set<string>) => void;
-    handleCalculateAverages: () => void;
+    handleCalculateAverages: (cls?: any, sub?: any, trim?: string, year?: string) => void;
     calculatedResults: any[];
     setCalculatedResults: (results: any[]) => void;
     handleSaveAverages: () => void;
@@ -20,9 +27,16 @@ interface AveragesViewProps {
 }
 
 const AveragesView: React.FC<AveragesViewProps> = ({
+    classes,
+    subjects,
     selectedClass,
+    handleClassChange,
     selectedSubject,
+    setSelectedSubject,
     trimester,
+    setTrimester,
+    academicYear,
+    setAcademicYear,
     coefficient,
     setCoefficient,
     allEvaluations,
@@ -38,236 +52,242 @@ const AveragesView: React.FC<AveragesViewProps> = ({
     const dest = user?.institution?.type === 'ECOLE' ? 'à la Direction' : 'au Provisoriat';
 
     return (
-        <div className="space-y-6 animate-in slide-in-from-bottom-10 duration-500">
-            <div className="bg-white ] shadow-2xl   overflow-hidden">
-                <div className="p-8   bg-slate-50/50 flex items-center justify-between">
+        <div className="space-y-6">
+            {/* Top Selection Bar: Classe, Matière, Trimestre, Année */}
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-wrap items-center gap-3">
+                <div className="flex flex-col gap-1 min-w-[160px] flex-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Classe *</label>
+                    <select
+                        value={typeof selectedClass === 'object' ? selectedClass?.id || '' : selectedClass || ''}
+                        onChange={(e) => {
+                            handleClassChange(e.target.value);
+                            const cls = classes.find(c => String(c.id) === e.target.value);
+                            handleCalculateAverages(cls, selectedSubject, trimester, academicYear);
+                        }}
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                    >
+                        <option value="">Sélectionner une classe...</option>
+                        {classes.map((c: any) => (
+                            <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="flex flex-col gap-1 min-w-[160px] flex-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Matière *</label>
+                    <select
+                        value={typeof selectedSubject === 'object' ? selectedSubject?.id || '' : selectedSubject || ''}
+                        onChange={(e) => {
+                            const sub = subjects.find(s => String(s.id) === e.target.value);
+                            setSelectedSubject(sub);
+                            handleCalculateAverages(selectedClass, sub, trimester, academicYear);
+                        }}
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                    >
+                        <option value="">Sélectionner une matière...</option>
+                        {subjects.map((s: any) => {
+                            const cycleName = s.cycle?.name || (typeof s.cycle === 'string' ? s.cycle : '');
+                            const cycleSuffix = cycleName ? ` (${cycleName})` : '';
+                            return (
+                                <option key={s.id} value={s.id}>
+                                    {s.name}{cycleSuffix}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
+
+                <div className="flex flex-col gap-1 min-w-[140px]">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Trimestre *</label>
+                    <select
+                        value={trimester}
+                        onChange={(e) => {
+                            setTrimester(e.target.value);
+                            handleCalculateAverages(selectedClass, selectedSubject, e.target.value, academicYear);
+                        }}
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                    >
+                        <option value="1er Trimestre">1er Trimestre</option>
+                        <option value="2ème Trimestre">2ème Trimestre</option>
+                        <option value="3ème Trimestre">3ème Trimestre</option>
+                    </select>
+                </div>
+
+                <div className="flex flex-col gap-1 min-w-[140px]">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Année Scolaire</label>
+                    <select
+                        value={academicYear}
+                        onChange={(e) => {
+                            setAcademicYear(e.target.value);
+                            handleCalculateAverages(selectedClass, selectedSubject, trimester, e.target.value);
+                        }}
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                    >
+                        <option value="2024-2025">2024-2025</option>
+                        <option value="2025-2026">2025-2026</option>
+                        <option value="2026-2027">2026-2027</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div className="p-5 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                        <h3 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                            <Calculator className="text-indigo-600" />
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                            <Calculator className="text-indigo-600 dark:text-indigo-400" size={18} />
                             Moyennes Trimestrielles
                         </h3>
-                        <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">
-                            {selectedClass?.name} • {selectedSubject?.name || 'Matière'} • {trimester}
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium uppercase">
+                            {selectedClass?.name || 'Classe non choisie'} • {selectedSubject?.name || 'Toutes les matières'}{selectedSubject?.cycle?.name ? ` (${selectedSubject.cycle.name})` : ''} • {trimester}
                         </p>
                     </div>
-                    <div className="flex items-center gap-6">
-                        <div className="flex flex-col items-end">
-                            <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-1">Coefficient</label>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="number"
-                                    value={coefficient}
-                                    onChange={(e) => {
-                                        const val = parseFloat(e.target.value) || 1;
-                                        setCoefficient(val);
-                                        // Auto update calculated results to show new points
-                                        setCalculatedResults(calculatedResults.map(r => ({
-                                            ...r,
-                                            coefficient: val,
-                                            points: r.moyenneTrimestrielle * val
-                                        })));
-                                    }}
-                                    className="w-20 bg-white    px-3 py-2 text-sm font-black text-indigo-600 focus:ring-2 focus:ring-indigo-500/20 outline-none text-center"
-                                    min="1"
-                                    step="0.5"
-                                />
-                            </div>
-                        </div>
+                    <div className="flex items-center gap-3">
+                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Coefficient</label>
+                        <input
+                            type="number"
+                            value={coefficient}
+                            onChange={(e) => {
+                                const val = parseFloat(e.target.value) || 1;
+                                setCoefficient(val);
+                                setCalculatedResults(calculatedResults.map(r => ({
+                                    ...r,
+                                    coefficient: val,
+                                    points: r.moyenneTrimestrielle * val
+                                })));
+                            }}
+                            className="w-16 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400 text-center outline-none"
+                            min="1"
+                            step="0.5"
+                        />
                     </div>
                 </div>
-                <div className="p-8 space-y-8">
-                    <div className="bg-slate-50 p-6 ]   space-y-4">
+
+                <div className="p-5 space-y-4">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3">
                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Choisir les evaluations à inclure</span>
-                            <div className="flex gap-4">
+                            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Choisir les évaluations à inclure</span>
+                            <div className="flex gap-3 text-xs font-bold">
                                 <button
                                     onClick={() => setSelectedEvalIds(new Set(allEvaluations.map(e => e.id)))}
-                                    className="text-[9px] font-black text-indigo-600 uppercase hover:underline"
+                                    className="text-indigo-600 dark:text-indigo-400 hover:underline"
                                 >
                                     Tout sélectionner
                                 </button>
                                 <button
                                     onClick={() => setSelectedEvalIds(new Set())}
-                                    className="text-[9px] font-black text-slate-400 uppercase hover:underline"
+                                    className="text-slate-400 hover:underline"
                                 >
                                     Tout désélectionner
                                 </button>
                             </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                            {allEvaluations.map(ev => (
-                                <button
-                                    key={ev.id}
-                                    onClick={() => {
-                                        const next = new Set(selectedEvalIds);
-                                        if (next.has(ev.id)) next.delete(ev.id);
-                                        else next.add(ev.id);
-                                        setSelectedEvalIds(next);
-                                    }}
-                                    className={`px-4 py-2.5  text-[10px] font-bold  transition-all flex items-center gap-2 ${selectedEvalIds.has(ev.id) ? 'bg-indigo-600  text-white shadow-lg shadow-indigo-600/20' : 'bg-white  text-slate-500 hover:'}`}
-                                >
-                                    <div className={`p-1  ${selectedEvalIds.has(ev.id) ? 'bg-white/20' : 'bg-slate-100'}`}>
-                                        {ev.isHomework ? <ClipboardList size={10} /> : <TrendingUp size={10} />}
-                                    </div>
-                                    <div className="text-left">
-                                        <div className="leading-tight">{ev.title}</div>
-                                        <div className="text-[7px] opacity-60 uppercase tracking-tighter">
-                                            {ev.isHomework ? 'Devoir' : 'Evaluation'} • {new Date(ev.date).toLocaleDateString()}
+                            {allEvaluations.length === 0 ? (
+                                <p className="text-xs text-slate-400 italic">Aucune évaluation disponible pour cette sélection.</p>
+                            ) : (
+                                allEvaluations.map(ev => (
+                                    <button
+                                        key={ev.id}
+                                        onClick={() => {
+                                            const next = new Set(selectedEvalIds);
+                                            if (next.has(ev.id)) next.delete(ev.id);
+                                            else next.add(ev.id);
+                                            setSelectedEvalIds(next);
+                                        }}
+                                        className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 ${selectedEvalIds.has(ev.id) ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}
+                                    >
+                                        <div className={`p-1 rounded-md ${selectedEvalIds.has(ev.id) ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-700'}`}>
+                                            {ev.isHomework ? <ClipboardList size={12} /> : <TrendingUp size={12} />}
                                         </div>
-                                    </div>
-                                    {selectedEvalIds.has(ev.id) && <Check size={10} className="ml-1" />}
-                                </button>
-                            ))}
+                                        <span>{ev.title}</span>
+                                        {selectedEvalIds.has(ev.id) && <Check size={12} />}
+                                    </button>
+                                ))
+                            )}
                         </div>
-                        <div className="flex justify-between items-center pt-2  ">
-                            <p className="text-[9px] font-medium text-slate-400 italic">Incluez ou excluez des notes pour recalculer.</p>
+                        <div className="flex justify-between items-center pt-2">
+                            <p className="text-[10px] text-slate-400 italic">Incluez ou excluez des notes pour recalculer.</p>
                             <button
-                                onClick={handleCalculateAverages}
-                                className="px-6 py-2.5 bg-indigo-600 text-white  text-[10px] font-black uppercase hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/20"
+                                onClick={() => handleCalculateAverages()}
+                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm transition-colors"
                             >
                                 <Calculator size={14} /> Recalculer
                             </button>
                         </div>
                     </div>
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+
+                <div className="p-4 overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400  ">
-                                <th className="px-8 py-6">Élève</th>
-                                {user?.institution?.type === 'ECOLE' && <th className="px-8 py-6">Matière</th>}
+                            <tr className="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                                <th className="pb-2 font-bold">Élève</th>
+                                {user?.institution?.type === 'ECOLE' && <th className="pb-2 font-bold">Matière</th>}
                                 {user?.institution?.type !== 'ECOLE' && (
                                     <>
-                                        <th className="px-8 py-6 text-center">Moy. Dev (/20)</th>
-                                        <th className="px-8 py-6 text-center">Note Exam (/20)</th>
+                                        <th className="pb-2 text-center font-bold">Moy. Dev (/20)</th>
+                                        <th className="pb-2 text-center font-bold">Note Exam (/20)</th>
                                     </>
                                 )}
-                                <th className="px-8 py-6 text-center bg-indigo-50/50 text-indigo-600 font-black">
-                                    {user?.institution?.type === 'ECOLE' ? 'Note /10' : 'Moy. Triméstrielle'}
-                                </th>
-                                <th className="px-8 py-6 text-center">Coeff</th>
-                                <th className="px-8 py-6 text-center  ">Points</th>
-                                <th className="px-8 py-6 text-right">Observation</th>
+                                <th className="pb-2 text-center font-bold">Moy. Trimestrielle</th>
+                                <th className="pb-2 text-center font-bold">Coeff</th>
+                                <th className="pb-2 text-center font-bold">Points</th>
+                                <th className="pb-2 text-right font-bold">Observation</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50 text-sm">
-                            {calculatedResults.map((res: any) => (
-                                <tr key={`${res.student.id}-${res.subject?.id || 'all'}`} className="hover:bg-slate-50/80 transition-all group">
-                                    <td className="px-8 py-5">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-9 h-9  bg-slate-100 text-slate-400 flex items-center justify-center font-black text-[10px]">
-                                                {res.student.lastName[0]}{res.student.firstName[0]}
-                                            </div>
-                                            <p className="font-black text-slate-800 uppercase tracking-tight">{res.student.lastName} {res.student.firstName}</p>
-                                        </div>
-                                    </td>
-                                    {user?.institution?.type === 'ECOLE' && (
-                                        <td className="px-8 py-5">
-                                            <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-3 py-1 bg-slate-100 ">
-                                                {res.subject?.name}
-                                            </span>
-                                        </td>
-                                    )}
-                                    {user?.institution?.type !== 'ECOLE' && (
-                                        <>
-                                            <td className="px-8 py-5 text-center font-bold text-slate-600">{res.moyenneDevoirs.toFixed(2)}</td>
-                                            <td className="px-8 py-5 text-center font-bold text-slate-600">{res.noteExamen.toFixed(2)}</td>
-                                        </>
-                                    )}
-                                    <td className="px-8 py-5 text-center bg-indigo-50/30">
-                                        <span className={`px-4 py-1.5  font-black text-sm ${res.moyenneTrimestrielle >= (user?.institution?.type === 'ECOLE' ? 5 : 10) ? 'bg-emerald-50 text-emerald-600  ' : 'bg-red-50 text-red-600  '}`}>
-                                            {res.moyenneTrimestrielle.toFixed(2)}
-                                        </span>
-                                    </td>
-                                    <td className="px-8 py-5 text-center font-bold text-slate-400">×{res.coefficient}</td>
-                                    <td className="px-8 py-5 text-center font-black text-slate-800  ">{res.points.toFixed(2)}</td>
-                                    <td className="px-8 py-5 text-right">
-                                        <input
-                                            type="text"
-                                            value={res.observation}
-                                            onChange={(e) => {
-                                                const newResults = [...calculatedResults];
-                                                const idx = newResults.findIndex(r => r.student.id === res.student.id && r.subject?.id === res.subject?.id);
-                                                if (idx !== -1) {
-                                                    newResults[idx].observation = e.target.value;
-                                                    setCalculatedResults(newResults);
-                                                }
-                                            }}
-                                            className="text-[10px] font-black uppercase text-slate-500 tracking-wider bg-slate-50    px-3 py-2 text-right focus:bg-white outline-none w-full max-w-[150px]"
-                                        />
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                            {calculatedResults.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="py-12 text-center text-slate-400 italic font-semibold">
+                                        Aucune moyenne calculée pour cette sélection. Choisissez une classe et une matière puis cliquez sur "Recalculer".
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                calculatedResults.map((res: any) => (
+                                    <tr key={`${res.student.id}-${res.subject?.id || 'all'}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                                        <td className="py-3 font-bold text-slate-900 dark:text-white">
+                                            {res.student.lastName} {res.student.firstName}
+                                        </td>
+                                        {user?.institution?.type === 'ECOLE' && (
+                                            <td className="py-3 text-slate-500 font-semibold">{res.subject?.name || 'Général'}</td>
+                                        )}
+                                        {user?.institution?.type !== 'ECOLE' && (
+                                            <>
+                                                <td className="py-3 text-center text-slate-700 dark:text-slate-300 font-semibold">{res.moyenneDevoirs?.toFixed(2) || '0.00'}</td>
+                                                <td className="py-3 text-center text-slate-700 dark:text-slate-300 font-semibold">{res.noteExamen?.toFixed(2) || '0.00'}</td>
+                                            </>
+                                        )}
+                                        <td className="py-3 text-center">
+                                            <span className={`px-2 py-0.5 rounded font-bold text-xs ${res.moyenneTrimestrielle >= (user?.institution?.type === 'ECOLE' ? 5 : 10) ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400'}`}>
+                                                {res.moyenneTrimestrielle?.toFixed(2) || '0.00'}
+                                            </span>
+                                        </td>
+                                        <td className="py-3 text-center text-slate-500 font-semibold">x{res.coefficient || coefficient}</td>
+                                        <td className="py-3 text-center font-bold text-slate-900 dark:text-white">{res.points?.toFixed(2) || '0.00'}</td>
+                                        <td className="py-3 text-right text-slate-500 dark:text-slate-400 font-medium">{res.observation || '-'}</td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>
 
-                {user?.institution?.type === 'ECOLE' && calculatedResults.length > 0 && (
-                    <div className="p-8 bg-slate-900 text-white ]">
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-3">
-                            <TrendingUp size={16} className="text-emerald-400" />
-                            Récapitulatif des Moyennes Générales (Estimation)
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {Array.from(new Set(calculatedResults.map(r => r.student.id))).map(studentId => {
-                                const studentRes = calculatedResults.filter(r => r.student.id === studentId);
-                                const studentName = `${studentRes[0].student.lastName} ${studentRes[0].student.firstName}`;
-                                const totalPoints = studentRes.reduce((acc, r) => acc + r.moyenneTrimestrielle, 0); // All coef 1 in ECOLE
-                                // Important: formula Somme / Nb matières SAISIES
-                                const subjectsCount = studentRes.length; 
-                                const generalAvg = totalPoints / (subjectsCount || 1);
-
-                                return (
-                                    <div key={studentId} className="bg-white/5    p-4 flex justify-between items-center">
-                                        <div>
-                                            <p className="text-[10px] font-black uppercase text-slate-500 mb-1 truncate max-w-[150px]">{studentName}</p>
-                                            <p className="text-[9px] font-medium text-slate-400 italic">{subjectsCount} matières saisies</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className={`text-lg font-black ${generalAvg >= 5 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                                {generalAvg.toFixed(2)}<span className="text-[10px] opacity-40 ml-1">/10</span>
-                                            </p>
-                                            <p className="text-[8px] font-black uppercase tracking-tighter opacity-60">Moy. Générale</p>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                        <div className="mt-6 p-4 bg-emerald-500/10    flex items-center gap-3">
-                            <div className="w-8 h-8  bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                                <ClipboardList size={14} />
-                            </div>
-                            <p className="text-[10px] font-medium text-emerald-100 italic">
-                                Note : Ce récapitulatif utilise la formule "Somme des notes / Nombre de matières saisies".
-                            </p>
-                        </div>
-                    </div>
-                )}
-            </div>
-            <div className="flex justify-end gap-4 p-8">
-                <button
-                    onClick={handleSaveAverages}
-                    className="bg-blue-600 text-white px-12 py-5 ] font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
-                >
-                    ENREGISTRER LES MOYENNES <Save size={18} />
-                </button>
-            </div>
-            <div className="bg-emerald-600 ] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl shadow-emerald-600/20">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white/20  flex items-center justify-center">
-                        <Check size={24} />
-                    </div>
-                    <div>
-                        <h4 className="text-lg font-black tracking-tight leading-tight">Vérification Terminée ?</h4>
-                        <p className="text-emerald-100 text-sm font-medium">Une fois les moyennes enregistrées, vous pourrez les envoyer définitivement {dest}.</p>
-                    </div>
+                <div className="p-5 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-end gap-3">
+                    <button
+                        onClick={handleSaveAverages}
+                        disabled={calculatedResults.length === 0}
+                        className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors uppercase flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                        <Save size={16} /> Enregistrer les Moyennes
+                    </button>
+                    <button
+                        onClick={handlePublishGrades}
+                        disabled={calculatedResults.length === 0}
+                        className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors uppercase flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                        <Check size={16} /> Finaliser et Envoyer {dest}
+                    </button>
                 </div>
-                <button
-                    onClick={handlePublishGrades}
-                    className="bg-white text-emerald-600 px-10 py-4  font-black uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl"
-                >
-                    Finaliser et Envoyer {dest}
-                </button>
             </div>
         </div>
     );

@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
     Download,
-    ChevronDown,
     TrendingUp,
     Award,
     BarChart3,
     Search,
     AlertCircle,
-    GraduationCap,
     Clock,
     Target,
     Star,
@@ -113,15 +111,15 @@ const ParentResults: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-                <div className="w-16 h-16     animate-spin"></div>
-                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement du profil parent...</p>
+            <div className="py-20 text-center">
+                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Chargement des résultats...</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-6">
             {isBulletinOpen && selectedChild && (
                 <BulletinModal
                     studentId={selectedChild.id}
@@ -132,25 +130,25 @@ const ParentResults: React.FC = () => {
             )}
 
             {/* Header / Filter Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                        <Award className="text-blue-600" size={36} />
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <Award className="text-blue-600 dark:text-blue-400" size={24} />
                         Résultats Académiques
                     </h2>
-                    <p className="text-slate-500 font-medium max-w-lg mt-1 italic">
-                        Visualisez les notes certifiées et les progrès de vos enfants par trimestre.
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Visualisez les notes certifiées et les bulletins trimestriels de vos enfants.
                     </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row flex-wrap items-center gap-4 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3 w-full md:w-auto">
                     {classes.length > 1 && (
                         <select
                             value={selectedClassId}
                             onChange={(e) => setSelectedClassId(e.target.value)}
-                            className="bg-white px-6 py-4 font-bold text-slate-600 outline-none transition-all shadow-sm text-xs uppercase tracking-widest w-full sm:w-auto"
+                            className="bg-white dark:bg-slate-900 px-4 py-2.5 border border-slate-200/80 dark:border-slate-800 rounded-2xl font-bold text-xs text-slate-900 dark:text-white outline-none w-full sm:w-auto"
                         >
-                            <option value="all">Filtre: Toutes les classes</option>
+                            <option value="all">Toutes les classes</option>
                             {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
                     )}
@@ -158,7 +156,7 @@ const ParentResults: React.FC = () => {
                     <select
                         value={selectedYear}
                         onChange={e => setSelectedYear(e.target.value)}
-                        className="bg-white px-6 py-4 font-bold text-slate-600 outline-none transition-all shadow-sm text-xs w-full sm:w-auto"
+                        className="bg-white dark:bg-slate-900 px-4 py-2.5 border border-slate-200/80 dark:border-slate-800 rounded-2xl font-bold text-xs text-slate-900 dark:text-white outline-none w-full sm:w-auto"
                     >
                         <option value="2024-2025">Année: 2024-2025</option>
                         <option value="2025-2026">Année: 2025-2026</option>
@@ -167,41 +165,39 @@ const ParentResults: React.FC = () => {
 
                     <button
                         onClick={() => setIsBulletinOpen(true)}
-                        className="bg-slate-900 text-white px-6 sm:px-10 py-4 font-black flex items-center justify-center gap-3 shadow-2xl hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all outline-none uppercase text-xs tracking-[0.1em] w-full sm:w-auto"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-2xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 uppercase tracking-wider w-full sm:w-auto"
                     >
-                        <Download size={18} /> Télécharger Bulletin
+                        <Download size={16} /> Bulletin PDF
                     </button>
                 </div>
             </div>
 
             {/* Child Selector & Trimester Toggle */}
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-                <div className="bg-white p-2 shadow-xl flex items-center w-full lg:w-auto min-w-[250px]">
-                    <div className="w-10 h-10 bg-blue-50 flex items-center justify-center text-blue-600 mr-2 shrink-0">
-                        <User size={18} />
-                    </div>
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+                <div className="bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-2 max-w-md">
+                    <User size={16} className="text-blue-600 dark:text-blue-400 ml-2 shrink-0" />
                     <select
                         value={selectedChild?.id || ''}
                         onChange={(e) => {
                             const child = filteredChildren.find((c: any) => c.id === Number(e.target.value));
                             if (child) setSelectedChild(child);
                         }}
-                        className="bg-transparent flex-1 py-3 px-2 font-black text-xs text-slate-700 uppercase tracking-widest outline-none cursor-pointer"
+                        className="bg-transparent flex-1 py-1.5 px-2 font-bold text-xs text-slate-900 dark:text-white outline-none cursor-pointer"
                     >
                         {filteredChildren.map((child: any) => (
                             <option key={child.id} value={child.id}>
-                                {child.firstName} {child.lastName}
+                                {child.firstName} {child.lastName} {child.classe?.name ? `— ${child.classe.name}` : ''}
                             </option>
                         ))}
                     </select>
                 </div>
 
-                <div className="flex bg-white p-2 ]   shadow-lg">
+                <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 self-start">
                     {['1er Trimestre', '2ème Trimestre', '3ème Trimestre'].map(trim => (
                         <button
                             key={trim}
                             onClick={() => setSelectedTrimester(trim)}
-                            className={`px-8 py-4 ] text-[10px] font-black uppercase tracking-widest transition-all ${selectedTrimester === trim ? 'bg-slate-100 text-blue-600 shadow-inner' : 'text-slate-400 hover:text-slate-600'}`}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedTrimester === trim ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
                             {trim.split(' ')[0]}
                         </button>
@@ -210,84 +206,77 @@ const ParentResults: React.FC = () => {
             </div>
 
             {selectedChild ? (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    <div className="lg:col-span-2 space-y-6 sm:space-y-10">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 space-y-6">
                         {/* Matrix Stats */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                            <MatrixBlock label="Moyenne" value={averageGeneral} color="blue" icon={BarChart3} />
-                            <MatrixBlock label="Meilleure Note" value={bestGrade} color="amber" icon={Star} trend="Record" />
-                            <MatrixBlock label="Évaluations" value={filteredGrades.length} color="emerald" icon={Target} trend="Global" />
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <MatrixBlock label="Moyenne Générale" value={`${averageGeneral} / 20`} color="blue" icon={BarChart3} />
+                            <MatrixBlock label="Meilleure Note" value={`${bestGrade} / 20`} color="amber" icon={Star} trend="Record" />
+                            <MatrixBlock label="Évaluations Rendu" value={filteredGrades.length} color="emerald" icon={Target} trend="Trimestre" />
                         </div>
 
                         {/* Main Grades Table */}
-                        <div className="bg-white shadow-2xl overflow-hidden min-h-[500px] relative">
+                        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden relative">
                             {gradesLoading && (
-                                <div className="absolute inset-0 bg-white/60 backdrop-blur-[4px] z-20 flex flex-col items-center justify-center gap-4">
-                                    <div className="w-10 h-10 animate-spin"></div>
-                                    <p className="font-black text-blue-900 text-[10px] uppercase tracking-widest">Calcul des moyennes...</p>
+                                <div className="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-3">
+                                    <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                    <p className="font-bold text-blue-900 dark:text-blue-300 text-xs uppercase tracking-wider">Chargement des notes...</p>
                                 </div>
                             )}
 
-                            <div className="p-6 sm:p-10 flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left gap-4 sm:gap-0 bg-slate-50/20">
+                            <div className="p-5 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Récapitulatif des Notes</h3>
-                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Période: {selectedTrimester} de {selectedChild.firstName}</p>
+                                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">Récapitulatif des Notes & Évaluations</h3>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{selectedTrimester} — {selectedChild.firstName} {selectedChild.lastName}</p>
                                 </div>
-                                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white shadow-sm flex items-center justify-center text-blue-600 rounded-full sm:rounded-none">
-                                    <TrendingUp size={24} />
+                                <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center font-bold">
+                                    <TrendingUp size={20} />
                                 </div>
                             </div>
 
-                            <div className="p-0 sm:p-6 overflow-x-auto">
+                            <div className="p-4 overflow-x-auto">
                                 {filteredGrades.length === 0 && !gradesLoading ? (
-                                    <div className="py-24 flex flex-col items-center justify-center text-center px-4">
-                                        <div className="w-20 h-20 bg-slate-50 flex items-center justify-center mb-6 grayscale opacity-50 rounded-full">
-                                            <Search size={40} className="text-slate-300" />
-                                        </div>
-                                        <h4 className="text-lg font-black text-slate-300 uppercase tracking-widest">Aucune note publiée</h4>
-                                        <p className="text-[10px] text-slate-300 font-bold uppercase tracking-[0.2em] mt-2 max-w-xs">Les professeurs n'ont pas encore saisi de notes pour ce trimestre.</p>
+                                    <div className="py-16 flex flex-col items-center justify-center text-center px-4 space-y-2">
+                                        <Search size={40} className="text-slate-300 dark:text-slate-600" />
+                                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Aucune note publiée</h4>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs">Les enseignants n'ont pas encore publié de notes pour ce trimestre.</p>
                                     </div>
                                 ) : (
-                                    <table className="w-full text-left whitespace-nowrap min-w-[600px]">
+                                    <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                                <th className="px-8 py-6">Matière / Évaluation</th>
-                                                <th className="px-8 py-6">Date</th>
-                                                <th className="px-8 py-6 text-center">Résultat</th>
-                                                <th className="px-8 py-6 text-right">Observation</th>
+                                            <tr className="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                                                <th className="pb-3 px-3 font-bold">Matière / Devoir</th>
+                                                <th className="pb-3 px-3 font-bold">Date</th>
+                                                <th className="pb-3 px-3 font-bold text-center">Note</th>
+                                                <th className="pb-3 px-3 font-bold text-right">Observation</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-50">
+                                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                                             {filteredGrades.map((row) => (
-                                                <tr key={row.id} className="hover:bg-blue-50/20 group transition-all">
-                                                    <td className="px-8 py-8">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10  bg-blue-50 text-blue-600 flex items-center justify-center font-black text-xs">
-                                                                {row.homework?.subject?.name?.substring(0, 2).toUpperCase()}
+                                                <tr key={row.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                                                    <td className="py-3.5 px-3">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
+                                                                {row.homework?.subject?.name?.substring(0, 2).toUpperCase() || 'MA'}
                                                             </div>
                                                             <div>
-                                                                <p className="font-black text-slate-800 text-sm uppercase leading-none mb-1.5">{row.homework?.subject?.name}</p>
-                                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{row.homework?.title}</p>
+                                                                <p className="font-bold text-slate-900 dark:text-white text-xs">{row.homework?.subject?.name || 'Matière'}</p>
+                                                                <p className="text-[10px] text-slate-400">{row.homework?.title || 'Devoir'}</p>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-8 py-8">
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[11px] font-black text-slate-700 flex items-center gap-1.5 uppercase">
-                                                                <Clock size={12} className="text-slate-300" /> {new Date(row.submittedAt).toLocaleDateString()}
-                                                            </span>
-                                                        </div>
+                                                    <td className="py-3.5 px-3">
+                                                        <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                                            <Clock size={12} className="text-slate-400" /> {new Date(row.submittedAt || Date.now()).toLocaleDateString('fr-FR')}
+                                                        </span>
                                                     </td>
-                                                    <td className="px-8 py-8 text-center">
-                                                        <div className="inline-flex flex-col items-center">
-                                                            <span className={`text-xl font-black tracking-tighter ${row.grade >= (row.homework?.maxPoints * 0.7) ? 'text-emerald-500' : row.grade >= (row.homework?.maxPoints * 0.5) ? 'text-blue-500' : 'text-rose-500'}`}>
-                                                                {row.grade}
-                                                            </span>
-                                                            <span className="text-[9px] font-black text-slate-300 uppercase">/{row.homework?.maxPoints}</span>
-                                                        </div>
+                                                    <td className="py-3.5 px-3 text-center">
+                                                        <span className={`text-sm font-bold ${row.grade >= (row.homework?.maxPoints * 0.7) ? 'text-emerald-600 dark:text-emerald-400' : row.grade >= (row.homework?.maxPoints * 0.5) ? 'text-blue-600 dark:text-blue-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                                                            {row.grade} <span className="text-[10px] text-slate-400 font-normal">/{row.homework?.maxPoints || 20}</span>
+                                                        </span>
                                                     </td>
-                                                    <td className="px-8 py-8 text-right">
-                                                        <span className="text-[11px] font-medium text-slate-400 italic max-w-[180px] block ml-auto truncate uppercase tracking-tighter">
+                                                    <td className="py-3.5 px-3 text-right">
+                                                        <span className="text-[11px] text-slate-500 dark:text-slate-400 italic">
                                                             {row.teacherFeedback || "Sans observation."}
                                                         </span>
                                                     </td>
@@ -300,85 +289,88 @@ const ParentResults: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="space-y-6 sm:space-y-10">
-                        {/* Subject Progress Chart-like Sidebar */}
-                        <div className="bg-slate-950 p-6 sm:p-12 text-white shadow-3xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[120px] group-hover:scale-125 transition-transform duration-1000"></div>
-                            <h3 className="text-xl font-black mb-6 sm:mb-10 relative z-10 flex items-center gap-4 italic tracking-tight">
-                                <TrendingUp size={24} className="text-blue-400" /> Profil par Matière
+                    <div className="space-y-6">
+                        {/* Subject Progress Sidebar */}
+                        <div className="bg-slate-900 text-white p-6 rounded-3xl border border-slate-800 shadow-sm space-y-4">
+                            <h3 className="text-sm font-bold flex items-center gap-2">
+                                <TrendingUp size={18} className="text-blue-400" /> Profil par Matière
                             </h3>
-                            <div className="space-y-6 sm:space-y-10 relative z-10">
+                            <div className="space-y-4 pt-2">
                                 {
-                                    (classSubjects.length > 0 
+                                    (classSubjects.length > 0
                                         ? classSubjects.map((s: any) => s.name)
                                         : Array.from(new Set(allGrades.map(g => g.homework?.subject?.name)))
                                     ).filter(Boolean).slice(0, 6).map((s: string) => {
-                                    const subjGrades = filteredGrades.filter(g => g.homework?.subject?.name === s);
-                                    const avg = subjGrades.length > 0
-                                        ? subjGrades.reduce((acc, curr) => acc + curr.grade, 0) / subjGrades.length
-                                        : 0;
-                                    const max = subjGrades[0]?.homework?.maxPoints || 20;
-                                    return (
-                                        <div key={s}>
-                                            <div className="flex justify-between items-center mb-3">
-                                                <span className="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] italic">{s}</span>
-                                                <span className="font-black text-sm text-white">{avg.toFixed(1)}<span className="text-blue-500/50 text-[10px] ml-1">/{max}</span></span>
+                                        const subjGrades = filteredGrades.filter(g => g.homework?.subject?.name === s);
+                                        const avg = subjGrades.length > 0
+                                            ? subjGrades.reduce((acc, curr) => acc + curr.grade, 0) / subjGrades.length
+                                            : 0;
+                                        const max = subjGrades[0]?.homework?.maxPoints || 20;
+                                        return (
+                                            <div key={s} className="space-y-1">
+                                                <div className="flex justify-between items-center text-xs">
+                                                    <span className="font-semibold text-slate-300 truncate">{s}</span>
+                                                    <span className="font-bold text-white">{avg.toFixed(1)} <span className="text-slate-500 text-[10px]">/{max}</span></span>
+                                                </div>
+                                                <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-blue-500 rounded-full transition-all duration-500" style={{ width: `${(avg / max) * 100}%` }}></div>
+                                                </div>
                                             </div>
-                                            <div className="h-2 w-full bg-white/5  overflow-hidden p-0.5 shadow-inner">
-                                                <div className="h-full bg-blue-500  shadow-lg transition-all duration-1000" style={{ width: `${(avg / max) * 100}%` }}></div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })
+                                }
+                                {allGrades.length === 0 && (
+                                    <p className="text-xs text-slate-400 italic text-center py-4">Aucune note à analyser.</p>
+                                )}
                             </div>
                         </div>
 
-                        <div className="bg-white p-6 sm:p-12 shadow-2xl relative overflow-hidden text-center group">
-                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-6 sm:mb-8 group-hover:rotate-12 transition-transform rounded-full sm:rounded-none">
-                                <BarChart3 size={32} />
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-center space-y-3">
+                            <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto">
+                                <BarChart3 size={24} />
                             </div>
-                            <h4 className="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-tight mb-2 sm:mb-4">Moyenne Générale</h4>
-                            <div className="text-5xl sm:text-6xl font-black text-slate-900 tracking-tighter mb-6 sm:mb-8">
-                                {averageGeneral}<span className="text-lg sm:text-xl text-slate-300 font-bold ml-2">/20</span>
+                            <div>
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Moyenne Générale</h4>
+                                <div className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
+                                    {averageGeneral} <span className="text-xs text-slate-400 font-medium">/ 20</span>
+                                </div>
                             </div>
-                            <button className="w-full py-4 sm:py-5 bg-slate-50 text-slate-400 font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all rounded sm:rounded-none">Imprimer Relevé</button>
+                            <button
+                                onClick={() => setIsBulletinOpen(true)}
+                                className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-2xl transition-colors"
+                            >
+                                Imprimer le Relevé
+                            </button>
                         </div>
                     </div>
                 </div>
             ) : (
-                <div className="min-h-[400px] flex flex-col items-center justify-center bg-white ] shadow-xl    p-20 text-center">
-                    <AlertCircle size={64} className="text-slate-100 mb-6" />
-                    <h3 className="text-2xl font-black text-slate-300 uppercase tracking-widest">Données indisponibles</h3>
-                    <p className="text-sm text-slate-300 font-bold uppercase tracking-widest mt-2">Affiliation des enfants en cours de vérification...</p>
+                <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-center space-y-3">
+                    <AlertCircle size={48} className="mx-auto text-slate-300 dark:text-slate-600" />
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Aucun enfant sélectionné</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Veuillez sélectionner un enfant pour consulter son bulletin et ses notes.</p>
                 </div>
             )}
-
-            <style>
-                {`
-                    .no-scrollbar::-webkit-scrollbar { display: none; }
-                    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-                `}
-            </style>
         </div>
     );
 };
 
 const MatrixBlock = ({ label, value, color, icon: Icon, trend }: any) => {
-    const colors = {
-        blue: 'text-blue-600 bg-blue-50',
-        amber: 'text-amber-600 bg-amber-50',
-        emerald: 'text-emerald-600 bg-emerald-50',
+    const colors: any = {
+        blue: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40',
+        amber: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40',
+        emerald: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40',
     };
     return (
-        <div className="group bg-white p-4 shadow-lg border border-slate-100 rounded-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden flex items-center gap-4">
-            <div className={`w-12 h-12 flex items-center justify-center rounded-xl shadow-inner shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all ${colors[color as keyof typeof colors]}`}>
-                <Icon size={24} />
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${colors[color]}`}>
+                <Icon size={20} />
             </div>
             <div className="flex-1">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">{label}</p>
                 <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-xl font-black text-slate-900 tracking-tight leading-none">{value}</h4>
-                    {trend && <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest px-1.5 py-0.5 bg-slate-50 rounded border border-slate-100">{trend}</span>}
+                    <h4 className="text-xl font-bold text-slate-900 dark:text-white">{value}</h4>
+                    {trend && <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg">{trend}</span>}
                 </div>
             </div>
         </div>

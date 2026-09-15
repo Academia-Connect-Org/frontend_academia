@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, UploadCloud, ArrowRight, CheckCircle2, AlertCircle, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import api from '../../../api/axios';
-import { useEffect } from 'react';
 
 const TARGET_FIELDS = [
     { key: 'firstName', label: 'Prénom (Requis)' },
@@ -69,7 +68,7 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
     useEffect(() => {
         if (!institutionId) {
             api.get('/institutions')
-               .then(res => setInstitutions(res.data))
+               .then(res => setInstitutions(res.data || []))
                .catch(err => console.error("Error fetching institutions", err));
         }
     }, [institutionId]);
@@ -78,7 +77,7 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
         const targetInst = institutionId || selectedInstitutionId;
         if (targetInst) {
             api.get(`/classes?institutionId=${targetInst}`)
-               .then(res => setClasses(res.data))
+               .then(res => setClasses(res.data || []))
                .catch(err => console.error("Error fetching classes", err));
         } else {
             setClasses([]);
@@ -124,7 +123,6 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
                 setFileHeaders(headers);
                 setFileData(mappedData);
                 
-                // Auto-map based on similar names
                 const autoMap: Record<string, string> = {};
                 TARGET_FIELDS.forEach(tf => {
                     const match = headers.find(h => h.toLowerCase().includes(tf.key.toLowerCase()) || tf.label.toLowerCase().includes(h.toLowerCase()));
@@ -197,7 +195,7 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
                 }
             });
             return student;
-        }).filter(s => s.firstName && s.lastName); // Ensure required fields exist
+        }).filter(s => s.firstName && s.lastName);
 
         if (finalPayload.length === 0) {
             setError("Aucun étudiant valide trouvé après le mapping. Vérifiez Prénom et Nom.");
@@ -219,42 +217,42 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
     };
 
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-2">
-            <div className="bg-white w-full max-w-[95vw] h-[95vh] rounded-none shadow-2xl p-6 flex flex-col">
-                <div className="flex justify-between items-center mb-6 shrink-0">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl p-6 flex flex-col overflow-hidden">
+                <div className="flex justify-between items-center mb-6 shrink-0 border-b border-slate-100 dark:border-slate-800 pb-4">
                     <div>
-                        <h2 className="text-2xl font-black text-slate-800 tracking-tight">Importer depuis CSV / Excel</h2>
-                        <p className="text-slate-500 text-sm mt-1">Étape {step} sur 3</p>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Importer depuis CSV / Excel</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Étape {step} sur 3</p>
                     </div>
-                    <button onClick={onClose} className="p-2 bg-slate-50 text-slate-400 hover:text-red-500 rounded-none transition-all hover:bg-red-50 border-0">
-                        <X size={20} />
+                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <X size={18} />
                     </button>
                 </div>
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-none flex items-center gap-2 font-bold text-sm shrink-0 border-0">
-                        <AlertCircle size={18} />
+                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-xl flex items-center gap-2 font-bold text-xs shrink-0">
+                        <AlertCircle size={16} />
                         {error}
                     </div>
                 )}
 
-                <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto pr-1">
                     {step === 1 && (
-                        <div className="h-full flex flex-col items-center justify-center py-6 bg-slate-50/50 rounded-none border-0">
-                            <FileSpreadsheet size={56} className="text-indigo-300 mb-4" />
-                            <h3 className="text-xl font-bold text-slate-700 mb-1">Sélectionnez votre fichier</h3>
-                            <p className="text-slate-500 mb-6 text-sm text-center max-w-md">Formats supportés: .csv, .xlsx, .xls.<br />La première ligne doit contenir les en-têtes de colonnes.</p>
+                        <div className="h-full flex flex-col items-center justify-center py-10 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6">
+                            <FileSpreadsheet size={48} className="text-blue-600 dark:text-blue-400 mb-3" />
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Sélectionnez votre fichier</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 text-center max-w-md">Formats supportés: .csv, .xlsx, .xls.<br />La première ligne doit contenir les en-têtes de colonnes.</p>
                             
                             {!institutionId && (
-                                <div className="mb-4 w-full max-w-md">
-                                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block text-center">Sélectionnez l'établissement cible</label>
+                                <div className="mb-3 w-full max-w-md">
+                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1 mb-1 block text-center">Établissement cible</label>
                                     <select
                                         value={selectedInstitutionId || ''}
                                         onChange={(e) => {
                                             setSelectedInstitutionId(Number(e.target.value));
                                             setSelectedClasseId(undefined);
                                         }}
-                                        className="w-full px-4 py-2.5 bg-slate-100 rounded-none text-sm font-bold text-slate-700 outline-none focus:bg-slate-200 text-center border-0"
+                                        className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 outline-none text-center"
                                     >
                                         <option value="">-- Choisir un établissement --</option>
                                         {institutions.map(inst => (
@@ -266,11 +264,11 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
 
                             {!classeId && (
                                 <div className="mb-6 w-full max-w-md">
-                                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block text-center">Sélectionnez la classe cible</label>
+                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1 mb-1 block text-center">Classe cible</label>
                                     <select
                                         value={selectedClasseId || ''}
                                         onChange={(e) => setSelectedClasseId(Number(e.target.value))}
-                                        className="w-full px-4 py-2.5 bg-slate-100 rounded-none text-sm font-bold text-slate-700 outline-none focus:bg-slate-200 text-center border-0"
+                                        className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 outline-none text-center"
                                     >
                                         <option value="">-- Choisir une classe --</option>
                                         {classes.map(c => (
@@ -280,8 +278,8 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
                                 </div>
                             )}
 
-                            <label className={`bg-indigo-600 text-white px-6 py-3 rounded-none font-black shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2 text-sm border-0 ${(!classeId && !selectedClasseId) || (!institutionId && !selectedInstitutionId) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105 active:scale-95'}`}>
-                                <UploadCloud size={18} />
+                            <label className={`bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-md transition-all flex items-center gap-2 text-xs ${(!classeId && !selectedClasseId) || (!institutionId && !selectedInstitutionId) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105 active:scale-95'}`}>
+                                <UploadCloud size={16} />
                                 Parcourir les fichiers
                                 <input type="file" accept=".csv, .xlsx, .xls" className="hidden" disabled={(!classeId && !selectedClasseId) || (!institutionId && !selectedInstitutionId)} onChange={handleFileUpload} />
                             </label>
@@ -290,17 +288,17 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
 
                     {step === 2 && (
                         <div className="space-y-4">
-                            <div className="bg-indigo-50 text-indigo-700 p-3 rounded-none text-sm font-bold border-0">
+                            <div className="bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 p-3 rounded-xl text-xs font-semibold">
                                 Associez les colonnes de votre fichier aux champs du système.
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                 {TARGET_FIELDS.map(field => (
-                                    <div key={field.key} className="bg-slate-50 p-4 rounded-none flex justify-between items-center gap-4 border-0">
-                                        <label className="text-xs font-bold text-slate-700 w-1/2 truncate" title={field.label}>
+                                    <div key={field.key} className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700 flex justify-between items-center gap-3">
+                                        <label className="text-xs font-bold text-slate-800 dark:text-slate-200 w-1/2 truncate" title={field.label}>
                                             {field.label}
                                         </label>
                                         <select
-                                            className="w-1/2 p-2 rounded-none bg-slate-200 text-xs outline-none focus:bg-slate-300 border-0"
+                                            className="w-1/2 p-2 rounded-xl bg-white dark:bg-slate-900 text-xs font-semibold text-slate-800 dark:text-slate-200 outline-none border border-slate-200 dark:border-slate-700"
                                             value={mapping[field.key] || ''}
                                             onChange={(e) => handleMappingChange(field.key, e.target.value)}
                                         >
@@ -317,22 +315,22 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
 
                     {step === 3 && (
                         <div className="space-y-4 h-full flex flex-col">
-                            <div className="bg-emerald-50 text-emerald-700 p-3 rounded-none text-sm font-bold flex items-center gap-2 border-0 shrink-0">
-                                <CheckCircle2 size={18} />
+                            <div className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 p-3 rounded-xl text-xs font-bold flex items-center gap-2 shrink-0">
+                                <CheckCircle2 size={16} />
                                 {fileData.length} étudiants prêts à être importés. Voici un aperçu des 3 premiers :
                             </div>
-                            <div className="flex-1 overflow-auto bg-slate-50 rounded-none border-0">
-                                <table className="w-full text-left bg-white">
-                                    <thead className="bg-slate-100 text-[11px] uppercase font-black text-slate-500 tracking-widest sticky top-0">
+                            <div className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-700">
+                                <table className="w-full text-left bg-white dark:bg-slate-900 border-collapse">
+                                    <thead className="bg-slate-100 dark:bg-slate-800 text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider sticky top-0">
                                         <tr>
                                             {TARGET_FIELDS.filter(f => mapping[f.key]).map(f => (
                                                 <th key={f.key} className="p-3 whitespace-nowrap">{f.label}</th>
                                             ))}
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100 text-sm text-slate-700 font-medium">
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-800 dark:text-slate-200 font-medium">
                                         {getPreviewData().map((row, idx) => (
-                                            <tr key={idx} className="hover:bg-slate-50">
+                                            <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
                                                 {TARGET_FIELDS.filter(f => mapping[f.key]).map(f => (
                                                     <td key={f.key} className="p-3 whitespace-nowrap">{row[f.key] || '-'}</td>
                                                 ))}
@@ -345,12 +343,12 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
                     )}
                 </div>
 
-                <div className="flex justify-between items-center mt-6 pt-4 border-t-0 shrink-0">
+                <div className="flex justify-between items-center mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 shrink-0">
                     {step > 1 ? (
-                        <button onClick={() => setStep((step - 1) as any)} className="px-5 py-2 font-bold text-slate-500 bg-slate-200 rounded-none hover:bg-slate-300 transition-all text-sm border-0">
+                        <button onClick={() => setStep((step - 1) as any)} className="px-4 py-2 font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-xs">
                             Retour
                         </button>
-                    ) : <div></div>}
+                    ) : <div />}
                     
                     {step === 2 && (
                         <button 
@@ -362,16 +360,16 @@ const CsvImporterModal: React.FC<CsvImporterModalProps> = ({ onClose, onSuccess,
                                 setError(null);
                                 setStep(3);
                             }} 
-                            className="px-6 py-2 bg-indigo-600 text-white rounded-none font-black shadow-lg shadow-indigo-600/30 flex items-center gap-2 hover:scale-105 active:scale-95 transition-all text-sm border-0"
+                            className="px-5 py-2 bg-blue-600 text-white rounded-xl font-bold shadow-md flex items-center gap-1.5 hover:bg-blue-700 transition-all text-xs"
                         >
-                            Suivant <ArrowRight size={18} />
+                            Suivant <ArrowRight size={16} />
                         </button>
                     )}
                     {step === 3 && (
                         <button 
                             onClick={handleSubmit} 
                             disabled={loading}
-                            className="px-6 py-2 bg-emerald-600 text-white rounded-none font-black shadow-lg shadow-emerald-600/30 flex items-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 text-sm border-0"
+                            className="px-5 py-2 bg-emerald-600 text-white rounded-xl font-bold shadow-md flex items-center gap-1.5 hover:bg-emerald-700 transition-all disabled:opacity-50 text-xs"
                         >
                             {loading ? 'Importation...' : 'Confirmer l\'importation'}
                         </button>

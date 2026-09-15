@@ -1,233 +1,295 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import nbLogo from '../assets/logo.png';
+import html2canvas from 'html2canvas';
 import api from '../api/axios';
 import { toast } from 'react-hot-toast';
+import type { ReceiptConfig } from '../types/receiptConfig';
+import { ReceiptPreviewCard } from '../components/dashboard/finance/ReceiptPreviewCard';
 
 export const loadImage = (url: string): Promise<HTMLImageElement> => {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'Anonymous';
-        img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error('Failed to load image'));
-        img.src = url;
-    });
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Failed to load image'));
+    img.src = url;
+  });
 };
 
 export const formatDisplayDate = (date: any) => {
-    if (!date) return '-';
-    if (Array.isArray(date)) {
-        const [year, month, day] = date;
-        return new Date(year, month - 1, day).toLocaleDateString('fr-FR');
+  if (!date) return '-';
+  if (Array.isArray(date)) {
+    const [year, month, day] = date;
+    return new Date(year, month - 1, day).toLocaleDateString('fr-FR');
+  }
+  return new Date(date).toLocaleDateString('fr-FR');
+};
+
+export const generateReceipt = async (
+  tx: any,
+  inst: any,
+  user: any,
+  isGlobal: boolean = false,
+  group: any = null,
+  configProp?: ReceiptConfig | null
+): Promise<boolean> => {
+  const downloadToast = toast.loading("Génération du reçu PDF haute résolution...");
+  let tempDiv: HTMLElement | null = null;
+  let root: any = null;
+
+  try {
+    const institutionId =
+      inst?.enrollment?.classe?.institution?.id ||
+      inst?.institution?.id ||
+      user?.institution?.id;
+
+    // Load saved config if not passed directly
+    let activeConfig: ReceiptConfig = configProp || {
+      paperSize: 'RECTANGULAR_SLIP_DL',
+      layoutType: 'SINGLE_SLIP',
+      customWidthMm: 210,
+      customHeightMm: 99,
+      headerTitle: 'RÉPUBLIQUE DU CAMEROUN',
+      headerSubtitle: "MINISTÈRE DE L'ENSEIGNEMENT SECONDAIRE",
+      motto: 'Paix - Travail - Patrie',
+      primaryColor: '#1E3A8A',
+      secondaryColor: '#2563EB',
+      textColor: '#1E293B',
+      backgroundColor: '#FFFFFF',
+      accentColor: '#DC2626',
+      fontFamily: 'Helvetica',
+      showLogo: true,
+      showWatermark: true,
+      watermarkText: 'SÉCURISÉ',
+      showQrCode: true,
+      showStampBox: true,
+      showStudentPhoto: false,
+      showCumulativeBalance: true,
+      showPaymentMethod: true,
+      signatureTitle: 'Le Caissier / Le Comptable',
+      footerNote: 'Les frais versés ne sont ni remboursables ni transmissibles. Gardez ce reçu précieusement.',
+    };
+
+    if (!configProp && institutionId) {
+      try {
+        const configRes = await api.get(`/institutions/${institutionId}/receipt-config`);
+        if (configRes.data) {
+          activeConfig = { ...activeConfig, ...configRes.data };
+        }
+      } catch (err) {
+        console.warn("Could not fetch institution receipt config, using defaults", err);
+      }
     }
-    return new Date(date).toLocaleDateString('fr-FR');
-};
 
-const formatPeriod = (start: any, end: any) => {
-    if (start && end) return `${formatDisplayDate(start)} au ${formatDisplayDate(end)}`;
-    if (end) return `Avant le ${formatDisplayDate(end)}`;
-    if (start) return `Depuis le ${formatDisplayDate(start)}`;
-    return '-';
-};
+    // Determine Paper Size & Orientation
+    let baseWidth = 210;
+    let baseHeight = 99;
 
-export const generateReceipt = async (tx: any, inst: any, user: any, isGlobal: boolean = false, group: any = null) => {
-    const downloadToast = toast.loading("Génération du reçu sécurisé A5...");
-    try {
-        const doc = new jsPDF('p', 'mm', 'a5'); // A5 format
-        const s = (val: number) => val * (148.5 / 210); // scale factor from A4 to A5
+    if (activeConfig.paperSize === 'THERMAL_80MM') {
+      baseWidth = 80;
+      baseHeight = 200;
+    } else if (activeConfig.paperSize === 'LANDSCAPE_A5') {
+      baseWidth = 210;
+      baseHeight = 148.5;
+    } else if (activeConfig.paperSize === 'PORTRAIT_A5') {
+      baseWidth = 148.5;
+      baseHeight = 210;
+    } else if (activeConfig.paperSize === 'CUSTOM' && activeConfig.customWidthMm && activeConfig.customHeightMm) {
+      baseWidth = activeConfig.customWidthMm;
+      baseHeight = activeConfig.customHeightMm;
+    }
 
-        const schoolName = inst.enrollment?.classe?.institution?.name || user?.institution?.name || "ÉTABLISSEMENT SCOLAIRE";
-        const institutionId = inst.enrollment?.classe?.institution?.id || user?.institution?.id;
-        const logoUrl = inst.enrollment?.classe?.institution?.logoUrl || user?.institution?.logoUrl;
-        
-        let secretariatName = "La Direction";
-        if (institutionId) {
-            try {
-                const staffRes = await api.get(`/institutions/${institutionId}/staff`);
-                const secretariat = staffRes.data.find((s: any) => s.role === 'SECRETARIAT');
-                if (secretariat) {
-                    secretariatName = `${secretariat.firstName} ${secretariat.lastName}`;
+    const isDual = activeConfig.layoutType === 'DUAL_SLIP';
+    const totalPdfHeight = isDual ? baseHeight * 2 : baseHeight;
+    const isLandscape = baseWidth >= totalPdfHeight;
+
+    // Create an isolated container for rendering the receipt card
+    tempDiv = document.createElement('div');
+    tempDiv.id = 'temp-pdf-render-area';
+    tempDiv.style.position = 'fixed';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.top = '-9999px';
+    tempDiv.style.width = `${baseWidth * 3.7795275591}px`; // Convert mm to px at 96 DPI
+    tempDiv.style.backgroundColor = '#FFFFFF';
+    tempDiv.style.zIndex = '-9999';
+    tempDiv.style.padding = '12px';
+    document.body.appendChild(tempDiv);
+
+    const schoolName =
+      inst?.enrollment?.classe?.institution?.name ||
+      inst?.institution?.name ||
+      user?.institution?.name ||
+      "COLLÈGE BILINGUE EXCELLENCE";
+
+    const logoUrl =
+      inst?.enrollment?.classe?.institution?.logoUrl ||
+      inst?.institution?.logoUrl ||
+      user?.institution?.logoUrl;
+
+    root = createRoot(tempDiv);
+    root.render(
+      React.createElement(ReceiptPreviewCard, {
+        config: activeConfig,
+        schoolName,
+        logoUrl,
+        transaction: tx,
+        student: inst,
+        user,
+        interactive: false,
+      })
+    );
+
+    // Wait 250ms for React rendering and layout calculation
+    await new Promise((res) => setTimeout(res, 250));
+
+    // Capture using html2canvas with Proxy getComputedStyle interceptor
+    const canvas = await html2canvas(tempDiv, {
+      scale: 2.5, // 2.5x crisp DPI rendering
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      backgroundColor: '#FFFFFF',
+      onclone: (clonedDoc) => {
+        // Intercept getComputedStyle in cloned window so oklch/oklab color values are automatically converted to standard rgb strings
+        if (clonedDoc.defaultView) {
+          const win = clonedDoc.defaultView;
+          const origGetComputedStyle = win.getComputedStyle;
+
+          win.getComputedStyle = function (el: Element, pseudoElt?: string | null) {
+            const style = origGetComputedStyle.call(win, el, pseudoElt);
+            return new Proxy(style, {
+              get(target: any, prop: string | symbol) {
+                const val = target[prop];
+                if (typeof val === 'string' && (val.includes('oklch') || val.includes('oklab'))) {
+                  const pStr = String(prop).toLowerCase();
+                  if (pStr.includes('background')) return 'rgb(255, 255, 255)';
+                  if (pStr.includes('border')) return 'rgb(203, 213, 225)';
+                  return 'rgb(30, 41, 59)';
                 }
-            } catch (e) {
-                console.error("Could not fetch staff", e);
-            }
+                return typeof val === 'function' ? val.bind(target) : val;
+              },
+            });
+          } as any;
         }
 
-        const bgColor = [240, 248, 255];
-        const headerColor = [37, 99, 235];
+        // Strip all external & Vite CSSOM style tags containing Tailwind v4 oklab/oklch rules
+        const styles = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
+        styles.forEach((s) => s.remove());
 
-        doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
-        doc.rect(0, 0, 148.5, 210, 'F');
+        // Inject clean, standard CSS layout rules for html2canvas
+        const cleanStyle = clonedDoc.createElement('style');
+        cleanStyle.textContent = `
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          .flex { display: flex !important; }
+          .flex-col { display: flex !important; flex-direction: column !important; }
+          .items-center { align-items: center !important; }
+          .justify-between { justify-content: space-between !important; }
+          .justify-center { justify-content: center !important; }
+          .grid { display: grid !important; }
+          .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+          .gap-3 { gap: 12px !important; }
+          .gap-4 { gap: 16px !important; }
+          .rounded-lg { border-radius: 8px !important; }
+          .rounded-md { border-radius: 6px !important; }
+          .rounded { border-radius: 4px !important; }
+          .rounded-full { border-radius: 9999px !important; }
+          .p-5 { padding: 20px !important; }
+          .p-4 { padding: 16px !important; }
+          .p-2\\.5 { padding: 10px !important; }
+          .p-1\\.5 { padding: 6px !important; }
+          .p-1 { padding: 4px !important; }
+          .px-3 { padding-left: 12px !important; padding-right: 12px !important; }
+          .py-1\\.5 { padding-top: 6px !important; padding-bottom: 6px !important; }
+          .px-2\\.5 { padding-left: 10px !important; padding-right: 10px !important; }
+          .py-1 { padding-top: 4px !important; padding-bottom: 4px !important; }
+          .px-2 { padding-left: 8px !important; padding-right: 8px !important; }
+          .py-0\\.5 { padding-top: 2px !important; padding-bottom: 2px !important; }
+          .px-1 { padding-left: 4px !important; padding-right: 4px !important; }
+          .pt-2 { padding-top: 8px !important; }
+          .pb-2 { padding-bottom: 8px !important; }
+          .mb-3 { margin-bottom: 12px !important; }
+          .mb-2 { margin-bottom: 8px !important; }
+          .my-3 { margin-top: 12px !important; margin-bottom: 12px !important; }
+          .mt-1 { margin-top: 4px !important; }
+          .mt-0\.5 { margin-top: 2px !important; }
+          .mt-auto { margin-top: auto !important; }
+          .border { border-style: solid !important; border-width: 1px !important; }
+          .border-b-2 { border-bottom-style: solid !important; border-bottom-width: 2px !important; }
+          .border-t-2 { border-top-style: solid !important; border-top-width: 2px !important; }
+          .border-t { border-top-style: solid !important; border-top-width: 1px !important; }
+          .border-2 { border-width: 2px !important; }
+          .border-dashed { border-style: dashed !important; }
+          .text-xs { font-size: 12px !important; line-height: 16px !important; }
+          .text-sm { font-size: 14px !important; line-height: 20px !important; }
+          .text-base { font-size: 16px !important; line-height: 24px !important; }
+          .text-\\[10px\\] { font-size: 10px !important; }
+          .text-\\[11px\\] { font-size: 11px !important; }
+          .text-\\[9px\\] { font-size: 9px !important; }
+          .text-\\[8px\\] { font-size: 8px !important; }
+          .font-bold { font-weight: 700 !important; }
+          .font-semibold { font-weight: 600 !important; }
+          .font-medium { font-weight: 500 !important; }
+          .uppercase { text-transform: uppercase !important; }
+          .italic { font-style: italic !important; }
+          .font-mono { font-family: monospace !important; }
+          .tracking-wider { letter-spacing: 0.05em !important; }
+          .tracking-wide { letter-spacing: 0.025em !important; }
+          .relative { position: relative !important; }
+          .absolute { position: absolute !important; }
+          .inset-0 { top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important; }
+          .w-12 { width: 48px !important; } .h-12 { height: 48px !important; }
+          .w-36 { width: 144px !important; } .h-14 { height: 56px !important; }
+          .w-8 { width: 32px !important; } .h-8 { height: 32px !important; }
+          .w-3 { width: 12px !important; } .h-3 { height: 12px !important; }
+          .w-4 { width: 16px !important; } .h-4 { height: 16px !important; }
+          .w-full { width: 100% !important; }
+          .shrink-0 { flex-shrink: 0 !important; }
+          .flex-1 { flex: 1 1 0% !important; }
+          .text-center { text-align: center !important; }
+          .text-right { text-align: right !important; }
+          .overflow-hidden { overflow: hidden !important; }
+          .opacity-5 { opacity: 0.05 !important; }
+          .opacity-60 { opacity: 0.6 !important; }
+          .pointer-events-none { pointer-events: none !important; }
+          .space-y-1 > * + * { margin-top: 4px !important; }
+          .space-y-4 > * + * { margin-top: 16px !important; }
+        `;
+        clonedDoc.head.appendChild(cleanStyle);
+      },
+    });
 
-        doc.setFontSize(s(50));
-        doc.setTextColor(bgColor[0] - 15, bgColor[1] - 15, bgColor[2] - 15);
-        doc.setFont('helvetica', 'bold');
-        for(let i=0; i<6; i++) {
-            doc.text(schoolName.toUpperCase(), 148.5 / 2, s(40 + (i * 45)), { align: 'center', angle: 45 });
-        }
+    const imgData = canvas.toDataURL('image/png');
 
-        doc.setDrawColor(headerColor[0], headerColor[1], headerColor[2]);
-        doc.setLineWidth(s(1.5));
-        doc.rect(s(5), s(5), s(200), s(287));
-        doc.setLineWidth(s(0.3));
-        doc.rect(s(7), s(7), s(196), s(283));
+    const doc = new jsPDF({
+      orientation: isLandscape ? 'landscape' : 'portrait',
+      unit: 'mm',
+      format: [baseWidth, totalPdfHeight],
+    });
 
-        doc.setFontSize(s(4));
-        doc.setTextColor(headerColor[0], headerColor[1], headerColor[2]);
-        let microText = "";
-        for(let i=0; i<25; i++) microText += "DOCUMENT AUTHENTIQUE SÉCURISÉ - ";
-        doc.text(microText, s(10), s(9));
-        doc.text(microText, s(10), s(289));
+    doc.addImage(imgData, 'PNG', 0, 0, baseWidth, totalPdfHeight);
 
-        const suffix = schoolName.substring(0, 3).toUpperCase().padEnd(3, 'X');
-        const dateStr = new Date(tx?.transactionDate || Date.now()).getTime().toString().slice(-8);
-        const idStr = isGlobal ? 'GLOBAL' : tx?.id?.toString().padStart(5, '0');
-        const reference = `REC${dateStr}${idStr}${suffix}`.substring(0, 19);
-        
-        doc.setFillColor(headerColor[0], headerColor[1], headerColor[2]);
-        doc.rect(s(10), s(15), s(190), s(35), 'F');
-        
-        if (logoUrl) {
-            try {
-                const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:8080';
-                const fullLogoUrl = logoUrl.startsWith('http') ? logoUrl : `${baseUrl}${logoUrl}`;
-                const img = await loadImage(fullLogoUrl);
-                doc.addImage(img, 'PNG', s(15), s(17), s(30), s(30));
-            } catch (e) {
-                console.error("Could not load school logo", e);
-            }
-        }
+    const refStr = tx?.reference || tx?.id || Date.now();
+    doc.save(`Recu_${refStr}.pdf`);
 
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(s(22));
-        doc.setFont('helvetica', 'bold');
-        doc.text(isGlobal ? "REÇU GLOBAL SÉCURISÉ" : "REÇU DE PAIEMENT SÉCURISÉ", 148.5 / 2, s(28), { align: 'center' });
-        
-        doc.setFontSize(s(10));
-        doc.setFont('helvetica', 'normal');
-        doc.text(schoolName.toUpperCase(), 148.5 / 2, s(42), { align: 'center' });
-        
-        doc.setTextColor(30, 41, 59);
-        doc.setFontSize(s(10));
-        doc.setFont('helvetica', 'bold');
-        doc.text("INFORMATIONS DU PARENT", s(15), s(65));
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Nom : ${user?.firstName || ''} ${user?.lastName || ''}`, s(15), s(72));
-        doc.text(`Email : ${user?.email || 'N/A'}`, s(15), s(78));
-        
-        doc.setFont('helvetica', 'bold');
-        doc.text("INFORMATIONS DE L'ÉLÈVE", s(15), s(90));
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Matricule : ${inst.enrollment?.student?.studentIdNumber || 'N/A'}`, s(15), s(97));
-        doc.text(`Nom : ${inst.enrollment?.student?.firstName || ''} ${inst.enrollment?.student?.lastName || ''}`, s(15), s(103));
-        doc.text(`Classe : ${inst.enrollment?.classe?.name || 'N/A'}`, s(15), s(109));
-        
-        doc.setFont('helvetica', 'bold');
-        doc.text("DÉTAILS DU REÇU", s(120), s(65));
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Référence : ${reference}`, s(120), s(72));
-        doc.text(`Date : ${new Date().toLocaleDateString('fr-FR')}`, s(120), s(78));
-        doc.text(`Type : ${isGlobal ? 'Paiement Intégral' : "Paiement d'acompte/frais"}`, s(120), s(84));
-        
-        let tableBody = [];
-        if (isGlobal && group) {
-            tableBody = group.installments.map((i: any) => [
-                i.feeType?.name || 'Frais de scolarité',
-                formatPeriod(i.startDate, i.dueDate),
-                `${i.paidAmount} FCFA`
-            ]);
-        } else {
-            tableBody = [[
-                inst.feeType?.name || 'Frais de scolarité',
-                formatPeriod(inst.startDate, inst.dueDate),
-                `${tx?.amount || 0} FCFA`
-            ]];
-        }
-
-        autoTable(doc, {
-            startY: s(120),
-            head: [['Désignation', 'Période', 'Montant Payé']],
-            body: tableBody,
-            headStyles: { fillColor: headerColor as [number, number, number], textColor: [255, 255, 255], fontStyle: 'bold' },
-            alternateRowStyles: { fillColor: [255, 255, 255] },
-            styles: { fontSize: s(10), cellPadding: s(6), fillColor: [250, 250, 250] },
-            margin: { left: s(15), right: s(15) }
-        });
-        
-        const finalY = (doc as any).lastAutoTable.finalY || s(140);
-        doc.setFontSize(s(14));
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(headerColor[0], headerColor[1], headerColor[2]);
-        
-        const totalToDisplay = isGlobal 
-            ? (group?.totalPaid !== undefined ? group.totalPaid : group?.installments?.reduce((sum: number, i: any) => sum + (i.paidAmount || 0), 0))
-            : tx?.amount;
-            
-        doc.text(`Total Payé : ${totalToDisplay} FCFA`, s(195), finalY + s(15), { align: 'right' });
-
-        doc.setDrawColor(220, 38, 38);
-        doc.setLineWidth(s(0.5));
-        doc.roundedRect(s(15), finalY + s(25), s(60), s(25), s(2), s(2));
-        
-        doc.setTextColor(220, 38, 38);
-        doc.setFontSize(s(8));
-        doc.setFont('helvetica', 'bold');
-        doc.text("CACHET DU SECRÉTARIAT", s(45), finalY + s(30), { align: 'center' });
-        
-        doc.setFontSize(s(6));
-        doc.setFont('helvetica', 'normal');
-        let truncatedSchoolName = schoolName.length > 35 ? schoolName.substring(0, 32) + "..." : schoolName;
-        doc.text(truncatedSchoolName.toUpperCase(), s(45), finalY + s(34), { align: 'center' });
-        
-        doc.setLineWidth(s(0.2));
-        doc.line(s(20), finalY + s(36), s(70), finalY + s(36));
-
-        doc.setTextColor(37, 99, 235);
-        doc.setFontSize(s(20));
-        doc.setFont('helvetica', 'italic');
-        doc.text(secretariatName, s(45), finalY + s(46), { align: 'center', angle: -8 });
-
-        doc.setTextColor(100, 116, 139);
-        doc.setFontSize(s(7));
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Validé par : ${secretariatName}`, s(45), finalY + s(54), { align: 'center' });
-
-        doc.setFillColor(15, 23, 42);
-        doc.rect(s(130), finalY + s(30), s(65), s(22), 'F');
-        
-        try {
-            const nbLogoImg = await loadImage(nbLogo);
-            // Add a white background behind the logo for contrast against the dark background
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(s(131), finalY + s(33), s(16), s(16), s(2), s(2), 'F');
-            doc.addImage(nbLogoImg, 'PNG', s(132), finalY + s(34), s(14), s(14));
-        } catch (e) {
-            console.error("Could not load ACADEMIA CONNECT logo", e);
-        }
-
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(s(7));
-        doc.setFont('helvetica', 'normal');
-        doc.text("SYSTÈME SÉCURISÉ PAR", s(172), finalY + s(38), { align: 'center' });
-        doc.setFontSize(s(10));
-        doc.setFont('helvetica', 'bold');
-        doc.text("ACADEMIA CONNECT", s(172), finalY + s(44), { align: 'center' });
-        doc.setFontSize(s(6));
-        doc.setTextColor(148, 163, 184);
-        doc.text("TECHNOLOGIE D'INFALSIFICATION", s(172), finalY + s(49), { align: 'center' });
-
-        doc.setTextColor(100, 116, 139);
-        doc.setFontSize(s(8));
-        doc.setFont('helvetica', 'italic');
-        doc.text("Merci pour votre paiement. Conservez ce reçu précieusement en cas de réclamation.", 148.5 / 2, s(275), { align: 'center' });
-        doc.text(`Document généré le ${new Date().toLocaleString('fr-FR')} - Validité garantie numériquement.`, 148.5 / 2, s(280), { align: 'center' });
-        
-        doc.save(`Recu_${reference}.pdf`);
-        toast.dismiss(downloadToast);
-        toast.success("Reçu A5 téléchargé avec succès !");
-    } catch (err) {
-        console.error("Error generating receipt PDF", err);
-        toast.dismiss(downloadToast);
-        toast.error("Erreur lors de la génération du reçu");
+    toast.dismiss(downloadToast);
+    toast.success("Reçu téléchargé avec succès en PDF !");
+    return true;
+  } catch (err) {
+    console.error("Error generating receipt PDF", err);
+    toast.dismiss(downloadToast);
+    toast.error("Erreur lors du téléchargement du PDF.");
+    return false;
+  } finally {
+    if (root) {
+      try {
+        root.unmount();
+      } catch (e) {
+        // ignore unmount errors
+      }
     }
+    if (tempDiv && document.body.contains(tempDiv)) {
+      document.body.removeChild(tempDiv);
+    }
+  }
 };

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-    MapPin,
     Download,
     Plus,
     Info,
     Briefcase,
-    BookOpen,
     Calendar,
     Loader2,
     Clock,
@@ -62,6 +60,10 @@ const Schedule: React.FC = () => {
         breaks: []
     });
 
+    const [viewMode, setViewMode] = useState<'me' | 'class'>('me');
+    const [classes, setClasses] = useState<{ id: number, name: string, cycle: { name: string } }[]>([]);
+    const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
+
     const timeSlots = React.useMemo(() => {
         const [startH, startM] = timetableConfig.startHour.split(':').map(Number);
         const [endH, endM] = timetableConfig.endHour.split(':').map(Number);
@@ -90,10 +92,46 @@ const Schedule: React.FC = () => {
     }, [timetableConfig]);
 
     useEffect(() => {
-        if (user?.id) {
+        if (viewMode === 'me' && user?.id) {
             fetchMySchedule();
+        } else if (viewMode === 'class') {
+            fetchClasses();
         }
-    }, [user?.id]);
+    }, [viewMode, user?.id]);
+
+    useEffect(() => {
+        if (viewMode === 'class' && selectedClassId) {
+            fetchClassSchedule(selectedClassId);
+        }
+    }, [selectedClassId]);
+
+    const fetchClasses = async () => {
+        try {
+            const res = await api.get(`/classes?institutionId=${user?.institution?.id}`);
+            setClasses(res.data || []);
+            if (res.data && res.data.length > 0) {
+                setSelectedClassId(res.data[0].id);
+            }
+        } catch (error) {
+            console.error("Failed to fetch classes", error);
+        }
+    };
+
+    const fetchClassSchedule = async (classId: number) => {
+        setLoading(true);
+        try {
+            const [scheduleRes, configRes] = await Promise.all([
+                api.get(`/timetable/classe/${classId}`),
+                api.get(`/timetable/config/institution/${user?.institution?.id}`)
+            ]);
+            setEntries(scheduleRes.data || []);
+            setTimetableConfig(configRes.data || { startHour: '08:00', endHour: '18:00', slotDuration: 60, breaks: [] });
+        } catch (error) {
+            console.error("Failed to fetch class schedule", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchMySchedule = async () => {
         setLoading(true);
@@ -103,8 +141,8 @@ const Schedule: React.FC = () => {
                 api.get(`/timetable/teacher/${user?.id}`),
                 api.get(`/timetable/config/institution/${instId}`)
             ]);
-            setEntries(scheduleRes.data);
-            setTimetableConfig(configRes.data);
+            setEntries(scheduleRes.data || []);
+            setTimetableConfig(configRes.data || { startHour: '08:00', endHour: '18:00', slotDuration: 60, breaks: [] });
         } catch (error) {
             console.error("Failed to fetch teacher schedule", error);
         } finally {
@@ -154,16 +192,14 @@ const Schedule: React.FC = () => {
         doc.text(subTitle, 14, 26);
         doc.text(`Généré le: ${format(new Date(), 'dd MMMM yyyy HH:mm', { locale: fr })}`, 14, 32);
 
-        // Prep data for autoTable with row spanning
         const tableColumn = ["Heures", ...DAYS];
         const bodyRows: any[] = [];
-        const spannedCells: Set<string> = new Set(); // format: "day-slotIdx"
+        const spannedCells: Set<string> = new Set();
 
         timeSlots.slice(0, -1).forEach((time, slotIdx) => {
             const nextTime = timeSlots[slotIdx + 1];
             const isBreak = timetableConfig.breaks.some(b => b.startTime === time);
 
-            // Col 0: Time slot
             const row: any[] = [{
                 content: `${time} - ${nextTime}`,
                 styles: { fontStyle: 'bold', fillColor: [248, 250, 252], textColor: [100, 116, 139] }
@@ -183,7 +219,6 @@ const Schedule: React.FC = () => {
                     if (entriesStartingHere.length > 0) {
                         const entry = entriesStartingHere[0];
 
-                        // Calculate rowSpan
                         let span = 1;
                         let checkIdx = slotIdx + 1;
                         while (checkIdx < timeSlots.length - 1) {
@@ -198,7 +233,7 @@ const Schedule: React.FC = () => {
                         }
 
                         row.push({
-                            content: `${entry.subjectName}\n(Classe: ${entry.classeName})\nSala: ${entry.room}`,
+                            content: `${entry.subjectName}\n(Classe: ${entry.classeName})\nSalle: ${entry.room}`,
                             rowSpan: span,
                             styles: {
                                 fontStyle: 'bold',
@@ -244,163 +279,192 @@ const Schedule: React.FC = () => {
     };
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                        <Calendar className="text-blue-600" size={32} />
-                        Mon Planning
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <Calendar className="text-blue-600 dark:text-blue-400" size={24} />
+                        {viewMode === 'me' ? 'Mon Planning' : 'Planning par Classe'}
                     </h2>
-                    <p className="text-slate-500 font-medium">Visualisez vos cours et gérez votre temps de travail.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Visualisez vos cours et gérez votre temps de travail.</p>
+
+                    <div className="flex gap-1.5 mt-3 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-max border border-slate-200/80 dark:border-slate-700">
+                        <button
+                            onClick={() => setViewMode('me')}
+                            className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all ${viewMode === 'me' ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                        >
+                            Mon Planning
+                        </button>
+                        <button
+                            onClick={() => setViewMode('class')}
+                            className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all ${viewMode === 'class' ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
+                        >
+                            Planning Par Classe
+                        </button>
+                    </div>
                 </div>
-                <div className="flex gap-4">
-                    <button
-                        onClick={() => { setEditingEntryForEdit(null); setEditModalOpen(true); }}
-                        className="bg-slate-100 border border-slate-200 px-6 py-3.5 rounded-3xl font-bold text-slate-700 flex items-center gap-2 hover:bg-slate-200 transition-all shadow-sm active:scale-95"
-                    >
-                        <Plus size={18} /> Nouvelle Session
-                    </button>
+
+                <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+                    {viewMode === 'class' && (
+                        <select
+                            value={selectedClassId || ''}
+                            onChange={(e) => setSelectedClassId(Number(e.target.value))}
+                            className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-xs text-slate-900 dark:text-white outline-none"
+                        >
+                            {classes.map(cls => (
+                                <option key={cls.id} value={cls.id}>
+                                    {cls.cycle?.name ? `[${cls.cycle.name}] ` : ''}{cls.name}
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                    {viewMode === 'me' && (
+                        <button
+                            onClick={() => { setEditingEntryForEdit(null); setEditModalOpen(true); }}
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                        >
+                            <Plus size={16} /> Nouvelle Session
+                        </button>
+                    )}
                     <button
                         onClick={generatePDF}
-                        className="bg-blue-600 border border-blue-500 px-6 py-3.5 rounded-3xl font-bold text-white flex items-center gap-2 hover:bg-blue-700 transition-all shadow-lg active:scale-95"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-colors"
                     >
-                        <Download size={18} /> Télécharger PDF
+                        <Download size={16} /> Imprimer PDF
                     </button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-[45px] shadow-2xl border border-blue-50 overflow-hidden relative mb-12">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden relative">
                 {loading && (
-                    <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-50 flex items-center justify-center">
-                        <Loader2 className="animate-spin text-blue-600" size={48} />
+                    <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center">
+                        <Loader2 className="animate-spin text-blue-600" size={36} />
                     </div>
                 )}
 
-                <div className="overflow-x-auto scrollbar-hide">
+                <div className="overflow-x-auto">
                     <div className="min-w-[800px]">
-                        <div className="h-14 bg-slate-50 border-b border-slate-100 flex items-center">
-                            <div className="w-20 border-r border-slate-100 h-full flex items-center justify-center">
-                        <Clock size={16} className="text-slate-400" />
-                    </div>
-                    <div className="flex-1 grid grid-cols-6 h-full items-center text-center">
-                        {DAYS.map(day => (
-                            <div key={day} className="py-2 font-black text-[10px] text-slate-400 uppercase tracking-widest border-l border-blue-50 first:border-0">
-                                {day}
+                        <div className="h-12 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex items-center">
+                            <div className="w-16 border-r border-slate-100 dark:border-slate-800 h-full flex items-center justify-center">
+                                <Clock size={14} className="text-slate-400" />
                             </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="flex relative" style={{ height: `${timeSlots.length * 100}px` }}>
-                    <div className="w-20 flex-shrink-0 border-r border-blue-50 relative z-20 bg-slate-50/50">
-                        {timeSlots.map(time => {
-                            const { top } = calculatePositionAndHeight(time, time);
-                            return (
-                                <div key={time} style={{ top }} className="absolute inset-x-0 h-4 -mt-2 text-[10px] font-black text-slate-400 text-center">
-                                    <span className="bg-white px-2 py-0.5 rounded-full border border-blue-50 shadow-sm">{time}</span>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    <div className="absolute inset-0 flex">
-                        <div className="w-20"></div>
-                        <div className="grid grid-cols-6 flex-1">
-                            {DAYS.map((_, i) => (
-                                <div key={i} className="border-l border-blue-50 h-full relative">
-                                    {timeSlots.slice(0, -1).map((time, j) => (
-                                        <div key={j} className="h-[100px] border-b border-blue-50/50"></div>
-                                    ))}
-                                </div>
-                            ))}
+                            <div className="flex-1 grid grid-cols-6 h-full items-center text-center">
+                                {DAYS.map(day => (
+                                    <div key={day} className="py-2 font-bold text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider border-l border-slate-100 dark:border-slate-800 first:border-0">
+                                        {day}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="flex-1 grid grid-cols-6 relative z-10">
-                        {DAYS.map((day) => (
-                            <div key={day} className="relative h-full mx-1">
-                                {timetableConfig.breaks.map((b, i) => {
-                                    const { top, height } = calculatePositionAndHeight(
-                                        b.startTime,
-                                        (() => {
-                                            const [h, m] = b.startTime.split(':').map(Number);
-                                            const totalM = h * 60 + m + b.duration;
-                                            return `${Math.floor(totalM / 60).toString().padStart(2, '0')}:${(totalM % 60).toString().padStart(2, '0')}`;
-                                        })()
-                                    );
+                        <div className="flex relative" style={{ height: `${timeSlots.length * 100}px` }}>
+                            <div className="w-16 flex-shrink-0 border-r border-slate-100 dark:border-slate-800 relative z-20 bg-slate-50/50 dark:bg-slate-800/40">
+                                {timeSlots.map(time => {
+                                    const { top } = calculatePositionAndHeight(time, time);
                                     return (
-                                        <div key={`break-${i}`} className="absolute inset-x-0 bg-slate-100/40 border-y border-slate-200/50 flex items-center justify-center z-0" style={{ top, height }}>
-                                            <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Pause</span>
+                                        <div key={time} style={{ top }} className="absolute inset-x-0 h-4 -mt-2 text-[10px] font-bold text-slate-400 text-center">
+                                            <span className="bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">{time}</span>
                                         </div>
                                     );
                                 })}
-
-                                <AnimatePresence>
-                                    {getEntriesForDay(day).map(entry => {
-                                        const { top, height } = calculatePositionAndHeight(entry.startTime, entry.endTime);
-                                        return (
-                                            <motion.div
-                                                key={entry.id}
-                                                layout
-                                                initial={{ opacity: 0, scale: 0.9 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                onClick={() => setDetailsEntry(entry)}
-                                                className="absolute inset-x-0 rounded-3xl p-4 shadow-xl border-l-4 overflow-hidden group hover:z-20 hover:scale-[1.03] transition-all cursor-pointer"
-                                                style={{ top, height, backgroundColor: `${entry.subjectColor}15`, borderColor: entry.subjectColor }}
-                                            >
-                                                <div className="flex flex-col h-full uppercase tracking-tighter relative">
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); setEditingEntryForEdit(entry); setEditModalOpen(true); }}
-                                                        className="absolute top-0 right-0 p-2 bg-white/50 hover:bg-white text-slate-600 rounded-full transition-colors z-30 shadow-sm"
-                                                        title="Modifier cette session"
-                                                    >
-                                                        <Edit2 size={12} />
-                                                    </button>
-                                                    <span className="text-[10px] font-black px-2 py-1 rounded-full bg-white/80 text-slate-600 shadow-sm w-fit mb-2">
-                                                        {entry.startTime} - {entry.endTime}
-                                                    </span>
-                                                    <h5 className="font-black text-slate-800 text-xs leading-tight mb-2 pr-6" style={{ color: entry.subjectColor }}>
-                                                        <span className="hidden md:inline">[{entry.classeName}] </span>{entry.subjectName}
-                                                    </h5>
-                                                    <div className="mt-auto">
-                                                        <span className="text-[10px] font-bold text-slate-500 underline">Voir détails</span>
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        );
-                                    })}
-                                </AnimatePresence>
                             </div>
-                        ))}
-                    </div>
-                </div>
+
+                            <div className="absolute inset-0 flex">
+                                <div className="w-16"></div>
+                                <div className="grid grid-cols-6 flex-1">
+                                    {DAYS.map((_, i) => (
+                                        <div key={i} className="border-l border-slate-100 dark:border-slate-800 h-full relative">
+                                            {timeSlots.slice(0, -1).map((time, j) => (
+                                                <div key={j} className="h-[100px] border-b border-slate-100/60 dark:border-slate-800/60"></div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex-1 grid grid-cols-6 relative z-10">
+                                {DAYS.map((day) => (
+                                    <div key={day} className="relative h-full mx-1">
+                                        {timetableConfig.breaks.map((b, i) => {
+                                            const { top, height } = calculatePositionAndHeight(
+                                                b.startTime,
+                                                (() => {
+                                                    const [h, m] = b.startTime.split(':').map(Number);
+                                                    const totalM = h * 60 + m + b.duration;
+                                                    return `${Math.floor(totalM / 60).toString().padStart(2, '0')}:${(totalM % 60).toString().padStart(2, '0')}`;
+                                                })()
+                                            );
+                                            return (
+                                                <div key={`break-${i}`} className="absolute inset-x-0 bg-slate-100/50 dark:bg-slate-800/50 border-y border-slate-200/50 dark:border-slate-700/50 flex items-center justify-center z-0" style={{ top, height }}>
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Pause</span>
+                                                </div>
+                                            );
+                                        })}
+
+                                        <AnimatePresence>
+                                            {getEntriesForDay(day).map(entry => {
+                                                const { top, height } = calculatePositionAndHeight(entry.startTime, entry.endTime);
+                                                return (
+                                                    <motion.div
+                                                        key={entry.id}
+                                                        layout
+                                                        initial={{ opacity: 0, scale: 0.95 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        onClick={() => setDetailsEntry(entry)}
+                                                        className="absolute inset-x-0 rounded-xl p-3 shadow-sm border-l-4 overflow-hidden group hover:z-20 hover:shadow-md transition-all cursor-pointer"
+                                                        style={{ top, height, backgroundColor: `${entry.subjectColor}15`, borderColor: entry.subjectColor }}
+                                                    >
+                                                        <div className="flex flex-col h-full uppercase relative">
+                                                            {viewMode === 'me' && (
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); setEditingEntryForEdit(entry); setEditModalOpen(true); }}
+                                                                    className="absolute top-0 right-0 p-1 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg transition-colors z-30 shadow-sm"
+                                                                    title="Modifier"
+                                                                >
+                                                                    <Edit2 size={12} />
+                                                                </button>
+                                                            )}
+                                                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 w-fit mb-1">
+                                                                {entry.startTime} - {entry.endTime}
+                                                            </span>
+                                                            <h5 className="font-bold text-xs truncate mb-1" style={{ color: entry.subjectColor }}>
+                                                                [{viewMode === 'class' ? (entry.teacherName || 'N/A') : entry.classeName}] {entry.subjectName}
+                                                            </h5>
+                                                        </div>
+                                                    </motion.div>
+                                                );
+                                            })}
+                                        </AnimatePresence>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-slate-900 p-8 rounded-[40px] text-white shadow-2xl relative overflow-hidden">
-                    <h3 className="text-xl font-black mb-6 flex items-center gap-2">
-                        <Briefcase size={22} className="text-blue-400" /> Stats
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-slate-900 p-5 rounded-2xl text-white shadow-sm">
+                    <h3 className="text-base font-bold mb-3 flex items-center gap-2">
+                        <Briefcase size={18} className="text-blue-400" /> Stats
                     </h3>
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="bg-white/5 p-5 rounded-3xl border border-white/5">
-                            <p className="text-blue-200 text-[10px] font-black uppercase mb-1">Volume</p>
-                            <p className="text-2xl font-black">{entries.length * 2}h</p>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-slate-800 p-3 rounded-xl">
+                            <p className="text-slate-400 text-[10px] font-bold uppercase mb-0.5">Volume</p>
+                            <p className="text-xl font-bold">{entries.length * 2}h</p>
                         </div>
-                        <div className="bg-white/5 p-5 rounded-3xl border border-white/5">
-                            <p className="text-blue-200 text-[10px] font-black uppercase mb-1">Classes</p>
-                            <p className="text-2xl font-black">{new Set(entries.map(e => e.classeId)).size}</p>
+                        <div className="bg-slate-800 p-3 rounded-xl">
+                            <p className="text-slate-400 text-[10px] font-bold uppercase mb-0.5">Classes</p>
+                            <p className="text-xl font-bold">{new Set(entries.map(e => e.classeId)).size}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-blue-600 p-8 rounded-[40px] text-white shadow-2xl relative overflow-hidden">
-                    <h3 className="text-xl font-black mb-4 flex items-center gap-2"><Info size={22} /> Outils</h3>
-                    <p className="text-blue-100 text-sm font-medium mb-6 uppercase tracking-tighter">Accès rapide.</p>
-                    <div className="flex gap-3">
-                        <button onClick={() => navigate('/dashboard/teacher/book')} className="flex-1 bg-white text-blue-600 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">Cahier</button>
-                        <button onClick={() => navigate('/dashboard/teacher/attendance')} className="flex-1 bg-blue-700 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">Historique d'appels</button>
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2"><Info size={18} className="text-blue-600 dark:text-blue-400" /> Accès Rapide</h3>
+                    <div className="flex gap-2 pt-2">
+                        <button onClick={() => navigate('/dashboard/teacher/book')} className="flex-1 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors">Cahier de Texte</button>
+                        <button onClick={() => navigate('/dashboard/teacher/attendance')} className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors">Historique d'appels</button>
                     </div>
                 </div>
             </div>
@@ -437,7 +501,7 @@ const Schedule: React.FC = () => {
                     }
                 }}
             />
-        </>
+        </div>
     );
 };
 

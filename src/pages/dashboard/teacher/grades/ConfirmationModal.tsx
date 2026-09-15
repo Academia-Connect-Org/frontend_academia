@@ -25,25 +25,25 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 }) => {
     const getColorClass = () => {
         switch (type) {
-            case 'danger': return 'bg-rose-600 shadow-rose-600/30';
-            case 'success': return 'bg-emerald-600 shadow-emerald-600/30';
-            default: return 'bg-indigo-600 shadow-indigo-600/30';
+            case 'danger': return 'bg-rose-600 hover:bg-rose-700';
+            case 'success': return 'bg-emerald-600 hover:bg-emerald-700';
+            default: return 'bg-indigo-600 hover:bg-indigo-700';
         }
     };
 
     const getIcon = () => {
         switch (type) {
-            case 'danger': return <Trash2 size={40} className="text-rose-600" />;
-            case 'success': return <Send size={40} className="text-emerald-600" />;
-            default: return <AlertCircle size={40} className="text-indigo-600" />;
+            case 'danger': return <Trash2 size={24} className="text-rose-600 dark:text-rose-400" />;
+            case 'success': return <Send size={24} className="text-emerald-600 dark:text-emerald-400" />;
+            default: return <AlertCircle size={24} className="text-indigo-600 dark:text-indigo-400" />;
         }
     };
 
     const getBgIconClass = () => {
         switch (type) {
-            case 'danger': return 'bg-rose-50';
-            case 'success': return 'bg-emerald-50';
-            default: return 'bg-indigo-50';
+            case 'danger': return 'bg-rose-50 dark:bg-rose-950/40';
+            case 'success': return 'bg-emerald-50 dark:bg-emerald-950/40';
+            default: return 'bg-indigo-50 dark:bg-indigo-950/40';
         }
     };
 
@@ -55,33 +55,33 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+                        className="absolute inset-0 bg-slate-950/60 backdrop-blur-md"
                         onClick={onClose}
                     />
                     <motion.div
-                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                        className="bg-white ] p-10 w-full max-w-md shadow-2xl relative z-10   text-center"
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.95, opacity: 0 }}
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 w-full max-w-sm rounded-2xl shadow-2xl relative z-10 text-center"
                     >
                         <button
                             onClick={onClose}
-                            className="absolute top-6 right-6 p-2 text-slate-300 hover:text-slate-500 transition-colors"
+                            className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                         >
-                            <X size={20} />
+                            <X size={18} />
                         </button>
 
-                        <div className={`w-20 h-20 ${getBgIconClass()}  flex items-center justify-center mx-auto mb-6`}>
+                        <div className={`w-12 h-12 rounded-xl ${getBgIconClass()} flex items-center justify-center mx-auto mb-3`}>
                             {getIcon()}
                         </div>
 
-                        <h3 className="text-2xl font-black text-slate-800 mb-2">{title}</h3>
-                        <p className="text-slate-500 font-medium mb-8 leading-relaxed">{message}</p>
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">{title}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">{message}</p>
 
-                        <div className="flex gap-4">
+                        <div className="flex gap-2">
                             <button
                                 onClick={onClose}
-                                className="flex-1 bg-slate-100 text-slate-600 py-4  font-black hover:bg-slate-200 transition-all active:scale-95"
+                                className="flex-1 py-2 font-bold text-xs text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl transition-colors"
                             >
                                 {cancelText}
                             </button>
@@ -90,7 +90,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                                     onConfirm();
                                     onClose();
                                 }}
-                                className={`flex-1 text-white py-4  font-black shadow-xl transition-all hover:scale-105 active:scale-95 ${getColorClass()}`}
+                                className={`flex-1 text-white py-2 font-bold text-xs rounded-xl shadow-md transition-colors ${getColorClass()}`}
                             >
                                 {confirmText}
                             </button>

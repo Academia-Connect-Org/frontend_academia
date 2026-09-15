@@ -3,8 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import api, { getFileUrl } from '../../../api/axios';
 import { ROUTES } from '../../../constants/routes';
-import { motion } from 'framer-motion';
-import { CheckCircle, Crown, ChevronLeft, ArrowRight, Building, RefreshCw, AlertCircle } from 'lucide-react';
+import { Crown, ChevronLeft, ArrowRight, Building, RefreshCw, AlertCircle } from 'lucide-react';
 import SubscriptionPlanCard from '../../../components/shared/SubscriptionPlanCard';
 
 const SelectPlan: React.FC = () => {
@@ -34,19 +33,16 @@ const SelectPlan: React.FC = () => {
 
                 setInstitution(instRes.data);
 
-                // Filter plans based on whether it's a new school or renewal
-                const availablePlans = plansRes.data
+                const availablePlans = (plansRes.data || [])
                     .sort((a: any, b: any) => (a.monthlyPrice || 0) - (b.monthlyPrice || 0))
                     .filter((p: any) => {
                         if (p.type === 'NONE') return false;
-                        // Show Free trial if the institution hasn't chosen any plan yet
                         if (p.type === 'FREE_TRIAL' && instRes.data.subscriptionType !== 'NONE') return false;
                         return true;
                     });
 
                 setPlans(availablePlans);
 
-                // Auto-select free trial if no plan chosen yet, else first paid plan
                 if (instRes.data.subscriptionType === 'NONE' && availablePlans.some((p: any) => p.type === 'FREE_TRIAL')) {
                     setSelectedPlan(availablePlans.find((p: any) => p.type === 'FREE_TRIAL'));
                 } else if (availablePlans.length > 0) {
@@ -66,7 +62,6 @@ const SelectPlan: React.FC = () => {
     const handleConfirm = async () => {
         if (!selectedPlan) return;
 
-        // If Free Trial is selected, activate immediately via API
         if (selectedPlan.type === 'FREE_TRIAL') {
             setIsSubmitting(true);
             setError(null);
@@ -76,7 +71,7 @@ const SelectPlan: React.FC = () => {
                         pdgId: user?.id,
                         institutionId: institution.id,
                         type: 'FREE_TRIAL',
-                        period: 'MONTHLY' // Free trial is usually a fixed period anyway
+                        period: 'MONTHLY'
                     }
                 });
                 navigate('/dashboard/pdg');
@@ -87,13 +82,11 @@ const SelectPlan: React.FC = () => {
                 setIsSubmitting(false);
             }
         } else {
-            // Calculate actual period based on plan's constraints
             let effectiveIsYearly = selectedPeriod === 'YEARLY';
             if (selectedPlan.billingOptions === 'MONTHLY_ONLY') effectiveIsYearly = false;
             if (selectedPlan.billingOptions === 'YEARLY_ONLY') effectiveIsYearly = true;
             const actualPeriod = effectiveIsYearly ? 'YEARLY' : 'MONTHLY';
 
-            // Paid plan -> Redirect to Payment Gateway
             const rawPrice = actualPeriod === 'MONTHLY' ? selectedPlan.monthlyPrice : selectedPlan.yearlyPrice;
             const priceStr = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(rawPrice);
             const durationStr = actualPeriod === 'MONTHLY' ? '/ mois' : '/ an';
@@ -103,87 +96,86 @@ const SelectPlan: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="w-10 h-10 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin"></div>
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
 
     if (!institution) {
         return (
-            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
                 <AlertCircle size={48} className="text-red-500 mb-4" />
-                <h2 className="text-2xl font-black text-slate-800 mb-2">Établissement introuvable</h2>
-                <p className="text-slate-500 mb-6">Nous n'avons pas pu charger les informations de l'établissement.</p>
-                <button onClick={() => navigate(-1)} className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold">Retour</button>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Établissement introuvable</h2>
+                <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">Nous n'avons pas pu charger les informations de l'établissement.</p>
+                <button onClick={() => navigate(-1)} className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-xs">Retour</button>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-20">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             {/* Header */}
-            <div className="bg-white border-b border-slate-200 shadow-sm mb-8">
+            <div className="bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 shadow-sm mb-8">
                 <div className="max-w-6xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
-                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold transition-colors">
-                        <ChevronLeft size={20} />
+                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-bold text-xs transition-colors">
+                        <ChevronLeft size={18} />
                         Retour
                     </button>
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center text-slate-400">
+                        <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden flex items-center justify-center text-slate-400">
                             {institution.logoUrl ? <img src={getFileUrl(institution.logoUrl)} alt="Logo" className="w-full h-full object-cover" /> : <Building size={20} />}
                         </div>
                         <div className="text-right hidden sm:block">
-                            <p className="text-xs font-black uppercase text-slate-400 tracking-wider">Abonnement pour</p>
-                            <h2 className="font-bold text-slate-800 text-sm leading-tight">{institution.name}</h2>
+                            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Abonnement pour</p>
+                            <h2 className="font-bold text-slate-900 dark:text-white text-xs leading-tight">{institution.name}</h2>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 md:px-8 mt-12">
-                <div className="text-center max-w-2xl mx-auto mb-16">
-                    <Crown size={48} className="mx-auto text-indigo-600 mb-6" />
-                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
+            <div className="max-w-7xl mx-auto px-4 md:px-8">
+                <div className="text-center max-w-2xl mx-auto mb-10">
+                    <Crown size={40} className="mx-auto text-blue-600 dark:text-blue-400 mb-4" />
+                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-3">
                         {institution.subscriptionType === 'NONE' ? 'Choisissez votre plan initial' : 'Renouvelez votre abonnement'}
                     </h1>
-                    <p className="text-lg text-slate-500 font-medium">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
                         {institution.subscriptionType === 'NONE'
                             ? 'Choisissez le forfait qui correspond à vos ambitions pour commencer à utiliser la plateforme.'
                             : 'Sélectionnez un forfait pour continuer à utiliser toutes nos fonctionnalités.'}
                     </p>
                 </div>
 
-                {/* Billing Toggle (Hide if only free trial is selected/available or if all plans have forced periods) */}
                 {plans.some(plan => plan.type !== 'FREE_TRIAL' && (plan.billingOptions === 'BOTH' || plan.billingOptions == null)) && (
-                    <div className="flex justify-center mb-12">
-                        <div className="bg-slate-200/50 p-1.5 rounded-2xl flex items-center shadow-inner border border-slate-200">
+                    <div className="flex justify-center mb-10">
+                        <div className="bg-slate-200/60 dark:bg-slate-900 p-1.5 rounded-2xl flex items-center border border-slate-200/80 dark:border-slate-800">
                             <button
                                 onClick={() => setSelectedPeriod('MONTHLY')}
-                                className={`px-8 py-3 rounded-xl font-black text-sm transition-all ${selectedPeriod === 'MONTHLY' ? 'bg-white text-slate-800 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
+                                className={`px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${selectedPeriod === 'MONTHLY' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
                             >
                                 Facturation Mensuelle
                             </button>
                             <button
                                 onClick={() => setSelectedPeriod('YEARLY')}
-                                className={`px-8 py-3 rounded-xl font-black text-sm transition-all flex items-center gap-2 ${selectedPeriod === 'YEARLY' ? 'bg-white text-slate-800 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
+                                className={`px-6 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 ${selectedPeriod === 'YEARLY' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`}
                             >
                                 Facturation Annuelle
-                                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-600 text-[10px] font-black rounded-lg uppercase tracking-wider">-10%</span>
+                                <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[9px] font-bold rounded-md uppercase">-10%</span>
                             </button>
                         </div>
                     </div>
                 )}
 
                 {error && (
-                    <div className="mb-8 p-4 bg-red-50 text-red-600 rounded-xl font-bold border border-red-100 flex items-center gap-3">
-                        <AlertCircle size={20} />
+                    <div className="mb-8 p-4 bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 rounded-xl font-bold border border-red-200 dark:border-red-800 text-xs flex items-center gap-2">
+                        <AlertCircle size={18} />
                         {error}
                     </div>
                 )}
 
                 {/* Plan Cards */}
-                <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto">
+                <div className="flex flex-wrap justify-center gap-6 max-w-7xl mx-auto">
                     {plans.map((plan) => {
                         const isSelected = selectedPlan?.id === plan.id;
                         const isFree = plan.type === 'FREE_TRIAL';
@@ -221,24 +213,24 @@ const SelectPlan: React.FC = () => {
                 </div>
 
                 {/* Footer Action */}
-                <div className="mt-12 text-center">
+                <div className="mt-10 text-center">
                     <button
                         onClick={handleConfirm}
                         disabled={!selectedPlan || isSubmitting}
-                        className={`inline-flex items-center gap-3 px-12 py-5 rounded-2xl font-black text-lg transition-all ${!selectedPlan || isSubmitting
-                            ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                            : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:-translate-y-1'
+                        className={`inline-flex items-center gap-2 px-10 py-4 rounded-xl font-bold text-sm transition-all ${!selectedPlan || isSubmitting
+                            ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95'
                             }`}
                     >
                         {isSubmitting ? (
-                            <><RefreshCw size={24} className="animate-spin" /> Activation en cours...</>
+                            <><RefreshCw size={20} className="animate-spin" /> Activation en cours...</>
                         ) : selectedPlan?.type === 'FREE_TRIAL' ? (
-                            <>Activer l'essai gratuit <ArrowRight size={24} /></>
+                            <>Activer l'essai gratuit <ArrowRight size={20} /></>
                         ) : (
-                            <>Continuer vers le paiement <ArrowRight size={24} /></>
+                            <>Continuer vers le paiement <ArrowRight size={20} /></>
                         )}
                     </button>
-                    <p className="text-slate-400 text-sm mt-4 font-medium">Paiement sécurisé. Aucun engagement à long terme.</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-3 font-medium">Paiement sécurisé. Aucun engagement à long terme.</p>
                 </div>
             </div>
         </div>

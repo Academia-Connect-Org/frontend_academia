@@ -79,13 +79,14 @@ export const MessagesProvider: React.FC<{ role: string, children: React.ReactNod
 
     const [searchParams] = useSearchParams();
     const contactId = searchParams.get('contactId');
+    const institutionId = searchParams.get('institutionId');
     const prefill = searchParams.get('prefill');
 
     useEffect(() => {
-        if (prefill && selectedRoom) {
+        if (prefill) {
             setNewMessage(decodeURIComponent(prefill));
         }
-    }, [prefill, !!selectedRoom]);
+    }, [prefill]);
 
     useEffect(() => {
         if (user?.id) {
@@ -101,22 +102,37 @@ export const MessagesProvider: React.FC<{ role: string, children: React.ReactNod
     }, [user?.id]);
 
     useEffect(() => {
-        if (contactId && user?.id && rooms.length > 0 && !selectedRoom) {
+        if ((contactId || institutionId) && user?.id) {
             const autoStart = async () => {
                 try {
-                    const res = await api.post(`chat/rooms/private?u1=${user.id}&u2=${contactId}`);
-                    const room = res.data;
-                    if (!rooms.some(r => r.id === room.id)) {
-                        setRooms(prev => [room, ...prev]);
+                    let targetUserId = contactId;
+                    if (!targetUserId && institutionId) {
+                        const staffRes = await api.get(`/institutions/${institutionId}/staff`);
+                        const staffList = staffRes.data || [];
+                        let secretariatUser = staffList.find((u: any) => u.role === 'SECRETARIAT' || u.role === 'SECRETARY');
+                        if (!secretariatUser) {
+                            secretariatUser = staffList.find((u: any) => u.role === 'DIRECTION' || u.role === 'PROVISORIAT' || u.role === 'ADMIN');
+                        }
+                        if (!secretariatUser && staffList.length > 0) {
+                            secretariatUser = staffList[0];
+                        }
+                        if (secretariatUser) {
+                            targetUserId = secretariatUser.id;
+                        }
                     }
-                    setSelectedRoom(room);
+                    if (targetUserId) {
+                        const res = await api.post(`chat/rooms/private?u1=${user.id}&u2=${targetUserId}`);
+                        const room = res.data;
+                        setRooms(prev => rooms.some(r => r.id === room.id) ? prev : [room, ...prev]);
+                        setSelectedRoom(room);
+                    }
                 } catch (err) {
                     console.error("Auto-start chat error:", err);
                 }
             };
             autoStart();
         }
-    }, [contactId, user?.id, rooms.length, !!selectedRoom]);
+    }, [contactId, institutionId, user?.id]);
 
     useEffect(() => {
         if (selectedRoom?.id && user?.id) {

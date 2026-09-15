@@ -62,7 +62,7 @@ const Schools: React.FC = () => {
         if (!user?.id) return;
         try {
             const res = await api.get(`/institutions/ceo/${user.id}`);
-            setInstitutions(res.data);
+            setInstitutions(res.data || []);
         } catch (err) {
             console.error(err);
         } finally {
@@ -138,12 +138,7 @@ const Schools: React.FC = () => {
                 formDataToSubmit.append('logo', logoFile);
             }
 
-            let res;
-            if (editingId) {
-                res = await api.post('/institutions/create-with-logo', formDataToSubmit);
-            } else {
-                res = await api.post('/institutions/create-with-logo', formDataToSubmit);
-            }
+            let res = await api.post('/institutions/create-with-logo', formDataToSubmit);
 
             closeModal();
             fetchInstitutions();
@@ -179,94 +174,94 @@ const Schools: React.FC = () => {
     };
 
     return (
-        <>
+        <div className="space-y-8">
             {/* Action Bar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Gestion du Réseau</h2>
-                    <p className="text-slate-500 font-medium">Supervisez et gérez tous vos établissements scolaires</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Gestion du Réseau</h2>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Supervisez et gérez tous vos établissements scolaires</p>
                 </div>
-                <div className="flex gap-3">
-                    <button
-                        onClick={() => { setEditingId(null); setShowModal(true); }}
-                        className="bg-blue-600 text-white px-8 py-4 ] font-black flex items-center gap-3 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all"
-                    >
-                        <Plus size={20} />
-                        Nouvel Établissement
-                    </button>
-                </div>
+                <button
+                    onClick={() => { setEditingId(null); setShowModal(true); }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 sm:py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all"
+                >
+                    <Plus size={18} />
+                    Nouvel Établissement
+                </button>
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-12 h-12     animate-spin mb-4"></div>
-                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Récupération du réseau...</p>
+                <div className="flex flex-col items-center justify-center py-16">
+                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3" />
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Récupération du réseau...</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {institutions.map((school) => (
-                        <div key={school.id} className="bg-white ] overflow-hidden   shadow-xl shadow-slate-200/40 group hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-500">
-                            <div className="flex flex-col md:flex-row">
-                                <div className="md:w-1/3 h-48 md:h-auto relative overflow-hidden bg-slate-50 flex items-center justify-center">
+                        <div key={school.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group">
+                            <div className="flex flex-col sm:flex-row">
+                                <div className="sm:w-1/3 h-44 sm:h-auto relative overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                                     {school.logoUrl ? (
-                                        <img src={getFileUrl(school.logoUrl)} alt={school.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                        <img src={getFileUrl(school.logoUrl)} alt={school.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                     ) : (
-                                        <SchoolIcon size={48} className="text-slate-200" />
+                                        <SchoolIcon size={40} className="text-slate-400 dark:text-slate-600" />
                                     )}
-                                    <div className="absolute top-4 left-4">
-                                        <span className={`px-4 py-1.5  text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-lg ${school.active ? 'bg-emerald-500/90 text-white' : 'bg-amber-500/90 text-white'}`}>
+                                    <div className="absolute top-3 left-3">
+                                        <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider shadow-md backdrop-blur-md ${school.active ? 'bg-emerald-500/90 text-white' : 'bg-amber-500/90 text-white'}`}>
                                             {school.active ? 'Actif' : 'En attente'}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="p-8 md:w-2/3">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div>
-                                            <p className="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-1">{school.type}</p>
-                                            <h3 className="text-xl font-black text-slate-800 leading-tight uppercase">{school.name}</h3>
+                                <div className="p-5 sm:p-6 sm:w-2/3 flex flex-col justify-between">
+                                    <div>
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div>
+                                                <p className="text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">{school.type}</p>
+                                                <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-snug">{school.name}</h3>
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <button
+                                                    onClick={() => handleEdit(school)}
+                                                    className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                                                    title="Modifier"
+                                                >
+                                                    <MoreVertical size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setDeletingId(school.id);
+                                                        setShowDeleteModal(true);
+                                                    }}
+                                                    className="text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                                                    title="Supprimer"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div className="flex gap-1">
-                                            <button
-                                                onClick={() => handleEdit(school)}
-                                                className="text-slate-300 hover:text-blue-600 transition-colors bg-slate-50 p-2 "
-                                                title="Modifier"
-                                            >
-                                                <MoreVertical size={20} />
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setDeletingId(school.id);
-                                                    setShowDeleteModal(true);
-                                                }}
-                                                className="text-slate-300 hover:text-red-500 transition-colors bg-slate-50 p-2 "
-                                                title="Supprimer"
-                                            >
-                                                <Trash2 size={20} />
-                                            </button>
+
+                                        <div className="space-y-2 mb-4 text-xs">
+                                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                                <MapPin size={14} className="text-slate-400 shrink-0" />
+                                                <span className="truncate">{school.address || 'Adresse non spécifiée'}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                                <Users size={14} className="text-slate-400 shrink-0" />
+                                                <span className="font-semibold">UAI: {school.uaiNumber || '---'}</span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3 mb-6">
-                                        <div className="flex items-center gap-3 text-slate-500">
-                                            <MapPin size={16} className="text-slate-400" />
-                                            <span className="text-sm font-medium">{school.address || 'Adresse non spécifiée'}</span>
-                                        </div>
-                                        <div className="flex items-center gap-3 text-slate-500">
-                                            <Users size={16} className="text-slate-400" />
-                                            <span className="text-sm font-bold text-slate-700">UAI: {school.uaiNumber || '---'}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="pt-6   flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10  bg-slate-100 flex items-center justify-center font-black text-xs text-slate-400 uppercase tracking-tighter overflow-hidden">
+                                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                        <div className="flex items-center gap-2.5 overflow-hidden">
+                                            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-600 dark:text-slate-300 uppercase shrink-0">
                                                 {school.email?.[0] || school.name?.[0]}
                                             </div>
-                                            <div>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase">Contact</p>
-                                                <p className="text-sm font-bold text-slate-700">{school.phone || school.email}</p>
+                                            <div className="overflow-hidden">
+                                                <p className="text-[9px] font-semibold text-slate-400 uppercase">Contact</p>
+                                                <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{school.phone || school.email}</p>
                                             </div>
                                         </div>
                                         <button
@@ -277,13 +272,13 @@ const Schools: React.FC = () => {
                                                     navigate(ROUTES.DASHBOARD.PDG.SCHOOL_DETAILS.replace(':id', school.id.toString()));
                                                 }
                                             }}
-                                            className={`px-6 py-2.5 font-black text-sm transition-all duration-300 shadow-sm flex items-center gap-2 ${
+                                            className={`px-4 py-2 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 shrink-0 ${
                                                 school.subscriptionType === 'NONE' || !school.active
-                                                    ? 'bg-amber-50 text-amber-600 hover:bg-amber-100 shadow-amber-500/10'
-                                                    : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-blue-500/10'
+                                                    ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 hover:bg-amber-100'
+                                                    : 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white'
                                             }`}
                                         >
-                                            {school.subscriptionType === 'NONE' || !school.active ? 'Activer' : 'Gérer'} <ChevronRight size={18} />
+                                            {school.subscriptionType === 'NONE' || !school.active ? 'Activer' : 'Gérer'} <ChevronRight size={16} />
                                         </button>
                                     </div>
                                 </div>
@@ -291,13 +286,13 @@ const Schools: React.FC = () => {
                         </div>
                     ))}
                     {institutions.length === 0 && (
-                        <div className="col-span-full py-20 bg-slate-50 ]    flex flex-col items-center justify-center text-center">
-                            <SchoolIcon size={64} className="text-slate-200 mb-6" />
-                            <h3 className="text-xl font-black text-slate-400 mb-2">Aucun établissement enregistré</h3>
-                            <p className="text-slate-400 font-medium mb-8">Commencez par ajouter votre première école ou établissement.</p>
+                        <div className="col-span-full py-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 flex flex-col items-center justify-center text-center p-6">
+                            <SchoolIcon size={48} className="text-slate-300 dark:text-slate-700 mb-4" />
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-1">Aucun établissement enregistré</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 max-w-sm">Commencez par ajouter votre premier établissement scolaire au réseau.</p>
                             <button
                                 onClick={() => setShowModal(true)}
-                                className="bg-white text-blue-600 px-8 py-3  font-black   shadow-lg hover:bg-blue-50 transition-all"
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all"
                             >
                                 Ajouter maintenant
                             </button>
@@ -308,98 +303,105 @@ const Schools: React.FC = () => {
 
             {/* Creation Modal */}
             {showModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-xl bg-slate-900/40 animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-2xl ] shadow-2xl overflow-hidden relative   animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
-                        <div className="p-8   bg-slate-50/10">
-                            <div className="flex justify-between items-center">
-                                <div className="flex gap-4 items-center">
-                                    <div className="w-12 h-12  bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20">
-                                        <SchoolIcon size={24} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-2xl font-black text-slate-800 tracking-tight">
-                                            {editingId ? 'Modifier l\'Établissement' : 'Nouvel Établissement'}
-                                        </h3>
-                                        <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest leading-none mt-1">
-                                            {editingId ? 'Mise à jour des données' : 'Configuration initiale'}
-                                        </p>
-                                    </div>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 backdrop-blur-md bg-slate-950/50 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh]">
+                        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md">
+                                    <SchoolIcon size={20} />
                                 </div>
-                                <button onClick={closeModal} className="p-3 bg-white text-slate-400  hover:text-red-500   shadow-sm transition-all hover:scale-105">
-                                    <X size={20} />
-                                </button>
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                                        {editingId ? 'Modifier l\'Établissement' : 'Nouvel Établissement'}
+                                    </h3>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {editingId ? 'Mise à jour des informations' : 'Configuration initiale'}
+                                    </p>
+                                </div>
                             </div>
+                            <button onClick={closeModal} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <X size={18} />
+                            </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto custom-scrollbar">
-                            <form id="schoolForm" onSubmit={handleSubmit} className="p-10 pb-32 space-y-10">
-                                {/* Group: Identity */}
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-px bg-slate-100 flex-1"></div>
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Identité & Type</span>
-                                        <div className="h-px bg-slate-100 flex-1"></div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Nom de l'établissement</label>
-                                        <input
-                                            required
-                                            type="text"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700"
-                                            placeholder="Ex: Groupe Scolaire Excellence"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Type d'entité</label>
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                            <form id="schoolForm" onSubmit={handleSubmit} className="space-y-5">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Nom de l'établissement</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="Ex: Groupe Scolaire Excellence"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Type d'entité</label>
                                         <select
                                             value={formData.type}
                                             onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700"
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                         >
                                             <option value="ECOLE">École</option>
                                             <option value="ETABLISSEMENT">Établissement</option>
                                         </select>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Numéro UAI (Optionnel)</label>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Numéro UAI (Optionnel)</label>
                                         <input
                                             type="text"
                                             value={formData.uaiNumber}
                                             onChange={(e) => setFormData({ ...formData, uaiNumber: e.target.value })}
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700"
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                             placeholder="Ex: 0751234A"
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Téléphone</label>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Téléphone</label>
                                         <input
                                             required
                                             type="tel"
                                             value={formData.phone}
                                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700"
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                             placeholder="+225 0102030405"
                                         />
                                     </div>
-                                    <div className="md:col-span-2 space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Adresse Géographique</label>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Email professionnel</label>
                                         <input
                                             required
-                                            type="text"
-                                            value={formData.address}
-                                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700"
-                                            placeholder="Ex: Toukra, N'Djaména, Tchad"
+                                            type="email"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
+                                            placeholder="contact@nom-etablissement.com"
                                         />
                                     </div>
-                                    <div className="md:col-span-2 space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Pays</label>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Adresse Géographique</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        value={formData.address}
+                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="Ex: Toukra, N'Djaména, Tchad"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Pays</label>
                                         <select
                                             value={formData.country}
                                             onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700"
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                         >
                                             <option value="">Sélectionnez un pays</option>
                                             {COUNTRIES.map(c => (
@@ -407,88 +409,76 @@ const Schools: React.FC = () => {
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Devise</label>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Devise / Devise</label>
                                         <input
                                             type="text"
                                             value={formData.motto}
                                             onChange={(e) => setFormData({ ...formData, motto: e.target.value })}
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700"
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                             placeholder="Ex: Unité - Travail - Progrès"
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Ministère de Tutelle</label>
-                                        <input
-                                            type="text"
-                                            value={formData.ministry}
-                                            onChange={(e) => setFormData({ ...formData, ministry: e.target.value })}
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700"
-                                            placeholder="Ex: Ministère de l'Éducation Nationale..."
-                                        />
-                                    </div>
-                                    <div className="md:col-span-2 space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Description de l'établissement</label>
-                                        <textarea
-                                            value={formData.description}
-                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            rows={5}
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-bold text-slate-700 whitespace-pre-wrap"
-                                            placeholder="Ex: Une description détaillée de votre école..."
-                                        />
-                                    </div>
-                                    <div className="md:col-span-2 space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Logo de l'établissement</label>
-                                        <div className="flex items-center gap-6 p-6 bg-slate-50 ]    hover: transition-all group/upload relative overflow-hidden">
-                                            {logoPreview ? (
-                                                <div className="relative w-24 h-24  overflow-hidden shadow-lg">
-                                                    <img src={logoPreview} alt="Preview" className="w-full h-full object-cover" />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => { setLogoFile(null); setLogoPreview(null); }}
-                                                        className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-all text-white"
-                                                    >
-                                                        <X size={20} />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <div className="w-24 h-24  bg-white   flex items-center justify-center text-slate-300">
-                                                    <Upload size={32} />
-                                                </div>
-                                            )}
-                                            <div className="flex-1">
-                                                <p className="text-sm font-black text-slate-700 mb-1">Télécharger le logo</p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">PNG, JPG, WEBP (Max 10MB)</p>
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleLogoChange}
-                                                    className="absolute inset-0 opacity-0 cursor-pointer"
-                                                />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Ministère de Tutelle</label>
+                                    <input
+                                        type="text"
+                                        value={formData.ministry}
+                                        onChange={(e) => setFormData({ ...formData, ministry: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="Ex: Ministère de l'Éducation Nationale..."
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Description de l'établissement</label>
+                                    <textarea
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        rows={3}
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="Ex: Une description détaillée de votre école..."
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Logo de l'établissement</label>
+                                    <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl relative overflow-hidden">
+                                        {logoPreview ? (
+                                            <div className="relative w-16 h-16 rounded-lg overflow-hidden shadow-sm shrink-0">
+                                                <img src={logoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => { setLogoFile(null); setLogoPreview(null); }}
+                                                    className="absolute inset-0 bg-black/50 flex items-center justify-center text-white opacity-0 hover:opacity-100 transition-opacity"
+                                                >
+                                                    <X size={16} />
+                                                </button>
                                             </div>
+                                        ) : (
+                                            <div className="w-12 h-12 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-400 shrink-0">
+                                                <Upload size={20} />
+                                            </div>
+                                        )}
+                                        <div className="flex-1">
+                                            <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Télécharger le logo</p>
+                                            <p className="text-[10px] text-slate-500 dark:text-slate-400">PNG, JPG, WEBP (Max 10MB)</p>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleLogoChange}
+                                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                            />
                                         </div>
-                                    </div>
-                                    <div className="md:col-span-2 space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Email de contact professionnel</label>
-                                        <input
-                                            required
-                                            type="email"
-                                            value={formData.email}
-                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            className="w-full bg-slate-50 border-none  px-6 py-4 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-extrabold text-slate-700 placeholder:text-slate-300"
-                                            placeholder="contact@nom-etablissement.com"
-                                        />
                                     </div>
                                 </div>
                             </form>
                         </div>
 
-                        {/* Sticky Footer explicitly outside local-scroll for safety, or styled inside */}
-                        <div className="p-8   bg-white/80 backdrop-blur-md flex gap-4 absolute bottom-0 left-0 right-0 z-10">
+                        <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 flex items-center justify-end gap-3">
                             <button
                                 type="button"
                                 onClick={closeModal}
-                                className="flex-1 py-4 ] font-black text-slate-400 hover:bg-slate-50 transition-all  "
+                                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
                             >
                                 Annuler
                             </button>
@@ -496,13 +486,12 @@ const Schools: React.FC = () => {
                                 type="submit"
                                 form="schoolForm"
                                 disabled={isSubmitting}
-                                className={`flex-[2] text-white py-4 font-black shadow-xl transition-all flex items-center justify-center gap-2 ${isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95'
-                                    }`}
+                                className={`px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-md transition-all flex items-center gap-2 ${isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                                        {editingId ? 'Mise à jour...' : 'Création en cours...'}
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Mise à jour...
                                     </>
                                 ) : (
                                     editingId ? 'Mettre à jour' : 'Confirmer la création'
@@ -512,32 +501,33 @@ const Schools: React.FC = () => {
                     </div>
                 </div>
             )}
-            {/* Delete Confirmation Modal */}
+
+            {/* Delete Modal */}
             {showDeleteModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-xl bg-slate-900/40 animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-md ] p-10 shadow-2xl text-center   animate-in zoom-in-95 duration-300">
-                        <div className="w-20 h-20 bg-red-50 text-red-500  flex items-center justify-center mx-auto mb-6">
-                            <Trash2 size={40} />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-slate-950/50 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md p-6 rounded-2xl shadow-2xl text-center">
+                        <div className="w-14 h-14 bg-red-50 dark:bg-red-950/50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <Trash2 size={28} />
                         </div>
-                        <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2">Supprimer l'établissement ?</h3>
-                        <p className="text-slate-500 font-medium mb-8 leading-relaxed">
-                            Cette action est irréversible. L'établissement et toutes ses données associées seront supprimés.
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Supprimer l'établissement ?</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                            Cette action est irréversible. L'établissement et ses données associées seront supprimés.
                         </p>
-                        <div className="flex gap-4">
+                        <div className="flex gap-3">
                             <button
                                 onClick={() => { setShowDeleteModal(false); setDeletingId(null); }}
-                                className="flex-1 py-4 ] font-black bg-slate-100 text-slate-400 hover:bg-slate-200 transition-all"
+                                className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 disabled={isDeleting}
                             >
                                 Annuler
                             </button>
                             <button
                                 onClick={handleDelete}
-                                className="flex-1 py-4 ] font-black bg-red-500 text-white shadow-xl shadow-red-500/20 hover:bg-red-600 transition-all flex items-center justify-center gap-2"
+                                className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-md transition-colors flex items-center justify-center gap-2"
                                 disabled={isDeleting}
                             >
                                 {isDeleting ? (
-                                    <div className="w-5 h-5     animate-spin"></div>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                 ) : (
                                     "Supprimer"
                                 )}
@@ -546,37 +536,27 @@ const Schools: React.FC = () => {
                     </div>
                 </div>
             )}
-            {/* Feedback Popup */}
+
+            {/* Feedback Toast */}
             <AnimatePresence>
                 {feedback && (
                     <motion.div
-                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        initial={{ opacity: 0, y: 50, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                        className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] min-w-[320px]"
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="fixed bottom-6 right-6 z-[200] max-w-sm"
                     >
-                        <div className={`p-6 ] shadow-2xl  flex items-center gap-4 backdrop-blur-xl ${feedback.type === 'success'
-                            ? 'bg-emerald-500/90  text-white'
-                            : 'bg-red-500/90  text-white'
-                            }`}>
-                            <div className="w-10 h-10  bg-white/20 flex items-center justify-center shrink-0">
-                                {feedback.type === 'success' ? <CheckCircle size={24} /> : <AlertCircle size={24} />}
-                            </div>
-                            <div className="flex-1">
-                                <p className="font-black text-xs uppercase tracking-widest opacity-70 mb-0.5">
-                                    {feedback.type === 'success' ? 'Succès' : 'Erreur'}
-                                </p>
-                                <p className="font-bold text-sm leading-tight">{feedback.message}</p>
-                            </div>
-                            <button onClick={() => setFeedback(null)} className="p-2 hover:bg-white/10  transition-colors">
-                                <X size={18} />
+                        <div className={`p-4 rounded-xl shadow-xl flex items-center gap-3 backdrop-blur-md ${feedback.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
+                            {feedback.type === 'success' ? <CheckCircle size={20} className="shrink-0" /> : <AlertCircle size={20} className="shrink-0" />}
+                            <p className="text-xs font-bold flex-1">{feedback.message}</p>
+                            <button onClick={() => setFeedback(null)} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
+                                <X size={16} />
                             </button>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-
-        </>
+        </div>
     );
 };
 

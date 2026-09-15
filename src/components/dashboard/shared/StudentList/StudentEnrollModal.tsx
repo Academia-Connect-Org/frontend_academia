@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, Key, Eye, EyeOff, Copy, Check, RefreshCw, Loader2 } from 'lucide-react';
 import api from '../../../../api/axios';
 
 interface StudentEnrollModalProps {
@@ -29,7 +29,6 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
 }) => {
     const [activeTab, setActiveTab] = useState<'info' | 'finance'>('info');
 
-    // Missing state for finance tab
     const [loadingInstallments, setLoadingInstallments] = useState(false);
     const [studentInstallments, setStudentInstallments] = useState<any[]>([]);
     const [payingInstallmentId, setPayingInstallmentId] = useState<number | null>(null);
@@ -37,6 +36,52 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
     const [paymentMode, setPaymentMode] = useState('ESPÈCES');
     const [isProcessingAction, setIsProcessingAction] = useState(false);
 
+    // Password modification state
+    const [newPasswordInput, setNewPasswordInput] = useState<string>('');
+    const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
+    const [savingPassword, setSavingPassword] = useState<boolean>(false);
+    const [passwordSuccessMsg, setPasswordSuccessMsg] = useState<string | null>(null);
+    const [passwordErrorMsg, setPasswordErrorMsg] = useState<string | null>(null);
+    const [copiedPassword, setCopiedPassword] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            setPasswordSuccessMsg(null);
+            setPasswordErrorMsg(null);
+            setNewPasswordInput('');
+        }
+    }, [isOpen]);
+
+    const handleUpdateStudentPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!studentId) return;
+        if (!newPasswordInput || newPasswordInput.trim().length < 4) {
+            setPasswordErrorMsg("Le mot de passe doit comporter au moins 4 caractères.");
+            return;
+        }
+        setPasswordErrorMsg(null);
+        setPasswordSuccessMsg(null);
+        setSavingPassword(true);
+        try {
+            await api.put(`/students/${studentId}/password`, { newPassword: newPasswordInput });
+            setPasswordSuccessMsg("Mot de passe mis à jour avec succès !");
+            setNewPasswordInput('');
+        } catch (err: any) {
+            setPasswordErrorMsg(err.response?.data?.message || err.response?.data || "Erreur lors de la modification du mot de passe.");
+        } finally {
+            setSavingPassword(false);
+        }
+    };
+
+    const generateRandomPassword = () => {
+        const chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        let pwd = "";
+        for (let i = 0; i < 8; i++) {
+            pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        setNewPasswordInput(pwd);
+        setShowNewPassword(true);
+    };
 
     const [dialogState, setDialogState] = useState<{
         isOpen: boolean;
@@ -58,7 +103,7 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
         setLoadingInstallments(true);
         try {
             const res = await api.get(`/finance/students/${studentId}/installments`);
-            setStudentInstallments(res.data);
+            setStudentInstallments(res.data || []);
         } catch (error) {
             console.error(error);
         } finally {
@@ -66,7 +111,6 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
         }
     };
 
-    // Simulate fetching installments when switching to finance tab or editing
     useEffect(() => {
         if (isEditing && activeTab === 'finance') {
             fetchInstallments();
@@ -101,7 +145,7 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
         try {
             setPayingInstallmentId(id);
             setIsProcessingAction(true);
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 1500));
             await api.post(`/finance/installments/${id}/pay`, null, {
                 params: { amount: amountToPay, paymentMethod: paymentMode }
             });
@@ -119,49 +163,52 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-7xl flex flex-col max-h-[95vh] shadow-2xl animate-in zoom-in-95 duration-200 relative overflow-hidden">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden relative">
                 {isProcessingAction && (
-                    <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-[200] flex flex-col items-center justify-center">
-                        <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4 shadow-lg shadow-indigo-600/20"></div>
-                        <p className="text-sm font-black text-slate-800 uppercase tracking-widest animate-pulse">Traitement en cours...</p>
+                    <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-md z-[200] flex flex-col items-center justify-center">
+                        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3" />
+                        <p className="text-xs font-bold text-white uppercase tracking-wider">Traitement en cours...</p>
                     </div>
                 )}
-                <div className="p-8 pb-4 shrink-0 border-b border-slate-100">
-                    <div className="flex justify-between items-center mb-6">
+                <div className="p-5 sm:p-6 shrink-0 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50">
+                    <div className="flex justify-between items-center mb-4">
                         <div>
-                            <h3 className="text-3xl font-black text-slate-800 tracking-tight">{isEditing ? "Mise à jour Dossier" : "Fiche d'Inscription"}</h3>
-                            <p className="text-slate-400 text-sm mt-1 font-medium italic">Les champs avec * sont recommandés pour le suivi administratif.</p>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{isEditing ? "Mise à jour Dossier" : "Fiche d'Inscription"}</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Les champs avec * sont recommandés pour le suivi administratif.</p>
                         </div>
-                        <button onClick={onClose} className="w-12 h-12 bg-slate-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition-all hover:bg-red-50"><X size={24} /></button>
+                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                            <X size={18} />
+                        </button>
                     </div>
 
                     {isEditing && (
-                        <div className="flex bg-slate-100 border-slate-200">
-                            <button onClick={() => setActiveTab('info')} className={`flex-1 py-3 text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'info' ? 'bg-white text-indigo-600 border-t-2 border-indigo-600' : 'text-slate-400 hover:bg-slate-50'}`}>Informations & Scolarité</button>
-                            <button onClick={() => setActiveTab('finance')} className={`flex-1 py-3 text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'finance' ? 'bg-white text-indigo-600 border-t-2 border-indigo-600' : 'text-slate-400 hover:bg-slate-50'}`}>Finances & Frais</button>
+                        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                            <button onClick={() => setActiveTab('info')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${activeTab === 'info' ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-400'}`}>Informations & Scolarité</button>
+                            <button onClick={() => setActiveTab('finance')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${activeTab === 'finance' ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-400'}`}>Finances & Frais</button>
                         </div>
                     )}
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
                     {activeTab === 'info' || !isEditing ? (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <SectionTitle title="État Civil de l'Élève" />
                                 <Input label="Prénom" value={formData.firstName} onChange={(v: string) => setFormData({ ...formData, firstName: v })} />
                                 <Input label="Nom de famille" value={formData.lastName} onChange={(v: string) => setFormData({ ...formData, lastName: v })} />
                                 <Input label="Email de l'élève (Si applicable)" type="email" placeholder="élève@école.com" value={formData.email} onChange={(v: string) => setFormData({ ...formData, email: v })} />
                                 <Input label="Matricule / ID École" placeholder="MAT-2024-XXX" value={formData.studentIdNumber} onChange={(v: string) => setFormData({ ...formData, studentIdNumber: v })} />
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Sexe</label>
-                                    <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Sexe</label>
+                                    <div className="grid grid-cols-2 gap-2">
                                         {['Masculin', 'Féminin'].map(g => (
                                             <button
                                                 key={g}
+                                                type="button"
                                                 onClick={() => setFormData({ ...formData, gender: g })}
-                                                className={`py-3.5 font-black text-xs transition-all ${formData.gender === g ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'bg-white text-slate-400 hover:'}`}
+                                                className={`py-2.5 rounded-xl font-bold text-xs transition-colors ${formData.gender === g ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                                             >
                                                 {g.toUpperCase()}
                                             </button>
@@ -169,15 +216,15 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
                                     </div>
                                 </div>
                                 <Input label="Date de Naissance" type="date" value={formData.birthDate} onChange={(v: string) => setFormData({ ...formData, birthDate: v })} />
-                                <div className="col-span-full">
+                                <div className="sm:col-span-2">
                                     <Input label="Adresse Résidentielle" placeholder="Quartier, Rue, Porte..." value={formData.address} onChange={(v: string) => setFormData({ ...formData, address: v })} />
                                 </div>
 
                                 <SectionTitle title="Parcours Scolaire" />
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Cycle d'affectation</label>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Cycle d'affectation</label>
                                     <select
-                                        className="w-full px-6 py-4 bg-slate-50 text-sm font-bold text-slate-700 outline-none appearance-none cursor-pointer focus:bg-white focus:"
+                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
                                         value={formData.cycleId}
                                         onChange={(e) => setFormData({ ...formData, cycleId: e.target.value, classeId: '' })}
                                     >
@@ -185,10 +232,10 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
                                         {cycles.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                                     </select>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Niveau / Classe précis</label>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Niveau / Classe précis</label>
                                     <select
-                                        className="w-full px-6 py-4 bg-slate-50 text-sm font-bold text-slate-700 outline-none appearance-none cursor-pointer focus:bg-white focus: disabled:opacity-50"
+                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50"
                                         value={formData.classeId}
                                         disabled={!formData.cycleId}
                                         onChange={(e) => setFormData({ ...formData, classeId: e.target.value })}
@@ -198,132 +245,183 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
                                     </select>
                                 </div>
 
-                                <SectionTitle title="Contacts Parents (Optionnels - Recommandés)" />
-                                <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50/50 p-6">
-                                    <div className="space-y-4">
-                                        <h5 className="flex items-center gap-2 text-[10px] font-black text-rose-500 uppercase tracking-[0.2em] mb-4">
-                                            <span className="w-1.5 h-1.5 bg-rose-500"></span> Dossier Mère
-                                        </h5>
+                                <SectionTitle title="Contacts Parents (Optionnels)" />
+                                <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700">
+                                    <div className="space-y-3">
+                                        <h5 className="text-xs font-bold text-pink-600 dark:text-pink-400 uppercase tracking-wider">Dossier Mère</h5>
                                         <Input label="Prénom" value={formData.motherFirstName} onChange={(v: string) => setFormData({ ...formData, motherFirstName: v })} />
                                         <Input label="Nom" value={formData.motherLastName} onChange={(v: string) => setFormData({ ...formData, motherLastName: v })} />
                                         <Input label="Email *" type="email" placeholder="mère@email.com" value={formData.motherEmail} onChange={(v: string) => setFormData({ ...formData, motherEmail: v })} />
                                         <Input label="Téléphone *" placeholder="+235 ..." value={formData.motherPhone} onChange={(v: string) => setFormData({ ...formData, motherPhone: v })} />
                                     </div>
-                                    <div className="space-y-4 pl-8">
-                                        <h5 className="flex items-center gap-2 text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-4">
-                                            <span className="w-1.5 h-1.5 bg-blue-500"></span> Dossier Père
-                                        </h5>
+                                    <div className="space-y-3">
+                                        <h5 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Dossier Père</h5>
                                         <Input label="Prénom" value={formData.fatherFirstName} onChange={(v: string) => setFormData({ ...formData, fatherFirstName: v })} />
                                         <Input label="Nom" value={formData.fatherLastName} onChange={(v: string) => setFormData({ ...formData, fatherLastName: v })} />
                                         <Input label="Email *" type="email" placeholder="père@email.com" value={formData.fatherEmail} onChange={(v: string) => setFormData({ ...formData, fatherEmail: v })} />
                                         <Input label="Téléphone *" placeholder="+235 ..." value={formData.fatherPhone} onChange={(v: string) => setFormData({ ...formData, fatherPhone: v })} />
                                     </div>
                                 </div>
+
+                                {isEditing && studentId && (
+                                    <>
+                                        <SectionTitle title="Accès & Sécurité Élève" />
+                                        <div className="sm:col-span-2">
+                                            <div className="p-4 bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-slate-50 dark:from-slate-900 dark:via-slate-850 dark:to-indigo-950/40 rounded-2xl border border-blue-200/80 dark:border-blue-900/60 shadow-sm space-y-3">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                                                        <Key size={16} />
+                                                        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                                                            Modifier le Mot de Passe Élève
+                                                        </span>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={generateRandomPassword}
+                                                        className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-1 rounded-xl border border-indigo-200/60 dark:border-indigo-800/60 transition-all cursor-pointer"
+                                                        title="Générer un mot de passe aléatoire sécurisé"
+                                                    >
+                                                        <RefreshCw size={12} /> Auto-générer
+                                                    </button>
+                                                </div>
+
+                                                {passwordSuccessMsg && (
+                                                    <div className="p-2.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-bold rounded-xl flex items-center justify-between gap-1.5 border border-emerald-200 dark:border-emerald-800">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <CheckCircle2 size={14} /> {passwordSuccessMsg}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {passwordErrorMsg && (
+                                                    <div className="p-2.5 bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 text-xs font-bold rounded-xl flex items-center gap-1.5 border border-red-200 dark:border-red-800">
+                                                        <AlertCircle size={14} /> {passwordErrorMsg}
+                                                    </div>
+                                                )}
+
+                                                <div className="flex items-center gap-2">
+                                                    <div className="relative flex-1">
+                                                        <input
+                                                            type={showNewPassword ? "text" : "password"}
+                                                            placeholder="Saisir un nouveau mot de passe..."
+                                                            value={newPasswordInput}
+                                                            onChange={(e) => setNewPasswordInput(e.target.value)}
+                                                            className="w-full bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl px-3.5 py-2.5 pr-16 text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white"
+                                                        />
+                                                        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                                            {newPasswordInput && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        navigator.clipboard.writeText(newPasswordInput);
+                                                                        setCopiedPassword(true);
+                                                                        setTimeout(() => setCopiedPassword(false), 2000);
+                                                                    }}
+                                                                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+                                                                    title="Copier le mot de passe"
+                                                                >
+                                                                    {copiedPassword ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+                                                                </button>
+                                                            )}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+                                                            >
+                                                                {showNewPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleUpdateStudentPassword}
+                                                        disabled={savingPassword || !newPasswordInput}
+                                                        className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md transition-all disabled:opacity-50 flex items-center gap-1.5 shrink-0 cursor-pointer"
+                                                    >
+                                                        {savingPassword ? <Loader2 size={14} className="animate-spin" /> : <Key size={14} />}
+                                                        Changer le mot de passe
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
-                            <div className="mt-8 flex gap-4">
-                                <button onClick={onClose} className="flex-1 py-5 font-bold bg-slate-50 text-slate-500 hover:bg-slate-100 transition-all">Abandonner</button>
+                            <div className="pt-4 flex gap-3">
+                                <button onClick={onClose} className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Abandonner</button>
                                 <button
                                     onClick={handleCreateOrUpdate}
                                     disabled={loading || !formData.firstName || !formData.lastName || !formData.classeId}
-                                    className="flex-[2] py-5 bg-indigo-600 text-white font-black shadow-2xl shadow-indigo-600/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 tracking-tight"
+                                    className="flex-[2] py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all disabled:opacity-50"
                                 >
-                                    {loading ? 'Enregistrement en cours...' : isEditing ? 'Appliquer les modifications' : 'Finaliser l\'inscription'}
+                                    {loading ? 'Enregistrement...' : isEditing ? 'Appliquer les modifications' : 'Finaliser l\'inscription'}
                                 </button>
                             </div>
                         </>
                     ) : (
-                        <div className="bg-slate-50/20 rounded-xl">
+                        <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700">
                             {loadingInstallments ? (
-                                <div className="py-20 text-center animate-pulse">
-                                    <div className="w-12 h-12 bg-indigo-100 mx-auto mb-4 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
-                                    <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Chargement des données financières...</p>
+                                <div className="py-16 text-center">
+                                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                                    <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-xs">Chargement des données financières...</p>
                                 </div>
                             ) : studentInstallments.length === 0 ? (
-                                <div className="py-20 text-center">
-                                    <AlertCircle size={48} className="mx-auto text-slate-300 mb-4 stroke-[1]" />
-                                    <p className="text-slate-400 font-black uppercase text-xs tracking-widest">Aucune donnée financière</p>
-                                    <p className="text-slate-400 text-sm mt-2 mb-6">L'élève n'est lié à aucun plan de paiement.</p>
+                                <div className="py-16 text-center">
+                                    <AlertCircle size={40} className="mx-auto text-slate-300 dark:text-slate-700 mb-3" />
+                                    <p className="text-slate-800 dark:text-white font-bold text-sm">Aucune donnée financière</p>
+                                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 mb-4">L'élève n'est lié à aucun plan de paiement.</p>
                                     <button
                                         onClick={handleGenerateInstallments}
-                                        className="bg-indigo-600 text-white px-6 py-2 rounded-full font-bold shadow-lg shadow-indigo-600/30 hover:scale-105 transition-all text-sm"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all"
                                     >
                                         Générer les tranches
                                     </button>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {studentInstallments.map((inst: any) => {
                                         const feeName = inst.feeType?.name || 'Autres';
-                                        const isEnrollmentFee = feeName.toLowerCase().includes('inscription');
                                         const remaining = inst.dueAmount - inst.paidAmount;
                                         const isFullyPaid = remaining <= 0;
                                         const progress = Math.min(100, Math.max(0, (inst.paidAmount / inst.dueAmount) * 100)) || 0;
 
                                         return (
-                                            <div key={inst.id} className="bg-white p-6 shadow-sm border border-slate-100 flex flex-col gap-4 relative overflow-hidden group">
-                                                {isFullyPaid && (
-                                                    <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12 pointer-events-none">
-                                                        <CheckCircle2 size={80} className="text-emerald-500" />
-                                                    </div>
-                                                )}
-                                                <div className="flex justify-between items-start z-10">
+                                            <div key={inst.id} className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col gap-3">
+                                                <div className="flex justify-between items-start">
                                                     <div>
-                                                        <div className="flex items-center gap-3 mb-1">
-                                                            <h5 className="font-black text-slate-800 uppercase tracking-tight text-lg">{feeName}</h5>
-                                                            {isEnrollmentFee && <span className="bg-amber-100 text-amber-700 text-[9px] font-black uppercase px-2 py-0.5 tracking-widest">Frais unique</span>}
-                                                        </div>
-                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                            Échéance : {new Date(inst.dueDate).toLocaleDateString('fr-FR')}
+                                                        <h5 className="font-bold text-slate-900 dark:text-white text-sm">{feeName}</h5>
+                                                        <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                                                            Échéance : {inst.dueDate ? new Date(inst.dueDate).toLocaleDateString('fr-FR') : '—'}
                                                         </p>
                                                     </div>
                                                     <div className="text-right">
-                                                        <p className="text-2xl font-black text-slate-800 tracking-tighter">{inst.dueAmount.toLocaleString()} <span className="text-sm text-slate-400">FCFA</span></p>
-                                                        <p className={`text-[10px] font-black uppercase tracking-widest ${isFullyPaid ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                                            {isFullyPaid ? 'Soldé' : `Reste : ${remaining.toLocaleString()} FCFA`}
+                                                        <p className="text-base font-black text-slate-900 dark:text-white">{(inst.dueAmount || 0).toLocaleString()} <span className="text-xs font-normal text-slate-400">FCFA</span></p>
+                                                        <p className={`text-[10px] font-bold uppercase tracking-wider ${isFullyPaid ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
+                                                            {isFullyPaid ? 'Soldé' : `Reste : ${(remaining || 0).toLocaleString()} FCFA`}
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="z-10">
-                                                    <div className="w-full bg-slate-100 h-2 mt-2 overflow-hidden">
-                                                        <div className={`h-full transition-all duration-1000 ${isFullyPaid ? 'bg-emerald-500' : 'bg-indigo-600'}`} style={{ width: `${progress}%` }}></div>
-                                                    </div>
+                                                <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                                    <div className={`h-full rounded-full transition-all duration-700 ${isFullyPaid ? 'bg-emerald-500' : 'bg-blue-600'}`} style={{ width: `${progress}%` }} />
                                                 </div>
 
-                                                {!isFullyPaid && !isEnrollmentFee && (
-                                                    <div className="pt-4 mt-2 border-t border-slate-100 z-10">
+                                                {!isFullyPaid && (
+                                                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                                                         {payingInstallmentId === inst.id ? (
-                                                            <div className="bg-slate-50 p-4 flex flex-col gap-4 animate-in fade-in zoom-in-95">
-                                                                <div className="flex gap-4">
-                                                                    <div className="flex-1 space-y-1.5">
-                                                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Montant à encaisser (Max {remaining})</label>
-                                                                        <input
-                                                                            type="number"
-                                                                            value={paymentAmount}
-                                                                            onChange={(e) => setPaymentAmount(e.target.value)}
-                                                                            className="w-full px-4 py-3 bg-white text-sm font-bold text-slate-700 outline-none border border-slate-200 focus:border-indigo-500"
-                                                                            placeholder={remaining.toString()}
-                                                                            max={remaining}
-                                                                        />
-                                                                    </div>
-                                                                    <div className="flex-1 space-y-1.5">
-                                                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mode de paiement</label>
-                                                                        <select
-                                                                            value={paymentMode}
-                                                                            onChange={(e) => setPaymentMode(e.target.value)}
-                                                                            className="w-full px-4 py-3 bg-white text-sm font-bold text-slate-700 outline-none border border-slate-200 focus:border-indigo-500 appearance-none"
-                                                                        >
-                                                                            <option value="ESPÈCES">Espèces</option>
-                                                                            <option value="VIREMENT">Virement Bancaire</option>
-                                                                            <option value="CHÈQUE">Chèque</option>
-                                                                            <option value="MOBILE_MONEY">Mobile Money</option>
-                                                                        </select>
-                                                                    </div>
-                                                                </div>
+                                                            <div className="flex flex-col gap-2">
+                                                                <input
+                                                                    type="number"
+                                                                    value={paymentAmount}
+                                                                    onChange={(e) => setPaymentAmount(e.target.value)}
+                                                                    className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                                                    placeholder={remaining.toString()}
+                                                                />
                                                                 <div className="flex gap-2">
-                                                                    <button onClick={() => setPayingInstallmentId(null)} className="flex-1 py-3 text-xs font-bold text-slate-500 hover:bg-slate-200 transition-all">Annuler</button>
-                                                                    <button onClick={() => handlePayInstallment(inst.id, inst.dueAmount, inst.paidAmount)} className="flex-[2] py-3 text-xs font-black bg-indigo-600 text-white uppercase tracking-widest shadow-lg shadow-indigo-600/30 hover:scale-[1.02] transition-all">Valider l'encaissement</button>
+                                                                    <button onClick={() => setPayingInstallmentId(null)} className="flex-1 py-1.5 text-xs font-bold text-slate-500 dark:text-slate-400">Annuler</button>
+                                                                    <button onClick={() => handlePayInstallment(inst.id, inst.dueAmount, inst.paidAmount)} className="flex-1 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md">Valider</button>
                                                                 </div>
                                                             </div>
                                                         ) : (
@@ -333,7 +431,7 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
                                                                     setPaymentAmount(remaining.toString());
                                                                     setPaymentMode('ESPÈCES');
                                                                 }}
-                                                                className="w-full py-3 bg-indigo-50 text-indigo-700 font-black text-xs uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all"
+                                                                className="w-full py-2 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-xl font-bold text-xs hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors"
                                                             >
                                                                 Encaisser un paiement
                                                             </button>
@@ -349,46 +447,16 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
                     )}
                 </div>
             </div>
+
             {dialogState.isOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-                    <div className="bg-white max-w-sm w-full p-6 shadow-2xl animate-in zoom-in-95 duration-200">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
-                            dialogState.type === 'confirm' ? 'bg-amber-100 text-amber-600' :
-                            dialogState.type === 'success' ? 'bg-emerald-100 text-emerald-600' :
-                            dialogState.type === 'warning' ? 'bg-orange-100 text-orange-600' :
-                            'bg-rose-100 text-rose-600'
-                        }`}>
-                            {dialogState.type === 'confirm' && <AlertCircle size={24} />}
-                            {dialogState.type === 'success' && <CheckCircle2 size={24} />}
-                            {dialogState.type === 'warning' && <AlertCircle size={24} />}
-                            {dialogState.type === 'error' && <X size={24} />}
-                        </div>
-                        <h3 className="text-lg font-black text-slate-800 mb-2">{dialogState.title}</h3>
-                        <p className="text-sm text-slate-500 mb-6">{dialogState.message}</p>
-                        <div className="flex gap-3 justify-end">
-                            {dialogState.onCancel && (
-                                <button onClick={dialogState.onCancel} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-widest transition-colors">
-                                    Annuler
-                                </button>
-                            )}
-                            {dialogState.onConfirm && (
-                                <button onClick={dialogState.onConfirm} className={`px-4 py-2 text-white text-xs font-bold uppercase tracking-widest transition-colors ${
-                                    dialogState.type === 'confirm' ? 'bg-indigo-600 hover:bg-indigo-700' :
-                                    dialogState.type === 'error' ? 'bg-rose-600 hover:bg-rose-700' :
-                                    dialogState.type === 'warning' ? 'bg-orange-600 hover:bg-orange-700' :
-                                    'bg-emerald-600 hover:bg-emerald-700'
-                                }`}>
-                                    Confirmer
-                                </button>
-                            )}
-                            {!dialogState.onConfirm && !dialogState.onCancel && (
-                                <button onClick={closeDialog} className={`px-4 py-2 text-white text-xs font-bold uppercase tracking-widest transition-colors ${
-                                    dialogState.type === 'success' ? 'bg-emerald-600 hover:bg-emerald-700' :
-                                    'bg-rose-600 hover:bg-rose-700'
-                                }`}>
-                                    Fermer
-                                </button>
-                            )}
+                <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[300] flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-sm w-full p-5 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200">
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">{dialogState.title}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{dialogState.message}</p>
+                        <div className="flex gap-2 justify-end">
+                            <button onClick={closeDialog} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-colors">
+                                OK
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -397,23 +465,22 @@ const StudentEnrollModal: React.FC<StudentEnrollModalProps> = ({
     );
 };
 
-// UI Helpers
 const SectionTitle = ({ title }: { title: string }) => (
-    <div className="col-span-full mt-6 first:mt-0 flex items-center gap-4">
-        <h4 className="text-xs font-black text-indigo-600 uppercase tracking-widest whitespace-nowrap">
+    <div className="sm:col-span-2 mt-4 first:mt-0 flex items-center gap-2">
+        <h4 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider whitespace-nowrap">
             {title}
         </h4>
-        <div className="h-px bg-slate-100 flex-1"></div>
+        <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
     </div>
 );
 
 const Input = ({ label, type = 'text', value, onChange, placeholder = '' }: any) => (
-    <div className="space-y-2">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</label>
+    <div className="space-y-1">
+        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">{label}</label>
         <input
             type={type}
             placeholder={placeholder}
-            className="w-full px-6 py-4 bg-slate-50 text-sm font-bold text-slate-700 focus:bg-white focus:outline-none transition-all placeholder:text-slate-300 shadow-sm"
+            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
             value={value}
             onChange={(e) => onChange(e.target.value)}
         />

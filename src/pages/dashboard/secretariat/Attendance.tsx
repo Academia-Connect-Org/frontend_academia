@@ -36,8 +36,8 @@ const Attendance: React.FC = () => {
         try {
             const institutionId = user?.institution?.id;
             const res = await api.get('/classes', { params: { institutionId } });
-            setClasses(res.data);
-            if (res.data.length > 0) {
+            setClasses(res.data || []);
+            if ((res.data || []).length > 0) {
                 setSelectedClassId(String(res.data[0].id));
             }
         } catch (error) {
@@ -51,7 +51,7 @@ const Attendance: React.FC = () => {
         setLoading(true);
         try {
             const res = await api.get(`/attendances/classe/${selectedClassId}`, { params: { date: selectedDate } });
-            setAttendances(res.data);
+            setAttendances(res.data || []);
         } catch (error) {
             console.error("Failed to fetch attendances", error);
         } finally {
@@ -76,105 +76,102 @@ const Attendance: React.FC = () => {
     const presenceRate = stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0;
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                        <Clock className="text-blue-600" size={28} />
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <Clock className="text-blue-600 dark:text-blue-400" size={24} />
                         Suivi des Présences
                     </h2>
-                    <p className="text-slate-500 text-sm font-medium">Consultez et gérez l'assiduité des élèves par classe.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Consultez et gérez l'assiduité des élèves par classe.</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-3 self-start md:self-auto">
                     <select
                         value={selectedClassId}
                         onChange={(e) => setSelectedClassId(e.target.value)}
-                        className="bg-white   px-6 py-3  font-bold text-slate-600 outline-none focus:"
+                        className="px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl font-bold text-xs text-slate-900 dark:text-white outline-none"
                     >
                         {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <MatrixBlock label="Taux de présence" value={`${presenceRate}%`} icon={CheckCircle} color="text-emerald-500" bg="bg-emerald-50" />
-                <MatrixBlock label="Élèves Absents" value={String(stats.absent)} icon={UserX} color="text-rose-500" bg="bg-rose-50" />
-                <MatrixBlock label="Retards du jour" value={String(stats.late)} icon={Clock} color="text-amber-500" bg="bg-amber-50" />
-                <MatrixBlock label="Dossiers Traités" value={String(stats.total)} icon={Users} color="text-blue-500" bg="bg-blue-50" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <MatrixBlock label="Taux de présence" value={`${presenceRate}%`} icon={CheckCircle} color="text-emerald-600 dark:text-emerald-400" bg="bg-emerald-50 dark:bg-emerald-950/40" />
+                <MatrixBlock label="Élèves Absents" value={String(stats.absent)} icon={UserX} color="text-rose-600 dark:text-rose-400" bg="bg-rose-50 dark:bg-rose-950/40" />
+                <MatrixBlock label="Retards du jour" value={String(stats.late)} icon={Clock} color="text-amber-600 dark:text-amber-400" bg="bg-amber-50 dark:bg-amber-950/40" />
+                <MatrixBlock label="Dossiers Traités" value={String(stats.total)} icon={Users} color="text-blue-600 dark:text-blue-400" bg="bg-blue-50 dark:bg-blue-950/40" />
             </div>
 
-            <div className="bg-white ] shadow-xl   overflow-hidden">
-                {/* Filters */}
-                <div className="p-8   flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2">
-                            <button onClick={() => handleDateChange(-1)} className="p-2.5 bg-slate-50  text-slate-400 hover:text-blue-600 transition-all  "><ChevronLeft size={18} /></button>
-                            <input
-                                type="date"
-                                value={selectedDate}
-                                onChange={(e) => setSelectedDate(e.target.value)}
-                                className="text-sm font-black text-slate-900 px-4 uppercase tracking-widest leading-none outline-none cursor-pointer"
-                            />
-                            <button onClick={() => handleDateChange(1)} className="p-2.5 bg-slate-50  text-slate-400 hover:text-blue-600 transition-all  "><ChevronRight size={18} /></button>
-                        </div>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => handleDateChange(-1)} className="p-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-blue-600 rounded-lg transition-colors"><ChevronLeft size={16} /></button>
+                        <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            className="bg-transparent border-none outline-none text-xs font-bold text-slate-900 dark:text-white px-2 cursor-pointer"
+                        />
+                        <button onClick={() => handleDateChange(1)} className="p-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-blue-600 rounded-lg transition-colors"><ChevronRight size={16} /></button>
                     </div>
                 </div>
 
                 <div className="p-4 overflow-x-auto">
-                    <table className="w-full text-left">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400  ">
-                                <th className="px-6 py-4">Élève</th>
-                                <th className="px-6 py-4">Classe</th>
-                                <th className="px-6 py-4">Statut</th>
-                                <th className="px-6 py-4">Heure d'arrivée</th>
-                                <th className="px-6 py-4">Alerte Parent</th>
-                                <th className="px-6 py-4">Action</th>
+                            <tr className="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                                <th className="pb-2 font-bold">Élève</th>
+                                <th className="pb-2 font-bold">Classe</th>
+                                <th className="pb-2 font-bold">Statut</th>
+                                <th className="pb-2 font-bold">Session</th>
+                                <th className="pb-2 font-bold">Commentaire</th>
+                                <th className="pb-2 text-right font-bold">Action</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={6} className="text-center py-20 text-slate-400 font-bold uppercase tracking-widest">
+                                    <td colSpan={6} className="text-center py-12 text-slate-400 font-bold uppercase tracking-wider">
                                         Chargement en cours...
                                     </td>
                                 </tr>
                             ) : attendances.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="text-center py-20 text-slate-400 font-bold uppercase tracking-widest">
+                                    <td colSpan={6} className="text-center py-12 text-slate-400 font-bold italic">
                                         Aucun appel enregistré pour cette classe à cette date.
                                     </td>
                                 </tr>
                             ) : attendances.map((row: any) => (
-                                <tr key={row.id} className="hover:bg-slate-50/50 group transition-all">
-                                    <td className="px-6 py-5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10  bg-slate-100 flex items-center justify-center font-black text-xs text-slate-400 uppercase tracking-tighter shadow-sm   group-hover:bg-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                                <tr key={row.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                                    <td className="py-3">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold text-xs flex items-center justify-center shrink-0">
                                                 {row.student?.firstName?.[0]}{row.student?.lastName?.[0]}
                                             </div>
-                                            <p className="font-bold text-slate-900 leading-none group-hover:text-blue-600 transition-colors uppercase tracking-tight">{row.student?.lastName} {row.student?.firstName}</p>
+                                            <span className="font-bold text-slate-900 dark:text-white uppercase">{row.student?.lastName} {row.student?.firstName}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-5 text-sm font-bold text-slate-500 uppercase tracking-tighter">{row.classe?.name}</td>
-                                    <td className="px-6 py-5">
-                                        <span className={`px-4 py-1.5  text-[10px] font-black uppercase tracking-wider shadow-sm
-                                            ${row.status === 'PRESENT' ? 'bg-emerald-50 text-emerald-600' :
-                                                row.status === 'ABSENT' ? 'bg-rose-50 text-rose-600' :
-                                                    row.status === 'LATE' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'}`}>
+                                    <td className="py-3 font-bold text-slate-600 dark:text-slate-400 uppercase text-[10px]">{row.classe?.name}</td>
+                                    <td className="py-3">
+                                        <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase
+                                            ${row.status === 'PRESENT' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' :
+                                                row.status === 'ABSENT' ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400' :
+                                                    row.status === 'LATE' ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400' : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'}`}>
                                             {row.status === 'LATE' ? 'Retard' : row.status === 'EXCUSED' ? 'Excusé' : row.status === 'PRESENT' ? 'Présent' : 'Absent'}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-5">
-                                        <div className="flex items-center gap-2 text-xs font-black text-slate-700 italic">
-                                            <span className="bg-slate-100 px-3 py-1   ">{row.timetableEntry?.subject?.name || 'Inconnu'}</span>
-                                            <span className="bg-slate-50 px-3 py-1   ">{row.timetableEntry?.startTime?.slice(0, 5)} - {row.timetableEntry?.endTime?.slice(0, 5)}</span>
+                                    <td className="py-3">
+                                        <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                                            <span className="font-bold">{row.timetableEntry?.subject?.name || 'Inconnu'}</span>
+                                            <span>({row.timetableEntry?.startTime?.slice(0, 5)} - {row.timetableEntry?.endTime?.slice(0, 5)})</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-5">
-                                        <span className="text-xs text-slate-500">{row.comment || '-'}</span>
+                                    <td className="py-3 text-slate-500 dark:text-slate-400 italic">
+                                        {row.comment || '-'}
                                     </td>
-                                    <td className="px-6 py-5">
-                                        <button className="p-2 bg-slate-50  text-slate-400 hover:text-blue-600 transition-all   hover: opacity-0 group-hover:opacity-100 duration-500">
+                                    <td className="py-3 text-right">
+                                        <button className="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                             <AlertCircle size={16} />
                                         </button>
                                     </td>
@@ -183,26 +180,20 @@ const Attendance: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
-
-                <div className="p-8   bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Mise à jour automatique every 5 min | Dernière synchro: 08:32</p>
-                    <button className="px-6 py-3 bg-white    font-black text-xs uppercase tracking-widest text-slate-900 shadow-sm hover:bg-slate-50 active:scale-95 transition-all">
-                        Imprimer Liste d'Appel
-                    </button>
-                </div>
             </div>
-        </>
+        </div>
     );
 };
 
-// Sub-components
 const MatrixBlock = ({ label, value, icon: Icon, color, bg }: { label: string, value: string, icon: any, color: string, bg: string }) => (
-    <div className="bg-white p-6 ] shadow-lg   group transition-all duration-300 hover:bg-slate-50/50">
-        <div className={`w-12 h-12 ${bg} ${color}  flex items-center justify-center mb-4 transition-transform group-hover:rotate-12`}>
+    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+        <div>
+            <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">{label}</p>
+            <h4 className="text-xl font-bold text-slate-900 dark:text-white">{value}</h4>
+        </div>
+        <div className={`w-12 h-12 rounded-xl ${bg} ${color} flex items-center justify-center shrink-0`}>
             <Icon size={22} />
         </div>
-        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">{label}</p>
-        <h4 className="text-2xl font-black text-slate-800 tracking-tight leading-none">{value}</h4>
     </div>
 );
 

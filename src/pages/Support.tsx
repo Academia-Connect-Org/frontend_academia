@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, BookOpen, UserPlus, MessageSquare, CreditCard, ShieldCheck,
     ChevronRight, ChevronDown, PlayCircle, CheckCircle, ArrowRight, ArrowUp, Briefcase, Building,
     FileText, GraduationCap, Users, Wrench, AlertTriangle, LifeBuoy, PhoneCall,
     Mail, Globe, FileSpreadsheet, FileCode2, Database, Cloud, Server, Smartphone,
-    Monitor, Coffee
+    Monitor, Coffee, Sparkles, ExternalLink, HelpCircle, Check, Compass, Sliders,
+    Calendar, Award, Lock, FileCheck, Layers, Send, Download, Paperclip, Bell, RefreshCw
 } from 'lucide-react';
 
 const Support: React.FC = () => {
@@ -13,6 +14,7 @@ const Support: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showTopBtn, setShowTopBtn] = useState(false);
+    const mainRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -27,7 +29,13 @@ const Support: React.FC = () => {
     }, []);
 
     const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (mainRef.current) {
+            const yOffset = -100;
+            const y = mainRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     const handleTabChange = (id: string) => {
@@ -35,1721 +43,1119 @@ const Support: React.FC = () => {
         scrollToTop();
     };
 
-
-
     const menuItems = [
-        { id: 'getting-started', label: 'Introduction & Démarrage', icon: PlayCircle, desc: "Vision globale du produit" },
-        { id: 'pdg', label: 'Espace PDG (Multi-écoles)', icon: Briefcase, desc: "Pilotage stratégique et stat globales" },
-        { id: 'direction', label: 'Espace Direction & Pilotage', icon: Building, desc: "Scolarité, Personnel, Emplous du temps" },
-        { id: 'secretariat', label: 'Secrétariat & Admissions', icon: FileText, desc: "Inscriptions, Bulletins, Dossiers" },
-        { id: 'teachers', label: 'Espace Enseignant', icon: GraduationCap, desc: "Appels, Devoirs, Saisie de notes" },
-        { id: 'parents', label: 'Espace Parents & Mobile', icon: Users, desc: "Suivi, Assiduité, Reçus PDF" },
-        { id: 'troubleshooting', label: 'Maintenance / Linux', icon: Wrench, desc: "Crash Linux, Wayland, X11, Caches" }
+        { id: 'getting-started', label: 'Vue d\'Ensemble & Navigation', icon: Compass, desc: "Portail complet des procédures opérationnelles" },
+        { id: 'pdg', label: 'Procédures PDG & Fondateur', icon: Briefcase, desc: "Multi-écoles, statistiques globales, trésorerie & licences" },
+        { id: 'direction', label: 'Procédures Direction & Provisorat', icon: Building, desc: "Cycles, classes, emplois du temps, bulletins & clôture" },
+        { id: 'secretariat', label: 'Procédures Secrétariat & Admissions', icon: FileText, desc: "Inscriptions (solo/CSV), reçus PDF, certificats & assiduité" },
+        { id: 'teachers', label: 'Procédures Enseignant', icon: GraduationCap, desc: "Appel numérique, cahier de texte, devoirs & carnet de notes" },
+        { id: 'parents', label: 'Procédures Parents & Élèves', icon: Users, desc: "Suivi des notes, bulletins PDF, devoirs & messagerie" },
+        { id: 'troubleshooting', label: 'Maintenance & Guide Technique', icon: Wrench, desc: "Crash Linux/Wayland, purge du cache IndexDB & logs" }
     ];
 
-    const filteredMenuItems = menuItems.filter(item => 
-        item.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const filteredMenuItems = menuItems.filter(item =>
+        item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.desc.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    // Component for Actionable Procedure Card
+    const ProcedureGuide: React.FC<{
+        id?: string;
+        title: string;
+        subtitle?: string;
+        badge?: string;
+        steps: Array<{ title: string; action: string; note?: string }>;
+        tip?: string;
+        warning?: string;
+    }> = ({ id, title, subtitle, badge, steps, tip, warning }) => (
+        <div id={id} className="mb-8 p-5 sm:p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:border-blue-300 dark:hover:border-blue-700/70 transition-all">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-xs shrink-0">
+                        <Sliders className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                        {title}
+                    </h3>
+                </div>
+                {badge && (
+                    <span className="text-[11px] font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800/60 px-2.5 py-1 rounded-lg">
+                        {badge}
+                    </span>
+                )}
+            </div>
+
+            {subtitle && (
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed font-medium">
+                    {subtitle}
+                </p>
+            )}
+
+            {/* Step-by-step Procedures List */}
+            <div className="space-y-3 my-4">
+                {steps.map((step, idx) => (
+                    <div key={idx} className="flex items-start gap-3.5 p-3.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-xl border border-slate-200/70 dark:border-slate-700/60">
+                        <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                            {idx + 1}
+                        </span>
+                        <div className="text-xs sm:text-sm leading-relaxed flex-1">
+                            <strong className="font-bold text-slate-900 dark:text-white">{step.title} : </strong>
+                            <span className="text-slate-700 dark:text-slate-300">{step.action}</span>
+                            {step.note && (
+                                <span className="block text-[11px] font-semibold text-blue-600 dark:text-blue-400 mt-1">
+                                    💡 Remarque : {step.note}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Optional Tip Callout */}
+            {tip && (
+                <div className="mt-4 p-3.5 bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 rounded-xl text-xs text-emerald-900 dark:text-emerald-300 flex items-start gap-2.5">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                    <span><strong>Conseil pratique :</strong> {tip}</span>
+                </div>
+            )}
+
+            {/* Optional Warning Callout */}
+            {warning && (
+                <div className="mt-4 p-3.5 bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl text-xs text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <span><strong>Attention :</strong> {warning}</span>
+                </div>
+            )}
+        </div>
+    );
+
+    // Section Title Banner
+    const SectionHeader: React.FC<{ title: string; desc: string }> = ({ title, desc }) => (
+        <div className="pb-5 mb-6 border-b border-slate-200/80 dark:border-slate-800">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                {title}
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
+                {desc}
+            </p>
+        </div>
+    );
+
     const render_getting_started = () => (
-        <div className='animate-in fade-in transition-all duration-700'>
-            <div className="mb-10 text-center">
-                <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tight leading-tight py-2">📚 ACADEMIA CONNECT : Manuel d'Utilisation Intégral (2026)</h1>
-                <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
+        <div className="space-y-6 animate-in fade-in transition-all duration-300">
+            <div className="text-center max-w-3xl mx-auto pb-4 border-b border-slate-200/80 dark:border-slate-800">
+                <span className="inline-flex items-center gap-2 px-3.5 py-1 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-full text-xs font-bold border border-blue-200/60 dark:border-blue-800/60 mb-3">
+                    <Sparkles className="w-3.5 h-3.5" /> Guide Intégral des Procédures Opérationnelles 2026
+                </span>
+                <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                    Manuel d'Action Academia Connect
+                </h1>
+                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                    Ce centre de support rassemble les <strong>directives pas-à-pas et procédures d'exécution</strong> dérivées directement des fonctionnalités du système. Choisissez un profil ci-dessous pour accéder au guide pratique correspondant.
+                </p>
             </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Bienvenue dans le guide de référence d'**ACADEMIA CONNECT**. Ce manuel a été conçu pour offrir une vision exhaustive de chaque module, de chaque bouton et de chaque flux de travail pour l'ensemble des acteurs de l'écosystème scolaire.
-            </p>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🌟 Vision du Produit</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                    onClick={() => handleTabChange('pdg')}
+                    className="p-5 bg-white dark:bg-slate-800/70 rounded-2xl border border-slate-200/80 dark:border-slate-700 hover:border-blue-500 text-left transition-all group shadow-xs hover:shadow-md"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <Briefcase className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Procédures PDG & Fondateur</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Créer et administrer les écoles, piloter la trésorerie globale et renouveler l'abonnement du groupe.</p>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 mt-3">Voir les 4 procédures <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" /></span>
+                </button>
+
+                <button
+                    onClick={() => handleTabChange('direction')}
+                    className="p-5 bg-white dark:bg-slate-800/70 rounded-2xl border border-slate-200/80 dark:border-slate-700 hover:border-blue-500 text-left transition-all group shadow-xs hover:shadow-md"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <Building className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Procédures Direction & Provisorat</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Configurer la structure pédagogique, valider l'emploi du temps, verrouiller les notes & clôturer l'année.</p>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 mt-3">Voir les 5 procédures <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" /></span>
+                </button>
+
+                <button
+                    onClick={() => handleTabChange('secretariat')}
+                    className="p-5 bg-white dark:bg-slate-800/70 rounded-2xl border border-slate-200/80 dark:border-slate-700 hover:border-blue-500 text-left transition-all group shadow-xs hover:shadow-md"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <FileText className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Procédures Secrétariat & Admission</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Inscription d'un élève (solo/CSV), émission des reçus de paiement et des certificats de scolarité PDF.</p>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 mt-3">Voir les 4 procédures <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" /></span>
+                </button>
+
+                <button
+                    onClick={() => handleTabChange('teachers')}
+                    className="p-5 bg-white dark:bg-slate-800/70 rounded-2xl border border-slate-200/80 dark:border-slate-700 hover:border-blue-500 text-left transition-all group shadow-xs hover:shadow-md"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <GraduationCap className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Procédures Enseignant</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Faire l'appel numérique, tenir le cahier de texte, publier des devoirs et saisir les évaluations.</p>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 mt-3">Voir les 4 procédures <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" /></span>
+                </button>
+
+                <button
+                    onClick={() => handleTabChange('parents')}
+                    className="p-5 bg-white dark:bg-slate-800/70 rounded-2xl border border-slate-200/80 dark:border-slate-700 hover:border-blue-500 text-left transition-all group shadow-xs hover:shadow-md"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <Users className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Procédures Parents & Élèves</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Consulter le bulletin en ligne, suivre l'emploi du temps, remettre des devoirs & utiliser la messagerie.</p>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 mt-3">Voir les 5 procédures <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" /></span>
+                </button>
+
+                <button
+                    onClick={() => handleTabChange('troubleshooting')}
+                    className="p-5 bg-white dark:bg-slate-800/70 rounded-2xl border border-slate-200/80 dark:border-slate-700 hover:border-blue-500 text-left transition-all group shadow-xs hover:shadow-md"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <Wrench className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Maintenance & Dépannage Technique</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Régler un écran noir Linux/Wayland, réinitialiser le cache IndexDB et localiser le fichier crash-log.txt.</p>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 mt-3">Voir les 3 procédures <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" /></span>
+                </button>
             </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                ACADEMIA CONNECT n'est pas qu'un simple logiciel de gestion. C'est un environnement de travail unifié qui relie l'administration, les enseignants et les familles pour garantir le succès des élèves.
-            </p>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📂 Organisation du manuel</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Pour faciliter votre lecture, le manuel est divisé en chapitres dédiés à chaque profil d'utilisateur. Cliquez sur les liens ci-dessous pour accéder aux guides détaillés :
-            </p>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                1.  ### [👔 Le Profil PDG (Multi-Écoles)](./PDG.md)
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Gestion globale des établissements.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Pilotage financier et abonnements.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Audit et statistiques stratégiques.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                2.  ### [🏛️ Le Profil Direction d'Établissement](./Direction.md)
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Configuration des cycles, classes et matières.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Gestion du personnel (Staff & Enseignants).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Emploi du temps intelligent et annonces.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                3.  ### [📝 Le Profil Secrétariat & Admission](./Secretariat.md)
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Processus d'inscription (Enrollment).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Dossier élève et suivi d'assiduité.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Génération de documents administratifs (Certificats, Reçus).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                4.  ### [👨‍🏫 Le Profil Enseignant (Expertise Pédagogique)](./Enseignant.md)
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Appel numérique et cahier de texte.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Gestion fine des notes et des moyennes.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Devoirs et ressources partagées.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                5.  ### [📱 Le Profil Parent & Élève (Usage Mobile)](./Parent_Eleve.md)
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Suivi des résultats et bulletins.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Agenda, devoirs et messagerie.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Suivi financier des frais de scolarité.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                6.  ### [🛠️ Guide Technique & Maintenance](./Technique.md)
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Résolution des problèmes (Crash Linux/Wayland).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Gestion du cache et mises à jour.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                *Dernière mise à jour : 22 Mars 2026*
-            </p>
         </div>
     );
 
     const render_pdg = () => (
-        <div className='animate-in fade-in transition-all duration-700'>
-            <div className="mb-10 text-center">
-                <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tight leading-tight py-2">👔 GUIDE FONCTIONNEL : Le Profil PDG (Multi-Écoles)</h1>
-                <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Ce sous-manuel est destiné aux propriétaires d'établissement(s) et aux directeurs de gestion de haut niveau cherchant à piloter leur(s) structure(s) scolaires via les indicateurs de performance d'ACADEMIA CONNECT.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📈 1. Tableau de bord stratégique (Global Stats)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le module **Global Stats** (accessible sur Web/Desktop) offre une vue consolidée de l'ensemble de l'écosystème Evenia.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">📊 1.1 Indicateurs de Performance (KPI)</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Nombre d'Élèves Totaux</strong> : Affichage du volume global d'élèves répartis sur l'ensemble des établissements d'un même groupe scolaire.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Taux de Présence Moyen</strong> : Un graphique interactif montrant l'évolution hebdomadaire de l'assiduité. Un PDG peut ainsi détecter un pic d'absence sur un établissement précis (problème sanitaire, infrastructure, etc.).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Performance Académique Globale</strong> : Moyenne arithmétique globale calculée à partir des derniers examens enregistrés dans chaque école. Permet de comparer la qualité pédagogique entre différents sites.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🏗️ 2. Créer une École ou un Établissement (Pas à Pas)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                C'est ici que le PDG définit la structure globale du groupe scolaire en ajoutant de nouveaux sites physiques ou administratifs.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">➕ Procédure de création d'un nouveau site :</h3>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                1.  **Accéder au module Schools** : Dans la barre latérale gauche, cliquez sur l'icône **Établissements**.
-            </p>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                2.  **Lancer l'ajout** : Cliquez sur le bouton bleu **"Ajouter une École"** situé en haut à droite de l'interface.
-            </p>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                3.  **Renseigner l'Identité** :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Saisissez le <strong className="text-blue-800 font-extrabold">Nom Officiel</strong> (ex: Complexe Scolaire Evenia Nord).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Sélectionnez le <strong className="text-blue-800 font-extrabold">Type d'établissement</strong> (Primaire, Secondaire, ou Mixte).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                4.  **Coordonnées de l'École** :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Entrez l'<strong className="text-blue-800 font-extrabold">Adresse physique</strong> précise (pour la géolocalisation éventuelle).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Ajoutez l'<strong className="text-blue-800 font-extrabold">Email de contact</strong> et le <strong className="text-blue-800 font-extrabold">Téléphone du secrétariat</strong> qui apparaîtront sur les courriers.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                5.  **Personnalisation Visuelle** :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Cliquez sur la zone de téléchargement pour importer le <strong className="text-blue-800 font-extrabold">Logo de l'école</strong> (Format PNG/JPG recommandé).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  *Note : Ce logo est utilisé par le système pour générer automatiquement les entêtes de bulletins.*</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                6.  **Validation** : Cliquez sur **"Enregistrer l'établissement"**. L'école apparaît désormais dans votre liste et vous pouvez commencer à y affecter du personnel de direction.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🏫 Suivi des Détails de l'Ecole (School Details)</h3>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Une fois l'école créée, vous pouvez cliquer dessus pour surveiller :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Volume d'Enseignants</strong> : Liste exhaustive des professeurs avec leur charge de travail.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Volume d'Eleves</strong> : Répartition par niveau (Primaire, Collège, Lycée).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Capacité des Salles</strong> : Vérification de la saturation des infrastructures.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">💰 3. Gestion Financière & Abonnements (Finance)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                La santé financière du groupe est pilotée directement depuis ce module.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">💸 3.1 Encaissements Globaux</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Rapport de Trésorerie</strong> : Somme cumulative des frais d'inscription et des scolarités mensuelles.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Taux de Recouvrement</strong> : Comparaison entre facturation et encaissement réel.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Détection des Impayés</strong> : Ciblez les classes problématiques.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">💳 3.2 Renouveler son Abonnement (Pas à Pas)</h3>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le PDG gère ici son propre accès au logiciel ACADEMIA CONNECT pour l'ensemble du groupe.
-            </p>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                1.  **Naviguer vers "Mon Compte / Licence"** : Cliquez sur votre profil en haut à droite, puis sur **Abonnement**.
-            </p>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                2.  **Vérifier le Statut** : Consultez la date d'expiration de votre licence actuelle.
-            </p>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                3.  **Choisir le Mode de Renouvellement** :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Automatique</strong> : Enregistrez une carte bancaire pour éviter toute coupure de service.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Manuel</strong> : Cliquez sur le bouton <strong className="text-blue-800 font-extrabold">"Renouveler Maintenant"</strong>.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                4.  **Sélection des Modules** :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Cochez les options souhaitées (Mobile Parent, SMS illimités, Module Transport).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Le prix s'ajuste dynamiquement en fonction du nombre total d'élèves enregistrés dans vos écoles.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                5.  **Paiement Sécurisé** :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Saisissez vos informations de paiement ou utilisez le crédit de votre portefeuille virtuel.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  Une fois validé, une facture au format PDF est générée instantanément dans l'onglet <strong className="text-blue-800 font-extrabold">Historique des Factures</strong>.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                6.  **Confirmation** : Votre date d'expiration est mise à jour immédiatement et les nouveaux modules sont débloqués pour tous les utilisateurs concernés.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🔒 4. Administration & Sécurité (Settings)</h2>
-            </div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">⚙️ 4.1 Variables Globales</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Cycles Scolaires</strong> : Définition des cycles (ex: Primaire/Secondaire).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Modèles de Bulletins</strong> : Choix du design graphique pour assurer une image de marque cohérente.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🚀 5. Avantages du Support Desktop pour le PDG</h2>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Rapidité des exports</strong> : Génération de rapports financiers complexes en quelques secondes.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Mode "Focus"</strong> : Interface sans distraction pour vos analyses stratégiques.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                *Fin du guide PDG détaillé*
-            </p>
+        <div className="space-y-6 animate-in fade-in transition-all duration-300">
+            <SectionHeader
+                title="Directives & Procédures : Espace PDG (Fondateur Multi-Écoles)"
+                desc="Manuels d'action détaillés pour chacune des fonctionnalités accessibles au PDG, incluant la création et la gestion post-création d'un établissement (responsables & abonnements)."
+            />
+
+            {/* 1. Tableau de bord */}
+            <ProcedureGuide
+                title="1. Tableau de Bord PDG (/dashboard/pdg)"
+                subtitle="Directive de consultation rapide des KPIs vitaux et des alerte du groupe scolaire."
+                badge="Vue Synthétique"
+                steps={[
+                    { title: "Consulter les KPIs en temps réel", action: "Observez la Moyenne Générale du groupe, la Meilleure Moyenne et le Taux de Réussite Global." },
+                    { title: "Examiner la courbe de croissance du réseau", action: "Analysez le graphique interactif 'Croissance du Réseau' par mois ou par année pour suivre l'évolution des effectifs." },
+                    { title: "Surveiller les Alertes Critiques", action: "Consultez le panneau d'alertes pour repérer immédiatement les écoles à taux d'absence élevé ou avec des baisses de moyenne." }
+                ]}
+            />
+
+            {/* 2. Statistiques Globales */}
+            <ProcedureGuide
+                title="2. Statistiques Globales (/dashboard/pdg/stats)"
+                subtitle="Directive d'analyse comparative de la performance pédagogique inter-établissements."
+                badge="Audit Pédagogique"
+                steps={[
+                    { title: "Filtrer par Établissement ou Période", action: "Sélectionnez un établissement spécifique ou conservez la vue consolidée du groupe." },
+                    { title: "Analyser la répartition des notes", action: "Consultez le diagramme des mentions (Très Bien, Bien, Passable, Échec) basé sur les évaluations enregistrées." },
+                    { title: "Comparer l'évolution par trimestre", action: "Examinez la courbe d'évolution des moyennes pour évaluer la progression pédagogique trimestre par trimestre." }
+                ]}
+            />
+
+            {/* 3. Établissements - Création */}
+            <ProcedureGuide
+                title="3a. Création d'un Établissement (/dashboard/pdg/schools)"
+                subtitle="Procédure complète pour déclarer et créer une nouvelle école physique ou administrative dans le réseau."
+                badge="Création École"
+                steps={[
+                    { title: "Accéder au module Établissements", action: "Cliquez sur 'Établissements' dans la barre latérale gauche." },
+                    { title: "Lancer le formulaire d'ajout", action: "Cliquez sur le bouton bleu 'Ajouter une École' situé en haut à droite." },
+                    { title: "Renseigner l'identité officielle", action: "Saisissez le Nom Officiel (ex: Complexe Scolaire Academia Nord) et le Type (Primaire, Secondaire, ou Mixte)." },
+                    { title: "Définir les coordonnées", action: "Renseignez l'adresse physique, l'email officiel du secrétariat et le téléphone." },
+                    { title: "Téléverser le logo officiel", action: "Importez le fichier image du logo (PNG/JPG).", note: "Ce logo sera utilisé sur les entêtes de bulletins et reçus générés par l'école." },
+                    { title: "Valider la création", action: "Cliquez sur 'Enregistrer l'établissement' pour finaliser la création." }
+                ]}
+                tip="Une fois créée, l'école apparaît dans le réseau du groupe et dans le sélecteur d'établissement."
+            />
+
+            {/* 3b. Établissements - Gestion & Administration */}
+            <ProcedureGuide
+                title="3b. Administration & Gestion d'un Établissement (/dashboard/pdg/schools/:id)"
+                subtitle="Procédure d'affectation des responsables (Direction/Secrétariat), de suivi de l'abonnement et de la licence de l'école."
+                badge="Administration École"
+                steps={[
+                    { title: "Ouvrir la fiche de l'établissement", action: "Dans la liste des établissements (/dashboard/pdg/schools), cliquez sur gérer de la carte de l'école pour accéder à son tableau de bord d'administration." },
+                    { title: "Nomination des Responsables (Onglet 'Équipe')", action: "Allez dans l'onglet 'Équipe' et cliquez sur 'Ajouter un membre du staff'. Saisissez le Prénom, Nom, Email professionnel, Téléphone et sélectionnez le rôle administratif : Direction, Provisorat ou Secrétariat. Attribuez un mot de passe temporaire pour leur première connexion." },
+                    { title: "Gestion des Accès du Personnel", action: "Éditez à tout moment les profils des responsables ou révoquez l'accès d'un compte en cas de changement de personnel dans l'établissement." },
+                    { title: "Gestion de l'Abonnement de l'Établissement (Onglet 'Abonnement')", action: "Accédez à l'onglet 'Abonnement' pour visualiser le forfait actif de l'école (Formule Mensuelle, Annuelle ou Premium), la date de fin de validité de la licence et le quota d'élèves/classes autorisés." },
+                    { title: "Renouvellement & Modification d'Abonnement", action: "Cliquez sur 'Renouveler' ou 'Changer de formule' pour étendre la souscription de l'établissement et débloquer des fonctionnalités supérieures." },
+                    { title: "Supervision Pédagogique & Grilles Tarifaires (Onglets 'Cycles' & 'Finances')", action: "Supervisez directement la structure des cycles pédagogiques et les plans tarifaires (droits d'inscription et de scolarité) rattachés à cette école." }
+                ]}
+                tip="Chaque école possède son propre compte d'abonnement et ses propres responsables désignés par le PDG. Le Directeur ou Secrétaire ainsi nommé pourra immédiatement se connecter avec les identifiants créés."
+            />
+
+            {/* 4. Finances & Analyses */}
+            <ProcedureGuide
+                title="4. Finances & Analyses (/dashboard/pdg/finances)"
+                subtitle="Directive de pilotage financier global, trésorerie et détection des impayés."
+                badge="Pilotage Financier"
+                steps={[
+                    { title: "Consulter la Trésorerie globale", action: "Examinez le montant total des frais d'inscription et des scolarités mensuelles encassées." },
+                    { title: "Évaluer le Taux de Recouvrement", action: "Comparez les montants facturés aux montants réellement perçus." },
+                    { title: "Cibler les impayés par établissement", action: "Filtrez par école et par classe pour identifier les retards de paiement et ordonner des relances." }
+                ]}
+            />
+
+            {/* 5. Élèves & Effectifs */}
+            <ProcedureGuide
+                title="5. Élèves & Effectifs (/dashboard/pdg/students)"
+                subtitle="Procédure de suivi du registre centralisé des élèves du groupe."
+                badge="Registre Élèves"
+                steps={[
+                    { title: "Consulter l'effectif global", action: "Visualisez la liste exhaustive des élèves inscrits dans l'ensemble des établissements." },
+                    { title: "Rechercher par matricule ou nom", action: "Saisissez le nom ou matricule (ex: 2026-001-A) dans la barre de recherche." },
+                    { title: "Vérifier les dossiers administratifs", action: "Ouvrez la fiche élève pour contrôler le statut de paiement et les coordonnées des parents." }
+                ]}
+            />
+
+            {/* 6. Enseignants */}
+            <ProcedureGuide
+                title="6. Enseignants (/dashboard/pdg/teachers)"
+                subtitle="Directive de contrôle du corps professoral et des affectations du groupe."
+                badge="Corps Professoral"
+                steps={[
+                    { title: "Consulter l'annuaire des professeurs", action: "Accédez à la liste des enseignants exerçant dans le groupe scolaire." },
+                    { title: "Vérifier les affectations et matières", action: "Contrôlez les écoles, classes et matières attribuées à chaque enseignant." },
+                    { title: "Vérifier le volume horaire", action: "Assurez-vous de l'équilibre des charges de travail entre les enseignants." }
+                ]}
+            />
+
+            {/* 7. Assiduité Globale */}
+            <ProcedureGuide
+                title="7. Assiduité Globale (/dashboard/pdg/attendance)"
+                subtitle="Directive de surveillance du taux de présence à l'échelle du groupe."
+                badge="Surveillance Assiduité"
+                steps={[
+                    { title: "Consulter le taux de présence hebdomadaire", action: "Examinez le graphique d'assiduité globale actualisé quotidiennement." },
+                    { title: "Repérer les anomalies d'absences", action: "Détectez les établissements ou niveaux ayant un taux d'absence anormalement élevé." }
+                ]}
+            />
+
+            {/* 8. Années Scolaires */}
+            <ProcedureGuide
+                title="8. Années Scolaires (/dashboard/pdg/academic-years)"
+                subtitle="Procédure de suivi des calendriers académiques et périodes de clôture."
+                badge="Calendrier Académique"
+                steps={[
+                    { title: "Consulter l'année scolaire active", action: "Vérifiez les dates de début et de fin de l'année scolaire en cours (ex: 2025-2026)." },
+                    { title: "Suivre le découpage des trimestres", action: "Contrôlez l'état des trimestres (En cours, Verrouillé, Clôturé)." }
+                ]}
+            />
+
+            {/* 9. Annonce */}
+            <ProcedureGuide
+                title="9. Annonce (/dashboard/pdg/announcements)"
+                subtitle="Procédure de rédaction et de diffusion de circulaires et notes officielles."
+                badge="Circulaires Officieuses"
+                steps={[
+                    { title: "Créer une nouvelle circulaire", action: "Cliquez sur 'Nouvelle Annonce' et rédigez le titre et le corps de la note." },
+                    { title: "Joindre des documents officiels", action: "Téléversez des fichiers PDF (ex: règlement intérieur, calendrier des vacances)." },
+                    { title: "Définir la cible de diffusion", action: "Choisissez si la note s'adresse à tout le groupe, uniquement aux Directeurs, ou aux Enseignants." },
+                    { title: "Diffuser", action: "Cliquez sur 'Publier'. Une notification push est transmise instantanément aux destinataires." }
+                ]}
+            />
+
+            {/* 10. Messagerie */}
+            <ProcedureGuide
+                title="10. Messagerie (/dashboard/pdg/messages)"
+                subtitle="Procédure de communication sécurisée directe avec les directeurs d'écoles et le personnel."
+                badge="Messagerie Sécurisée"
+                steps={[
+                    { title: "Accéder à la messagerie", action: "Cliquez sur 'Messagerie' pour ouvrir le centre d'échange instantané." },
+                    { title: "Sélectionner un interlocuteur", action: "Sélectionnez un directeur d'école ou membre du personnel administratif dans la liste." },
+                    { title: "Envoyer un message ou document", action: "Rédigez votre message et joignez d'éventuels fichiers sans échanger vos coordonnées personnelles." }
+                ]}
+            />
+
+            {/* 11. Paramètres */}
+            <ProcedureGuide
+                title="11. Paramètres (/dashboard/pdg/settings)"
+                subtitle="Procédure de gestion du profil, de l'abonnement du groupe et de la sécurité."
+                badge="Paramètres & Licences"
+                steps={[
+                    { title: "Onglet Profil & Identité (?tab=profile)", action: "Mettez à jour votre nom, photo de profil, adresse email et coordonnées personnelles." },
+                    { title: "Onglet Mon Abonnement (?tab=subscription)", action: "Consultez l'état de la licence d'utilisation du groupe et lancez le renouvellement de votre formule." },
+                    { title: "Onglet Sécurité & Accès (?tab=security)", action: "Modifiez votre mot de passe et activez la double authentification pour protéger le compte PDG." }
+                ]}
+            />
         </div>
     );
 
     const render_direction = () => (
-        <div className='animate-in fade-in transition-all duration-700'>
-            <div className="mb-10 text-center">
-                <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tight leading-tight py-2">🏛️ GUIDE FONCTIONNEL : Le Profil Provisoriat/Direction</h1>
-                <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                La Direction d'établissement assure le pilotage opérationnel d'une école. Ce guide détaille chaque module de gestion académique pour le Proviseur, le Principal ou le Directeur d'école.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📅 1. Configuration Annuelle et Cycles (Cycles)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Avant le début de l'année scolaire, la Direction doit configurer l'infrastructure logique de l'établissement.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🔄 1.1 Définition des Cycles</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Cycle Primaire</strong> (CP au CM2) : Configuration des coefficients (bases 10 ou 20) et des tranches d'âges admises.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Cycle Collège</strong> (6ème à la 3ème) : Mise en place des matières obligatoires et facultatives.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Cycle Lycée</strong> (2nde à la Terminale) : Gestion des spécialités et des coefficients d'examens (BAC).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🏫 2. Gestion des Classes et des Salles (Classes & Rooms)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                C'est le module de structuration physique et logique.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🗂️ 2.1 Création des Classes</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Dénomination</strong> : Exemple : "Terminale S1", "6ème A", "CM2 Vert".</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Affectation Enseignant Principal</strong> : Choix du professeur responsable pour la classe. Ce dernier aura des privilèges étendus (validation des bulletins, avis de conseil de classe).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Capacité Maximale</strong> : Nombre de places assises disponibles pour éviter la surpopulation scolaire.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🚪 2.2 Salles de Classe (Rooms)</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Inventaire des Salles</strong> : Création des salles physiques (Salle 102, Laboratoire de SVT, Salle de Sport).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Disponibilité</strong> : Suivi des créneaux libres pour la location ou les cours de soutien.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">👮 3. Gestion du Personnel (Staff & Teachers)</h2>
-            </div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">👨‍🏫 3.1 Corps Enseignant (Teachers)</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Fiches Professeurs</strong> : Coordonnées, diplômes et spécialités (Maths, Français, Musique).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Volumes Horaires</strong> : Définition du nombre d'heures contractuelles par semaine.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Assignation des Matières</strong> : Liaison entre un professeur et les matières qu'il est habilité à enseigner (ex: un professeur de Physique peut aussi enseigner la Technologie).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">👷 3.2 Personnel Administratif (Staff)</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Gestion des Comptes</strong> : Création de comptes spécifiques pour les agents de sécurité, les surveillants et les agents d'entretien.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Droits d'Accès</strong> : Limitation des vues aux seuls modules nécessaires à leur mission.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🗓️ 4. Emploi du Temps Intelligent (Schedule)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le module **Schedule** est le cœur synchronisé de l'école.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🛠️ 4.1 Génération de l'Emploi du Temps</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Grilles Horaires</strong> : Définition des heures de début et de fin de cours (ex: 08:00 - 17:00).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Évitement des Conflits</strong> : Le système empêche d'affecter un professeur ou une salle à deux cours simultanés.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Export PDF/Numérique</strong> : Une fois validé, l'emploi du temps est instantanément publié sur les applications des professeurs, élèves et parents.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📢 5. Communication et Annonces (Announcements)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                La Direction utilise ce canal pour les communications officielles.
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Diffusion de News</strong> : Annonce de réunions parents-profs, jours fériés ou événements sportifs.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Ciblage des Messages</strong> : Possibilité d'envoyer une annonce à toute l'école, à un niveau seulement (ex: Brevet Blanc pour les 3èmes) ou aux enseignants uniquement.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Notifications Push</strong> : Chaque annonce génère une alerte mobile immédiate pour assurer une visibilité maximale.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📑 6. Validation des Résultats & Bulletins (Report Cards)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                La Direction a le dernier mot sur les performances académiques.
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Révision des Moyennes</strong> : Vue d'ensemble sur les carnets de notes pour détecter les anomalies de saisie.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Génération des Bulletins PDF</strong> : Une fois le conseil de classe passé, la Direction lance la génération massive des PDF. Ces documents sont horodatés et protégés.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Signature Numérique</strong> : Possibilité d'apposer un sceau numérique sur les documents pour authentifier leur origine.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🌐 7. Avantages Desktop pour la Direction</h2>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Edition Multi-fenêtres</strong> : Travaillez sur l'emploi du temps tout en consultant la liste des enseignants grâce à la gestion native des fenêtres sur l'app Desktop.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Impression Rapide</strong> : Accès direct aux drivers d'imprimantes locales pour les certificats et badges.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                *Fin du guide Direction*
-            </p>
+        <div className="space-y-6 animate-in fade-in transition-all duration-300">
+            <SectionHeader
+                title="Directives & Procédures : Espace Direction & Provisorat"
+                desc="Manuels d'action détaillés pour chacune des 15 fonctionnalités de la barre latérale (Sidebar) de la Direction."
+            />
+
+            <ProcedureGuide
+                title="1. Vue d'ensemble (/dashboard/direction)"
+                subtitle="Directive de contrôle quotidien des KPIs de l'établissement."
+                badge="Tableau de Bord"
+                steps={[
+                    { title: "Consulter la synthèse de l'établissement", action: "Observez le nombre total d'élèves inscrits, le nombre d'enseignants actifs et le taux de présence du jour." },
+                    { title: "Surveiller les alertes de scolarité", action: "Consultez les notifications prioritaires (classes sans emploi du temps, absences d'enseignants, impayés)." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="2. Gestion Cycles (/dashboard/direction/cycles)"
+                subtitle="Procédure de structuration des grands ensembles pédagogiques."
+                badge="Cycles Pédagogiques"
+                steps={[
+                    { title: "Créer un nouveau cycle", action: "Cliquez sur 'Nouveau Cycle' et saisissez l'intitulé (ex: Premier Cycle, Second Cycle Général, Cycle Technique)." },
+                    { title: "Définir les niveaux rattachés", action: "Associez les niveaux de classes correspondant à chaque cycle." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="3. Frais de scolarité & Grilles Tarifaires (/dashboard/direction/fees)"
+                subtitle="Procédure de paramétrage des grilles tarifaires, rubriques de scolarité et ciblage des droits d'inscription ou ré-inscription."
+                badge="Grille Tarifaire & Plans"
+                steps={[
+                    { title: "Définir les rubriques tarifaires", action: "Créer les types de frais (Inscription, Ré-inscription, Mensualité de scolarité, Tenue scolaire, Cantine, Assurance)." },
+                    { title: "Créer ou Éditer un Plan de Paiement", action: "Cliquez sur 'Créer un plan' et saisissez le Nom du plan, la Description et le Montant Total." },
+                    { title: "Sélectionner la Catégorie d'Élève ciblée", action: "Dans le champ 'Catégorie d'élève', choisissez la cible du tarif : 'Tous les élèves' (Nouveaux & Anciens), 'Nouveaux élèves uniquement' (Droit d'Inscription initiale), ou 'Anciens élèves uniquement' (Droit de Ré-inscription annuelle)." },
+                    { title: "Définir le Périmètre (Classe ou Cycle)", action: "Choisissez d'appliquer le plan à une Classe spécifique ou à l'ensemble d'un Cycle pédagogique." },
+                    { title: "Configurer l'Échéancier des Versements", action: "Ajoutez les lignes de frais avec leurs montants respectifs, date de début et date d'exigibilité." }
+                ]}
+                tip="Pour différencier les tarifs entre une première admission (Inscription) et la réadmission d'un élève existant (Ré-inscription), configurez deux plans distincts en sélectionnant la catégorie 'Nouveaux élèves uniquement' pour les frais d'inscription et 'Anciens élèves uniquement' pour les frais de ré-inscription."
+            />
+
+            <ProcedureGuide
+                title="4. Gestion des Classes (/dashboard/direction/classes)"
+                subtitle="Procédure de création des classes et nomination du Professeur Principal."
+                badge="Gestion Classes"
+                steps={[
+                    { title: "Ajouter une nouvelle classe", action: "Cliquez sur 'Ajouter une Classe' et renseignez le nom (ex: 6ème A, Tle D)." },
+                    { title: "Nommer le Professeur Principal", action: "Sélectionnez l'enseignant responsable dans la liste déroulante." },
+                    { title: "Fixer la capacité maximale", action: "Renseignez le nombre maximal d'élèves autorisés par classe." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="5. Gestion des Matières (/dashboard/direction/subjects)"
+                subtitle="Procédure de configuration de la grille des cours et coefficients."
+                badge="Programme & Coefficients"
+                steps={[
+                    { title: "Enregistrer une matière", action: "Saisissez le nom de la matière (ex: Mathématiques, Physique-Chimie, Histoire-Géo)." },
+                    { title: "Fixer les coefficients officiels", action: "Attribuez le coefficient par série ou niveau (ex: Coeff 5 en Tle C, Coeff 2 en 6ème)." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="6. Liste Enseignants (/dashboard/direction/teachers)"
+                subtitle="Procédure d'administration du corps professoral."
+                badge="Gestion Professeurs"
+                steps={[
+                    { title: "Créer un profil Enseignant", action: "Renseignez l'état civil, le diplôme et l'adresse email de l'enseignant." },
+                    { title: "Attribuer les matières et classes", action: "Cochez les matières enseignées et les classes attribuées à chaque professeur." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="7. Gestion Élève (/dashboard/direction/students)"
+                subtitle="Directive de consultation du fichier central des élèves de l'école."
+                badge="Fichier Élèves"
+                steps={[
+                    { title: "Rechercher une fiche élève", action: "Accédez au registre pour consulter le dossier académique, les sanctions ou encouragements." },
+                    { title: "Changer la classe d'un élève", action: "Effectuez une réaffectation administrative en cas de changement de filière." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="8. Gestion des Présences (/dashboard/direction/attendance)"
+                subtitle="Directive de contrôle global de l'assiduité de l'établissement."
+                badge="Présences & Discipline"
+                steps={[
+                    { title: "Consulter la synthèse journalière", action: "Visualisez l'état des appels effectués par les professeurs à chaque heure." },
+                    { title: "Relancer les appels manquants", action: "Repérer les cours où l'appel numérique n'a pas été validé et notifier l'enseignant." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="9. Finances & Analyses (/dashboard/direction/finances)"
+                subtitle="Directive de contrôle des encaissements de l'établissement."
+                badge="Analyse Financière"
+                steps={[
+                    { title: "Analyser le rapport d'encaissement", action: "Consultez la somme des versements effectués au guichet du secrétariat." },
+                    { title: "Suivre le taux d'impayés", action: "Identifier les classes accusant un retard de paiement important." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="10. Emploi du temps (/dashboard/direction/schedule)"
+                subtitle="Procédure de planification des horaires de cours sans conflits."
+                badge="Concepteur d'Horaires"
+                steps={[
+                    { title: "Positionner les créneaux horaires", action: "Glissez-déposez les cours sur la grille hebdomadaire." },
+                    { title: "Résoudre les alerte de conflits", action: "Corrigez l'affectation si une salle ou un professeur est sélectionné deux fois simultanément." },
+                    { title: "Publier", action: "Validez la publication pour rendre l'emploi du temps visible chez les profs, élèves et parents." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="11. Gestion des Salles (/dashboard/direction/rooms)"
+                subtitle="Procédure de déclaration du parc de salles et laboratoires."
+                badge="Gestion Salles"
+                steps={[
+                    { title: "Créer une salle", action: "Saisissez le nom/numéro de la salle (ex: Salle 102, Labo de Chimie)." },
+                    { title: "Renseigner la capacité et équipements", action: "Indiquez le nombre de places et les équipements présents (Vidéoprojecteur, Ordinateurs)." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="12. Messagerie (/dashboard/direction/messages)"
+                subtitle="Procédure de communication sécurisée avec l'écosystème scolaire."
+                badge="Messagerie Institutionnelle"
+                steps={[
+                    { title: "Accéder à la boîte de réception", action: "Échangez en direct avec le PDG, les enseignants, le secrétariat ou les parents." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="13. Annonce (/dashboard/direction/announcements)"
+                subtitle="Procédure de rédaction et de diffusion de notes d'information officielles."
+                badge="Circulaires École"
+                steps={[
+                    { title: "Créer une annonce d'établissement", action: "Rédigez la note d'information, joignez d'éventuels fichiers PDF et choisissez le public ciblé." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="14. Gestion des Bulletins (/dashboard/direction/report-cards)"
+                subtitle="Procédure de verrouillage des notes, calcul des moyennes et génération des bulletins PDF."
+                badge="Génération Bulletins"
+                steps={[
+                    { title: "Verrouiller la saisie", action: "Clôturez la période de saisie à la fin du trimestre." },
+                    { title: "Calculer les moyennes et rangs", action: "Exécutez le moteur de calcul automatisé de l'établissement." },
+                    { title: "Générer et archiver les PDF", action: "Produisez les bulletins PDF officiels avec signature numérique et entête." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="15. Années Scolaires (/dashboard/direction/academic-years)"
+                subtitle="Procédure de gestion des trimestres et de passage d'année."
+                badge="Gestion Année"
+                steps={[
+                    { title: "Définir l'année académique active", action: "Configurer les dates de rentrée et de clôture." },
+                    { title: "Assistant de fin d'année", action: "Exécuter le passage de classe massif des admis et le transfert des archives." }
+                ]}
+            />
         </div>
     );
 
     const render_secretariat = () => (
-        <div className='animate-in fade-in transition-all duration-700'>
-            <div className="mb-10 text-center">
-                <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tight leading-tight py-2">📝 GUIDE FONCTIONNEL : Le Profil Secrétariat & Admission</h1>
-                <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le secrétariat d'établissement est le premier point de contact des familles. Ce guide détaille chaque étape du processus d'inscription et de réinscription scolaire.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🎒 1. Processus d'Inscription (Enrollment)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                C'est l'un des flux les plus critiques d'ACADEMIA CONNECT.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">📝 1.1 Inscription individuelle</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Formulaire d'Admission</strong> : Saisie des informations de base (Nom, Prénom, Date de Naissance, Sexe, Nationalité).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Coordonnées Parents</strong> : Liaison obligatoire entre un compte élève et au moins un compte parent (téléphone, email, lien de parenté).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Génération de Matricule</strong> : Un identifiant unique (Ex: 2026-001-A) est automatiquement généré pour assurer le suivi sans erreur de l'élève durant toute sa scolarité.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🍱 1.2 Inscription Massive (Bulk Import)</h3>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Lors de la rentrée scolaire ou du transfert d'élèves, le secrétariat peut importer un fichier Excel ou CSV pré-rempli pour créer des centaines de comptes en un clic.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📂 2. Gestion du Dossier Éélève (Students)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le module **Students** centralise toute l'histoire académique et administrative de l'enfant.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🔍 2.1 Fiche Éélève détaillée</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Historique Scolaire</strong> : Conservation des bulletins des années précédentes (si l'école utilise ACADEMIA CONNECT depuis longtemps).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">État Civil</strong> : Information sur les allergies, urgences médicales et certificats d'aptitude.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Statut de Paiement</strong> : Indicateur visuel (Vert/Rouge) sur la situation financière de l'élève (scolarité payée ou en retard).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🏷️ 2.2 Re-inscription Annuelle</h3>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le secrétariat peut passer les élèves d'une classe N à une classe N+1 (ex: du CM1 au CM2) via une interface de validation simplifiée.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📑 3. Génération de Documents Administratifs (Reports)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le secrétariat est sollicité pour produire des documents officiels.
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Certificats de Scolarité</strong> : Pré-remplis avec les données de l'élève, datés et signés numériquement.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Listes d'Émargement</strong> : Listes nominatives par classe pour les examens ou les sorties scolaires.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Reçus de Paiement</strong> : Déclenchés automatiquement lors d'un encaissement pour preuve de paiement des frais.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">⏱️ 4. Suivi d'Assiduité (Attendance Admin)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Alors que les professeurs font l'appel en classe, le secrétariat traite les absences au niveau administratif.
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Justification d'Absence</strong> : Saisie des certificats médicaux ou motifs familiaux pour passer une absence de "non-justifiée" à "justifiée".</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Synthèse Quotidienne</strong> : Rapport montrant les élèves absents sur plusieurs cours successifs pour un appel téléphonique immédiat aux familles.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">👩‍💻 5. Usage de l'application Desktop pour le Secrétariat</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le secrétariat bénéficie grandement de l'application **Desktop** pour :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Saisie Rapide</strong> : Rapidité de réaction de l'interface lors de la saisie de gros volumes d'informations (période de pointe de la rentrée).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Impression en Série</strong> : Lancement de l'impression de centaines de badges élèves en une seule action.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Support Hors-ligne (Cache)</strong> : Possibilité de continuer à saisir des informations même lors de micro-coupures internet, avec synchronisation automatique au retour de la connexion.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                *Fin du guide Secrétariat*
-            </p>
+        <div className="space-y-6 animate-in fade-in transition-all duration-300">
+            <SectionHeader
+                title="Directives & Procédures : Secrétariat & Admissions"
+                desc="Manuels d'action détaillés pour chacune des 16 fonctionnalités accessibles dans le menu latéral (Sidebar) du Secrétariat."
+            />
+
+            {/* 1. Tableau de bord */}
+            <ProcedureGuide
+                title="1. Tableau de bord (/dashboard/secretariat)"
+                subtitle="Directive de consultation de l'activité quotidienne du secrétariat."
+                badge="Guichet & Admissions"
+                steps={[
+                    { title: "Consulter la synthèse des admissions", action: "Observez le nombre de nouvelles inscriptions du jour et les dossiers en attente de validation." },
+                    { title: "Suivre la caisse du jour", action: "Vérifiez le total des frais d'inscription et scolarités encaissés au guichet." },
+                    { title: "Alerte absences", action: "Consultez les signalements d'absences non justifiées transmises par les professeurs." }
+                ]}
+            />
+
+            {/* 2. Gestion Cycles */}
+            <ProcedureGuide
+                title="2. Gestion Cycles (/dashboard/secretariat/cycles)"
+                subtitle="Procédure de consultation de la structure des cycles pour l'orientation des inscriptions."
+                badge="Cycles Pédagogiques"
+                steps={[
+                    { title: "Consulter les cycles disponibles", action: "Vérifiez les niveaux d'études ouverts aux nouvelles inscriptions (Primaire, Collège, Lycée)." }
+                ]}
+            />
+
+            {/* 3. Frais de scolarité */}
+            <ProcedureGuide
+                title="3. Frais de scolarité (/dashboard/secretariat/fees)"
+                subtitle="Directive d'information et d'encaissement des grilles tarifaires au guichet (Nouveaux & Anciens élèves)."
+                badge="Information Familles"
+                steps={[
+                    { title: "Consulter le barème des frais", action: "Vérifiez les montants dus par classe et par statut d'élève : Frais d'Inscription (Nouveaux élèves), Frais de Ré-inscription (Anciens élèves), mensualités de scolarité, tenues et cantine." },
+                    { title: "Renseigner les parents", action: "Communiquer le barème exact et le calendrier des échéances aux familles en fonction de la situation de l'élève (nouvel inscrit ou ré-inscrit)." }
+                ]}
+            />
+
+            {/* 4. Gestion des Classes */}
+            <ProcedureGuide
+                title="4. Gestion des Classes (/dashboard/secretariat/classes)"
+                subtitle="Directive de contrôle des effectifs et places disponibles par classe."
+                badge="Capacité & Effectifs"
+                steps={[
+                    { title: "Vérifier la disponibilité des places", action: "Avant d'inscrire un élève, vérifiez que la classe souhaitée n'a pas atteint son effectif maximal." }
+                ]}
+            />
+
+            {/* 5. Gestion des Matières */}
+            <ProcedureGuide
+                title="5. Gestion des Matières (/dashboard/secretariat/subjects)"
+                subtitle="Consultation du programme des cours pour la constitution des fiches pédagogiques."
+                badge="Programme d'Études"
+                steps={[
+                    { title: "Consulter la liste des matières", action: "Accédez au programme pour vérifier les matières enseignées par section." }
+                ]}
+            />
+
+            {/* 6. Personnel / Enseignants */}
+            <ProcedureGuide
+                title="6. Personnel / Enseignants (/dashboard/secretariat/teachers)"
+                subtitle="Directive d'utilisation de l'annuaire interne de l'établissement."
+                badge="Annuaire Interne"
+                steps={[
+                    { title: "Consulter les coordonnées des enseignants", action: "Retrouver le numéro professionnel ou l'email d'un professeur en cas de besoin." },
+                    { title: "Contacter un membre du staff", action: "Faciliter la prise de contact pour les urgences d'élèves ou remplaçants." }
+                ]}
+            />
+
+            {/* 7. Inscriptions */}
+            <ProcedureGuide
+                title="7. Inscriptions & Admissions (/dashboard/secretariat/enroll)"
+                subtitle="Procédure complète pour inviter un parent, valider les paiements cash en attente, inscrire un élève en direct ou ajouter un enseignant."
+                badge="Admissions & Matrice"
+                steps={[
+                    { title: "Option A : Inviter un parent (WhatsApp / Email)", action: "Sélectionnez l'onglet 'Inviter un parent'. Saisissez son Prénom, Nom et Numéro WhatsApp (ou Email). Le système génère un lien personnalisé contenant le lien d'installation de l'application mobile et le Code d'Établissement unique (ex: ACXXXXX). Le parent télécharge l'application, s'inscrit et procède à la pré-inscription de son enfant." },
+                    { title: "Option B : Valider les inscriptions & ré-inscriptions en attente de paiement (Paiement Cash)", action: "Cliquez sur l'onglet 'Inscriptions en attente' pour voir les demandes soumises par les parents (statut PENDING_FEE). Lorsqu'un parent se présente au guichet, cliquez sur 'Valider' à côté du nom de l'enfant, enregistrez le versement en espèces (Cash) des droits d'inscription (nouveaux élèves) ou de ré-inscription (anciens élèves). La validation active définitivement l'élève et génère le Reçu de Paiement PDF officiel." },
+                    { title: "Option C : Inscription Directe de l'élève au guichet", action: "Si le parent n'a pas de smartphone, cliquez sur 'Inscription Directe'. Saisissez l'état civil complet de l'élève, la classe affectée et les coordonnées d'au moins un parent. Le système génère instantanément le matricule unique (ex: 2026-001-A) et les identifiants d'accès." },
+                    { title: "Option D : Inscription d'un Nouvel Enseignant", action: "Sélectionnez l'onglet 'Nouvel Enseignant'. Saisissez son Prénom, Nom, Email institutionnel, Téléphone professionnel, Genre, les Cycles d'intervention (ex: Premier/Second Cycle), les Spécialités/Matières enseignées et attribuez un Mot de passe temporaire. Dès validation, un email d'activation d'accès lui est automatiquement adressé." }
+                ]}
+                tip="Pour les invitations WhatsApp, cliquez sur 'Générer l'invitation WhatsApp' puis sur 'WhatsApp' pour ouvrir la discussion pré-remplie directement."
+                warning="Une pré-inscription reste bloquée au statut 'PENDING_FEE' jusqu'à ce que le secrétariat valide l'encaissement des frais d'inscription en espèces (Cash) ou mobile money."
+            />
+
+            {/* 8. Dossiers Élèves */}
+            <ProcedureGuide
+                title="8. Dossiers Élèves (/dashboard/secretariat/students)"
+                subtitle="Procédure de délivrance de certificats de scolarité et de badges élèves."
+                badge="Gestion des Dossiers"
+                steps={[
+                    { title: "Rechercher un dossier élève", action: "Recherchez par nom ou matricule dans le registre centralisé." },
+                    { title: "Imprimer le Certificat de Scolarité", action: "Cliquez sur 'Générer Certificat' pour produire le PDF officiel avec le sceau de l'école." },
+                    { title: "Émettre le Badge / Carte Éléve", action: "Imprimez le badge avec le QR Code d'identification pour le contrôle d'accès." }
+                ]}
+            />
+
+            {/* 9. Présences */}
+            <ProcedureGuide
+                title="9. Présences (/dashboard/secretariat/attendance)"
+                subtitle="Procédure de suivi des absences signalées et enregistrement des justificatifs."
+                badge="Contrôle des Absences"
+                steps={[
+                    { title: "Consulter les absences du jour", action: "Examinez les signalements transmis par les enseignants lors des appels." },
+                    { title: "Contacter les familles", action: "Passez un appel téléphonique aux parents d'élèves absents sans motif." },
+                    { title: "Saisir le justificatif", action: "Enregistrer le certificat médical ou motif valable pour passer le statut de l'absence en 'Justifiée'." }
+                ]}
+            />
+
+            {/* 10. Finances & Analyses */}
+            <ProcedureGuide
+                title="10. Finances & Analyses (/dashboard/secretariat/finances)"
+                subtitle="Procédure d'encaissement des versements au guichet et émission des reçus PDF."
+                badge="Guichet Encaissement"
+                steps={[
+                    { title: "Sélectionner l'élève débiteur", action: "Recherchez l'élève et ouvrez sa fiche financière." },
+                    { title: "Sélectionner le type de frais", action: "Cochez la rubrique concernée (Inscription, Mensualité N°, Tenue)." },
+                    { title: "Enregistrer le paiement", action: "Saisissez le montant et le mode (Espèces, Chèque, Mobile Money)." },
+                    { title: "Imprimer le Reçu PDF", action: "Le reçu officiel est généré avec numéro d'enregistrement et entête. Remettez un exemplaire au parent." }
+                ]}
+            />
+
+            {/* 11. Emploi du temps */}
+            <ProcedureGuide
+                title="11. Emploi du temps (/dashboard/secretariat/schedule)"
+                subtitle="Consultation de l'agenda des cours pour l'orientation et l'information."
+                badge="Consultation Horaires"
+                steps={[
+                    { title: "Rechercher la salle ou le cours", action: "Consultez l'emploi du temps pour localiser un élève ou transmettre un message en classe." }
+                ]}
+            />
+
+            {/* 12. Gestion des Salles */}
+            <ProcedureGuide
+                title="12. Gestion des Salles (/dashboard/secretariat/rooms)"
+                subtitle="Consultation de l'affectation des salles pour l'accueil des visiteurs."
+                badge="Occupation Salles"
+                steps={[
+                    { title: "Vérifier la salle disponible", action: "Consulter la disponibilité des salles pour les entretiens de réinscription ou examens." }
+                ]}
+            />
+
+            {/* 13. Gestion des Bulletins */}
+            <ProcedureGuide
+                title="13. Gestion des Bulletins (/dashboard/secretariat/report-cards)"
+                subtitle="Procédure d'impression et de distribution des bulletins de notes."
+                badge="Impression Bulletins"
+                steps={[
+                    { title: "Télécharger les bulletins validés", action: "Une fois le conseil de classe passé, accédez aux bulletins PDF validés par la Direction." },
+                    { title: "Lancer l'impression en série", action: "Imprimez l'ensemble des bulletins de la classe pour la remise aux parents." }
+                ]}
+            />
+
+            {/* 14. Années Scolaires */}
+            <ProcedureGuide
+                title="14. Années Scolaires (/dashboard/secretariat/academic-years)"
+                subtitle="Directive de préparation de la campagne de réinscription."
+                badge="Campagne Réinscription"
+                steps={[
+                    { title: "Consulter l'année active", action: "Vérifier les dates de l'année scolaire en cours et préparer les fiches de réinscription." }
+                ]}
+            />
+
+            {/* 15. Annonce */}
+            <ProcedureGuide
+                title="15. Annonce (/dashboard/secretariat/announcements)"
+                subtitle="Procédure de publication de notes de service du secrétariat."
+                badge="Communication Guichet"
+                steps={[
+                    { title: "Rédiger un avis secrétariat", action: "Diffuser un appel à paiement, un rappel de délai ou des convocations aux parents." }
+                ]}
+            />
+
+            {/* 16. Messagerie */}
+            <ProcedureGuide
+                title="16. Messagerie (/dashboard/secretariat/messages)"
+                subtitle="Procédure d'échange en ligne sécurisé avec les parents et enseignants."
+                badge="Messagerie Secrétariat"
+                steps={[
+                    { title: "Répondre aux sollicitations des parents", action: "Traiter les demandes d'informations ou de rendez-vous reçues en ligne." }
+                ]}
+            />
         </div>
     );
 
     const render_teachers = () => (
-        <div className='animate-in fade-in transition-all duration-700'>
-            <div className="mb-10 text-center">
-                <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tight leading-tight py-2">👨‍🏫 GUIDE FONCTIONNEL : Le Profil Enseignant (Expertise Pédagogique)</h1>
-                <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le professeur utilise ACADEMIA CONNECT au quotidien, souvent en classe ou à domicile. Ce manuel présente les outils pour optimiser la gestion pédagogique.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🗂️ 1. Organisation Hebdomadaire (My Schedule)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le professeur dispose d'une vue personnalisée de sa semaine.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🕰️ 1.1 Emploi du Temps personnel</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Synchronisation Automatique</strong> : Toute modification de l'emploi du temps par la Direction est instantanément mise à jour sur le tableau de bord du professeur.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Affectation des Salles</strong> : Indication claire de la salle pour chaque cours.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Liste des Classes</strong> : Un bouton direct permet d'accéder à la liste des élèves de la classe concernée par le cours.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">⏱️ 2. Gestion de l'Assiduité (Attendance)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                C'est l'un des premiers gestes au début de chaque heure de cours.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">📝 2.1 Appel Numérique</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Liste des Éleves dynamique</strong> : Affichage des photos des élèves pour une identification rapide.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Marquage Rapide</strong> : En un clic, marquez un élève comme :</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Présent</strong> : Statut par défaut.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Absent</strong> : Déclenche automatiquement une alerte interne et, selon les réglages, une notification mobile au parent.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Retard</strong> : Enregistre le temps de retard (ex: 10 min) pour le décompte global.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Validation du Rapport</strong> : Une fois validé, le rapport d'appel est transmis au secrétariat et à la Direction.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📒 3. Cahier de Texte et Progression (Books)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Afin d'assurer la continuité pédagogique, le professeur renseigne le cahier de texte numérique.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🖊️ 3.1 Contenu de la Séance</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Résumé du Cours</strong> : Description rapide des notions abordées (ex: Théorème de Pythagore, Analyse de texte, etc.).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Pièces Jointes</strong> : Possibilité de télécharger le support de cours (PDF, Images) pour que les élèves puissent le consulter plus tard.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🎒 3.2 Gestion des Devoirs (Homework)</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Description du Travail</strong> : Consignes détaillées pour le travail à faire à la maison.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Date de Rendu</strong> : Une date limite est fixée pour le rendu du devoir. Celui-ci apparaît automatiquement sur le calendrier mobile de l'élève.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📊 4. Évaluation et Saisie des Notes (Grades)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                La saisie des notes est l'un des volets les plus optimisés d'ACADEMIA CONNECT.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">📝 4.1 Carnet de Notes Numérique</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Création d'Évaluation</strong> : Définition d'un titre (ex: Devoir Surveillé N°1), d'une date et d'un coefficient.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Interface de Saisie Rapide</strong> : Liste des élèves avec un champ de saisie unique. Le passage d'un élève à l'autre se fait via la touche "Entrée" ou "Tabulation" (Optimisation Desktop).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Commentaires et Appréciations</strong> : Ajout d'un commentaire individualisé par élève (ex: "Très bon travail", "Des efforts à poursuivre").</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">📈 4.2 Calcul des Moyennes</h3>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le système calcule automatiquement les moyennes pondérées en fonction des coefficients définis par le professeur ou l'administration.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">👨‍💻 5. Pourquoi privilégier l'application Desktop pour l'Enseignant ?</h2>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Mode Hors-ligne (Offline)</strong> : Le professeur peut saisir les notes chez lui sans connexion internet stable. Les données se synchroniseront dès le retour du réseau.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Saisie au Clavier</strong> : L'ergonomie native de l'application desktop permet de saisir des notes beaucoup plus rapidement qu'un navigateur web (pas de lag de rechargement de page).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Double Écran</strong> : Possibilité de garder le cahier de texte ouvert à côté de ses propres supports de cours numériques.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                *Fin du guide Enseignant*
-            </p>
+        <div className="space-y-6 animate-in fade-in transition-all duration-300">
+            <SectionHeader
+                title="Directives & Procédures : Espace Enseignant"
+                desc="Manuels d'action détaillés et directives pédagogiques pour chacune des 9 fonctionnalités du menu latéral (Sidebar) de l'Enseignant."
+            />
+
+            {/* 1. Tableau de bord */}
+            <ProcedureGuide
+                title="1. Tableau de Bord Enseignant (/dashboard/teacher)"
+                subtitle="Directive de consultation rapide du planning quotidien et des alertes d'évaluation."
+                badge="Vue Synthétique Professeur"
+                steps={[
+                    { title: "Consulter le cours actif / prochain cours", action: "Visualisez l'heure de cours à venir, le nom de la classe et la salle d'affectation." },
+                    { title: "Statistiques & Devoirs à corriger", action: "Observez le nombre de devoirs remis en ligne en attente de correction et les dernières moyennes enregistrées." },
+                    { title: "Accès rapide à l'Appel", action: "Cliquez sur le bouton du cours en cours pour lancer immédiatement l'appel numérique de l'heure." }
+                ]}
+            />
+
+            {/* 2. Cahier de texte */}
+            <ProcedureGuide
+                title="2. Cahier de Texte (/dashboard/teacher/book)"
+                subtitle="Procédure de tenue du cahier de texte numérique et de continuité pédagogique."
+                badge="Cahier de Texte"
+                steps={[
+                    { title: "Sélectionner la classe et la séance", action: "Ouvrez le cahier de texte, choisissez la classe et la plage horaire effectuée." },
+                    { title: "Rédiger le contenu du cours", action: "Saisissez le titre du chapitre, le résumé des notions enseignées et les exercices travaillés en classe." },
+                    { title: "Joindre des supports de cours (PDF/Images)", action: "Cliquez sur 'Joindre un fichier' pour importer le cours au format PDF ou des fiches de révision." },
+                    { title: "Programmer un devoir à la maison", action: "Cochez 'Assigner un devoir', saisissez la consigne et choisissez la date limite de rendu." },
+                    { title: "Publier la séance", action: "Cliquez sur 'Valider'. La séance devient instantanément visible par la Direction, les élèves et les parents." }
+                ]}
+            />
+
+            {/* 3. Gestion des Devoirs */}
+            <ProcedureGuide
+                title="3. Gestion des Devoirs (/dashboard/teacher/homework)"
+                subtitle="Procédure de création, de suivi des remises et de correction des devoirs en ligne."
+                badge="Devoirs & Corrections"
+                steps={[
+                    { title: "Créer un nouveau devoir", action: "Accédez à 'Devoirs', cliquez sur 'Ajouter un Devoir' et définissez la consigne, la classe et la date butoir." },
+                    { title: "Suivre l'état des remises", action: "Consultez la liste des élèves ayant déposé leur travail en ligne vs les retardataires." },
+                    { title: "Corriger et annoter les fichiers reçus", action: "Cliquez sur la copie numérique (PDF ou Photo) téléversée par l'élève, attribuez une note et saisissez un commentaire de correction." }
+                ]}
+            />
+
+            {/* 4. Notes & Évaluation */}
+            <ProcedureGuide
+                title="4. Notes & Évaluation (/dashboard/teacher/grades)"
+                subtitle="Procédure de création d'évaluations et de saisie rapide du carnet de notes."
+                badge="Carnet de Notes"
+                steps={[
+                    { title: "Créer une nouvelle Évaluation", action: "Dans le carnet de notes, cliquez sur 'Nouvelle Évaluation' (ex: Interrogation Écrite n°2, TP de Chimie)." },
+                    { title: "Configurer le barème et le coefficient", action: "Fixez la note maximale (ex: /20), le coefficient de l'épreuve (ex: Coeff 2) et le trimestre." },
+                    { title: "Saisir les notes de classe", action: "Remplissez la grille de notation élève par élève. Utilisez la touche 'Entrée' pour passer à la ligne suivante." },
+                    { title: "Valider et publier", action: "Cliquez sur 'Publier l'évaluation'. Les moyennes de classe sont recalculées et une notification est transmise aux parents." }
+                ]}
+            />
+
+            {/* 5. Gestion des Bulletins */}
+            <ProcedureGuide
+                title="5. Gestion des Bulletins (/dashboard/teacher/report-cards)"
+                subtitle="Procédure de saisie des appréciations pédagogiques trimestrielles."
+                badge="Appréciations Trimestrielles"
+                steps={[
+                    { title: "Accéder au module Bulletins", action: "Sélectionnez votre classe et votre matière pour afficher le tableau des bulletins trimestriels." },
+                    { title: "Rédiger les appréciations individuelles", action: "Saisissez l'avis pédagogique pour chaque élève en fonction de son travail et de sa conduite." },
+                    { title: "Appréciation du Professeur Principal (si applicable)", action: "Si vous êtes Professeur Principal, saisissez l'avis global du conseil de classe et la décision de passage." }
+                ]}
+            />
+
+            {/* 6. Mes Classes */}
+            <ProcedureGuide
+                title="6. Mes Classes (/dashboard/teacher/classes)"
+                subtitle="Directive de consultation des effectifs et du trombinoscope de vos élèves."
+                badge="Trombinoscope & Profils"
+                steps={[
+                    { title: "Consulter la liste de vos élèves", action: "Visualisez le trombinoscope complet avec les photos de chaque élève pour faciliter l'apprentissage des visages." },
+                    { title: "Identifier les délégués et responsables", action: "Repérez le délégué de classe, le professeur principal et les fiches individuelles." }
+                ]}
+            />
+
+            {/* 7. Emploi du temps */}
+            <ProcedureGuide
+                title="7. Emploi du temps (/dashboard/teacher/schedule)"
+                subtitle="Consultation de l'agenda hebdomadaire et des affectations de salles."
+                badge="Planning Personnel"
+                steps={[
+                    { title: "Consulter votre grille de cours", action: "Vérifiez vos heures de cours quotidiennes, vos salles d'affectation et vos créneaux libres." },
+                    { title: "Suivre les modifications d'horaires", action: "Consultez les ajustements d'emploi du temps validés par la Direction." }
+                ]}
+            />
+
+            {/* 8. Historique des Appels */}
+            <ProcedureGuide
+                title="8. Historique des Appels (/dashboard/teacher/attendance)"
+                subtitle="Procédure obligatoire d'appel numérique en début de cours et suivi."
+                badge="Appel Numérique"
+                steps={[
+                    { title: "Lancer l'Appel en début de séance", action: "Au début du cours, cliquez sur 'Faire l'Appel'. La liste des élèves s'affiche avec leurs photos." },
+                    { title: "Marquer les absences et retards", action: "Tous les élèves sont 'Présents' par défaut. Cliquez pour passer en 'Absent' ou 'En Retard' (indiquez le retard en minutes, ex: 10 min)." },
+                    { title: "Valider et transmettre", action: "Cliquez sur 'Valider l'Appel'. Le rapport est envoyé instantanément au Secrétariat et notifié aux parents." },
+                    { title: "Consulter l'historique", action: "Revoir l'historique de vos appels passés pour vérifier les taux de présence par classe." }
+                ]}
+                tip="Exécutez l'appel dans les 5 premières minutes du cours pour que le secrétariat puisse contacter immédiatement les parents d'élèves absents."
+            />
+
+            {/* 9. Messagerie */}
+            <ProcedureGuide
+                title="9. Messagerie (/dashboard/teacher/messages)"
+                subtitle="Procédure de communication sécurisée avec la Direction, le secrétariat et les parents."
+                badge="Messagerie Enseignant"
+                steps={[
+                    { title: "Échanger en direct et en toute sécurité", action: "Discutez en ligne avec les parents d'élèves, vos collègues ou l'administration sans transmettre votre numéro de téléphone personnel." }
+                ]}
+            />
         </div>
     );
 
     const render_parents = () => (
-        <div className='animate-in fade-in transition-all duration-700'>
-            <div className="mb-10 text-center">
-                <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tight leading-tight py-2">📱 GUIDE FONCTIONNEL : Le Profil Parent & Élève (Usage Mobile)</h1>
-                <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
+        <div className="space-y-6 animate-in fade-in transition-all duration-300">
+            <SectionHeader
+                title="Directives & Procédures : Espace Parents & Élèves"
+                desc="Manuels d'action détaillés pour chacune des fonctionnalités accessibles aux Parents (8 modules) et aux Élèves (6 modules)."
+            />
+
+            {/* PARTIE 1 : ESPACE PARENTS */}
+            <div className="border-b border-slate-200 dark:border-slate-800 pb-3 pt-2">
+                <h3 className="text-base font-black text-blue-600 dark:text-blue-400 uppercase tracking-wider">👨‍👩‍👧 Espace Parents d'Élèves (8 Fonctionnalités)</h3>
             </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                L'application mobile est l'interface vivante d'ACADEMIA CONNECT, elle assure le lien constant entre l'école et la famille.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">👨‍👩‍👧 1. Profil Parent : Suivi Scolaire à Distance</h2>
+
+            {/* 1. Mes Enfants */}
+            <ProcedureGuide
+                title="1. Mes Enfants (/dashboard/parent)"
+                subtitle="Directive de sélection de l'enfant et aperçu général de sa scolarité."
+                badge="Espace Famille"
+                steps={[
+                    { title: "Basculez entre vos enfants", action: "Si vous avez plusieurs enfants inscrits dans l'établissement, cliquez sur le sélecteur d'enfant en haut de page pour basculer la vue." },
+                    { title: "Consulter la synthèse globale", action: "Affichez la moyenne générale actuelle, le nombre d'absences signalées et le dernier devoir publié." }
+                ]}
+            />
+
+            {/* 2. Inscrire un enfant */}
+            <ProcedureGuide
+                title="2. Inscrire ou ré-inscrire un enfant (/dashboard/parent/enroll)"
+                subtitle="Procédure de pré-inscription en ligne d'un nouvel élève ou ré-inscription d'un ancien élève."
+                badge="Pré-Inscription & Ré-inscription"
+                steps={[
+                    { title: "Saisir le Code d'Établissement (ex: ACXXXXX)", action: "Saisissez le code unique fourni par l'école ou scannez le QR Code de l'établissement." },
+                    { title: "Remplir l'état civil et le statut de l'enfant", action: "Saisissez le Nom, Prénom, Date de naissance et choisissez la classe souhaitée (indiquez s'il s'agit d'un nouvel élève ou d'un ré-inscrit)." },
+                    { title: "Soumettre la demande", action: "Validez la demande. Elle passe au statut 'PENDING_FEE'. Présentez-vous au guichet du secrétariat pour l'encaissement des droits d'inscription (nouveaux élèves) ou de ré-inscription (anciens élèves) et la validation définitive." }
+                ]}
+                tip="Les grilles tarifaires et montants exigés s'adaptent automatiquement selon que l'enfant effectue sa première inscription ou sa ré-inscription annuelle."
+            />
+
+            {/* 3. Explorer les écoles */}
+            <ProcedureGuide
+                title="3. Explorer les écoles (/dashboard/parent/schools)"
+                subtitle="Consultation du catalogue et des fiches de présentation des écoles."
+                badge="Catalogue Écoles"
+                steps={[
+                    { title: "Consulter les fiches d'établissements", action: "Découvrez les niveaux enseignés, la localisation, les équipements et les coordonnées des secrétariats du groupe." }
+                ]}
+            />
+
+            {/* 4. Finances & Reçus */}
+            <ProcedureGuide
+                title="4. Finances & Reçus (/dashboard/parent/payments)"
+                subtitle="Procédure de suivi des mensualités de scolarité et téléchargement des reçus PDF."
+                badge="Comptabilité Famille"
+                steps={[
+                    { title: "Consulter l'échéancier des frais", action: "Vérifiez les mensualités déjà réglées au guichet et les échéances restant à payer." },
+                    { title: "Télécharger un reçu de paiement PDF", action: "Cliquez sur l'icône de téléchargement en face d'un versement pour obtenir la preuve comptable officielle avec entête." }
+                ]}
+            />
+
+            {/* 5. Résultats & Bulletins */}
+            <ProcedureGuide
+                title="5. Résultats & Bulletins (/dashboard/parent/results)"
+                subtitle="Procédure de suivi des notes au fil de l'eau et téléchargement du bulletin officiel."
+                badge="Résultats Scolaires"
+                steps={[
+                    { title: "Consulter les notes d'examens", action: "Consultez le relevé détaillé des interrogations et devoirs surveillés publiés par les professeurs." },
+                    { title: "Télécharger le bulletin trimestriel PDF", action: "En fin de trimestre, cliquez sur 'Télécharger le Bulletin Officiel' pour obtenir le document signé par la Direction." }
+                ]}
+            />
+
+            {/* 6. Emploi du temps */}
+            <ProcedureGuide
+                title="6. Emploi du temps (/dashboard/parent/schedule)"
+                subtitle="Consultation de l'agenda hebdomadaire et des salles de cours de votre enfant."
+                badge="Planning Élève"
+                steps={[
+                    { title: "Consulter l'emploi du temps hebdomadaire", action: "Vérifiez les heures de présence, les matières enseignées et les salles attribuées jour par jour." }
+                ]}
+            />
+
+            {/* 7. Assiduité */}
+            <ProcedureGuide
+                title="7. Assiduité (/dashboard/parent/attendance)"
+                subtitle="Procédure de contrôle des absences, retards et transmission de justificatifs."
+                badge="Bilan Assiduité"
+                steps={[
+                    { title: "Consulter l'historique d'assiduité", action: "Vérifiez la liste des absences et des retards en minutes signalés lors des appels numériques des professeurs." },
+                    { title: "Contrôler la justification", action: "Assurez-vous que le secrétariat a bien enregistré votre motif (statut vert 'Justifiée')." }
+                ]}
+            />
+
+            {/* 8. Messagerie */}
+            <ProcedureGuide
+                title="8. Messagerie (/dashboard/parent/messages)"
+                subtitle="Procédure d'échange sécurisé avec les professeurs et la Direction."
+                badge="Messagerie Parents"
+                steps={[
+                    { title: "Démarrer une discussion", action: "Cliquez sur 'Nouveau message', sélectionnez le professeur ou l'administration et rédigez votre message sans partager votre numéro personnel." }
+                ]}
+            />
+
+            {/* PARTIE 2 : ESPACE ÉLÈVES */}
+            <div className="border-b border-slate-200 dark:border-slate-800 pb-3 pt-6">
+                <h3 className="text-base font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">🎓 Espace Élèves (6 Fonctionnalités)</h3>
             </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le parent dispose de sa propre session pour suivre un ou plusieurs enfants au sein de l'établissement scolaire.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🏠 1.1 Tableau de Bord Enfant</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Aperçu Actuel</strong> : Visualisation instantanée des dernières évaluations, de l'état d'assiduité et des événements à venir.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Changement d'enfant</strong> : Si un parent a plusieurs enfants (ex: un au Primaire, un au Collège), il peut basculer entre leurs profils via un menu intuitif sans se reconnecter.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📉 2. Résultats Académiques (Scores & Bulletins)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                C'est le module le plus consulté de l'application.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">📊 2.1 Notes et Évaluations</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Historique des Notes</strong> : Liste des notes obtenues par matière, avec le coefficient associé.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Moyenne Provisoire</strong> : Calcul automatique de la moyenne trimestrielle actuelle basée sur les devoirs déjà saisis par les professeurs.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Appréciations</strong> : Lecture des commentaires des enseignants par évaluation.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">📑 2.2 Téléchargement des Bulletins (Report Cards)</h3>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Une fois validés par la Direction, les livrets scolaires (bulletins) sont disponibles au format PDF. Le parent peut les télécharger sur son téléphone ou les imprimer directement.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">⏱️ 3. Assiduité et Ponctualité (Attendance & Absences)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le parent est immédiatement informé du comportement scolaire de l'élève.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">📝 3.1 Registre des Absences et Retards</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Détail du Jour et de l'Heure</strong> : Indication du cours précis où l'absence a été enregistrée.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Suivi du Statut</strong> : Le parent peut voir si l'absence a été transmise comme "justifiée" ou "non-justifiée" par le Secrétariat.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🎒 4. Profil Élève : Agenda et Devoirs (Homework)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                L'élève utilise l'application mobile pour son organisation personnelle.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🗓️ 4.1 Emploi du Temps et Salles</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Lien vers le Cours</strong> : Consultation quotidienne de l'emploi du temps avec indication de la salle et du professeur.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Gestion des Changements</strong> : En cas de changement de salle ou d'enseignant, l'application se met à jour en temps réel.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">📒 4.2 Cahier de Texte et Travaux à rendre</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Détails des Devoirs</strong> : Liste des travaux à faire par matière avec les consignes détaillées laissées par le professeur.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Calendrier de Rendu</strong> : Alertes pour les dates limites de rendu de devoirs ou les évaluations à réviser.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">💰 5. Suivi Financier (Finances & Scolarité)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Le parent peut suivre l'état financier de son foyer avec l'école.
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Détail des Frais</strong> : Liste des rubriques payées (Inscriptions, Tenues scolaires, Assurance, Mensualités).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Paiements à échoir</strong> : Notifications de rappels pour les mensualités à venir pour éviter les retards.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Reçus PDF</strong> : Téléchargement des reçus de paiement pour les besoins de preuve comptable.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">💬 6. Messagerie et Notifications (Messages)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Canal direct de communication.
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Avis de l'École</strong> : Réception des notes d'information, circulaires et invitations aux réunions.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Échanges Enseignants/Parents</strong> : Messagerie sécurisée pour discuter du comportement ou de la scolarité de l'élève sans échanger de numéros personnels.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                *Fin du guide Parent & Élève*
-            </p>
+
+            {/* 1. Mon Espace */}
+            <ProcedureGuide
+                title="1. Mon Espace (/dashboard/student)"
+                subtitle="Directive de consultation du tableau de bord de l'élève."
+                badge="Espace Élève"
+                steps={[
+                    { title: "Aperçu du jour", action: "Consultez l'emploi du temps de la journée, la salle du cours suivant et le nombre de devoirs à faire pour le lendemain." }
+                ]}
+            />
+
+            {/* 2. Mes Cours */}
+            <ProcedureGuide
+                title="2. Mes Cours (/dashboard/student/courses)"
+                subtitle="Procédure d'accès au cahier de texte et supports de cours."
+                badge="Supports de Cours"
+                steps={[
+                    { title: "Consulter le cahier de texte", action: "Ouvrez la liste des séances publiées par vos professeurs." },
+                    { title: "Télécharger les ressources PDF", action: "Cliquez sur les fiches de cours et exercices joints pour réviser la leçon." }
+                ]}
+            />
+
+            {/* 3. Mes Notes */}
+            <ProcedureGuide
+                title="3. Mes Notes (/dashboard/student/results)"
+                subtitle="Procédure de consultation des notes obtenues et moyennes par matière."
+                badge="Notes & Moyennes"
+                steps={[
+                    { title: "Consulter vos résultats", action: "Examinez vos notes par matière, le coefficient de l'épreuve et les appréciations du professeur." }
+                ]}
+            />
+
+            {/* 4. Devoirs */}
+            <ProcedureGuide
+                title="4. Devoirs (/dashboard/student/homework)"
+                subtitle="Procédure de consultation des devoirs et remise des travaux en ligne."
+                badge="Devoirs à la Maison"
+                steps={[
+                    { title: "Consulter les devoirs à rendre", action: "Accédez à la liste des travaux assignés avec leur date limite de rendu." },
+                    { title: "Déposer votre travail numérisé", action: "Cliquez sur 'Soumettre mon travail', téléversez votre fichier (PDF ou Photo lisible de votre cahier) et validez." }
+                ]}
+                tip="Veillez à prendre une photo bien éclairée et cadrée si vous remettez votre devoir sous forme d'image."
+            />
+
+            {/* 5. Emploi du temps */}
+            <ProcedureGuide
+                title="5. Emploi du temps (/dashboard/student/schedule)"
+                subtitle="Consultation de l'emploi du temps de la classe."
+                badge="Emploi du Temps"
+                steps={[
+                    { title: "Vérifier le planning des cours", action: "Consultez vos horaires quotidiens, les matières et les numéros de salles." }
+                ]}
+            />
+
+            {/* 6. Messagerie */}
+            <ProcedureGuide
+                title="6. Messagerie (/dashboard/student/messages)"
+                subtitle="Procédure de communication directe avec les enseignants."
+                badge="Messagerie Élève"
+                steps={[
+                    { title: "Poser une question au professeur", action: "Envoyez un message direct à votre enseignant pour demander une précision sur un cours ou un devoir." }
+                ]}
+            />
         </div>
     );
 
     const render_troubleshooting = () => (
-        <div className='animate-in fade-in transition-all duration-700'>
-            <div className="mb-10 text-center">
-                <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tight leading-tight py-2">🛠️ GUIDE FONCTIONNEL : Guide Technique & Maintenance</h1>
-                <div className="h-2 w-32 bg-blue-600  mx-auto mt-6 mb-8"></div>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Ce manuel s'adresse aux référents informatiques et aux utilisateurs avancés de la solution ACADEMIA CONNECT. Il détaille les bonnes pratiques pour le maintien de l'application.
-            </p>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">💻 1. Installation et Mises à Jour (Setup)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                ACADEMIA CONNECT est une solution hybride combinant Web, Desktop et Mobile.
-            </p>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🌐 1.1 Accès Web</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">URL Officielle</strong> : Recommandé pour l'usage ponctuel ou les postes sans droits d'installation (Cybercafés, Bibliothèques).</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Navigateurs Supportés</strong> : Chrome, Firefox et Edge dans leurs versions les plus récentes.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🖥️ 1.2 Application Desktop (Recommandé)</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Windows / macOS / Linux</strong> : Téléchargement du binaire depuis le portail d'administration.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Mise à jour Automatique</strong> : L'application vérifie la présence d'une nouvelle version à chaque lancement pour assurer l'accès aux derniers correctifs de sécurité.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">📱 1.3 Application Mobile</h3>
-            </div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Android (Play Store) & iOS (App Store)</strong> : L'application est nommée "ACADEMIA CONNECT Mobile".</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Connexion au Code École</strong> : Lors de la première installation, le parent doit renseigner le code école (ex: ECOLE-001) avant ses identifiants personnels.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">🐛 2. Dépannage Courant (Troubleshooting)</h2>
-            </div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">⚠️ 2.1 Problèmes de Lancement (Spécial Linux/Wayland)</h3>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                Si l'application Desktop affiche un écran noir ou se ferme au démarrage sur Linux :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Cause Problématique</strong> : Incompatibilité du GPU avec les pilotes NVIDIA ou Wayland.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Solution Implémentée</strong> : Nous avons forcé le mode X11 et désactivé l'accélération matérielle nativement dans le script de démarrage `main.ts`.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Restauration Initiale</strong> : Si le problème persiste, vider le dossier de cache de l'utilisateur à l'adresse suivante : `~/.config/frontend-desktop/`.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">🧹 2.2 Vidage du Cache et Réinitialisation</h3>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                En cas d'affichage incohérent des données (données non à jour malgré la synchronisation) :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Déconnexion / Reconnexion</strong> : Force le rafraîchissement des jetons d'accès.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Nettoyage du Local Storage</strong> : Dans les options du navigateur (F12, Application puis Storage), vider les données de cache (LocalStorage/IndexDB). ACADEMIA CONNECT utilise IndexDB pour la fluidité hors-ligne.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">💾 3. Sauvegardes et Sécurité (Backup)</h2>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                La sécurité des données est au cœur d'ACADEMIA CONNECT.
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Stockage Cloud Sécurisé</strong> : Toutes les données de scolarité sont chiffrées sur nos serveurs.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Sauvegardes Quotidiennes</strong> : Une copie de sauvegarde de la base de données est effectuée toutes les 24 heures.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Chiffrement des PDF</strong> : Les bulletins de notes et reçus générés sont marqués numériquement pour éviter les falsifications.</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <div className="mt-16 mb-8 relative">
-                <div className="absolute -left-6 top-2 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-indigo-600 "></div>
-                <h2 className="text-xl md:text-3xl font-extrabold text-slate-800 pl-4">📞 4. Support Technique ACADEMIA CONNECT</h2>
-            </div>
-            <div className="mt-10 mb-6 flex items-center gap-4 bg-slate-50 p-4   ">
-                <div className="w-10 h-10  bg-blue-100 flex items-center justify-center font-bold text-blue-700"><CheckCircle className="w-6 h-6" /></div>
-                <h3 className="text-lg md:text-2xl font-bold text-blue-900">Comment signaler un bug ?</h3>
-            </div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                1.  **Identification du Module** : Précisez sur quel écran le problème survient (ex: "Saisie des notes").
-            </p>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                2.  **Capture d'Écran** : Fournir une image de l'erreur si un message rouge s'affiche.
-            </p>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                3.  **Logs Techniques** : Pour les utilisateurs d'application Desktop, les erreurs sont enregistrées dans :
-            </p>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Windows</strong> : `%APPDATA%/frontend-desktop/crash-log.txt`</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">Linux</strong> : `~/.config/frontend-desktop/crash-log.txt`</span>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="mb-4 pl-4 hover:pl-6 transition-all duration-300">
-                <div className="flex items-start gap-3 md:gap-4 p-3 md:p-5 bg-white    shadow-sm hover:shadow-md hover: transition-all">
-                    <div className="mt-1 shrink-0 w-6 h-6 md:w-8 md:h-8  bg-blue-50 flex items-center justify-center text-blue-500"><ArrowRight className="w-4 h-4" /></div>
-                    <div className="text-sm md:text-lg text-slate-600 leading-relaxed font-medium">
-                        <span>  <strong className="text-blue-800 font-extrabold">macOS</strong> : `~/Library/Application Support/frontend-desktop/crash-log.txt`</span>
-                    </div>
-                </div>
-            </motion.div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-12 hidden md:block"></div>
-            <p className="text-sm md:text-xl text-slate-500 mb-8 leading-loose font-medium">
-                *Fin du guide Technique & Maintenance*
-            </p>
+        <div className="space-y-6 animate-in fade-in transition-all duration-300">
+            <SectionHeader
+                title="Directives & Procédures : Maintenance & Dépannage Technique"
+                desc="Procédures de résolution de problèmes informatiques pour les administrateurs système et utilisateurs."
+            />
+
+            <ProcedureGuide
+                title="Comment résoudre un écran noir au démarrage sous Linux (Wayland / NVIDIA) ?"
+                subtitle="Directive de dépannage pour l'application Desktop sous Linux."
+                badge="Dépannage Linux"
+                steps={[
+                    { title: "Fermer l'application bloquée", action: "Appuyez sur Alt+F4 ou quittez le processus via le terminal (`killall frontend-desktop`)." },
+                    { title: "Nettoyer le dossier de cache", action: "Ouvrez votre terminal Linux et exécutez la commande : `rm -rf ~/.config/frontend-desktop/`" },
+                    { title: "Relancer l'application", action: "Relancez l'application depuis votre menu ou le terminal. Le script `main.ts` forçera le mode X11 stable." }
+                ]}
+                warning="Ne modifiez pas manuellement les variables d'environnement XDG_SESSION_TYPE, le binaire gère lui-même le basculement X11 de secours."
+            />
+
+            <ProcedureGuide
+                title="Comment forcer la réinitialisation du cache et la synchronisation ?"
+                subtitle="Directive en cas d'affichage incohérent des données sur navigateur web."
+                badge="Purge du Cache"
+                steps={[
+                    { title: "Effectuer une Déconnexion", action: "Cliquez sur 'Déconnexion' dans le menu latéral pour vider les jetons d'accès expiré." },
+                    { title: "Ouvrir l'inspecteur web", action: "Appuyez sur la touche F12 de votre clavier (ou Clic droit > Inspecter)." },
+                    { title: "Purger les données Storage", action: "Allez dans l'onglet 'Application' > 'Storage', puis cliquez sur 'Clear site data' (Réinitialise la base IndexDB)." },
+                    { title: "Recharger et se reconnecter", action: "Rechargez la page (Ctrl+F5) et connectez-vous à nouveau." }
+                ]}
+            />
+
+            <ProcedureGuide
+                title="Comment récupérer les fichiers de logs de crash pour le support ?"
+                subtitle="Procédure d'extraction des logs d'erreurs techniques pour transmission à notre équipe."
+                badge="Extraction Logs"
+                steps={[
+                    { title: "Ouvrir l'explorateur de fichiers", action: "Accédez au dossier de configuration selon votre système d'exploitation :" },
+                    { title: "Sur Windows", action: "Saisissez `%APPDATA%/frontend-desktop/` dans la barre d'adresse et localisez `crash-log.txt`." },
+                    { title: "Sur Linux", action: "Ouvrez le dossier masqué `~/.config/frontend-desktop/crash-log.txt`." },
+                    { title: "Sur macOS", action: "Ouvrez `~/Library/Application Support/frontend-desktop/crash-log.txt`." },
+                    { title: "Transmettre au support", action: "Joignez ce fichier texte à votre ticket d'assistance accompagnant une capture d'écran de l'erreur." }
+                ]}
+            />
         </div>
     );
 
-
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50 font-sans pb-32 overflow-x-hidden xl:overflow-x-visible">
-            <header className="relative bg-[#0A192F] pt-32 pb-16 xl:pt-28 xl:pb-12 overflow-hidden shadow-2xl shrink-0">
-                <div className="absolute inset-0 z-0">
-                    <div className="absolute top-10 left-10 w-96 h-96 bg-blue-600/20  blur-[120px] mix-blend-screen animate-pulse"></div>
-                    <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-indigo-500/20  blur-[150px] mix-blend-screen animate-pulse"></div>
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 font-sans pb-24 transition-colors">
+            {/* Header Hero Banner */}
+            <header className="relative bg-slate-900 dark:bg-slate-950 pt-16 pb-12 overflow-hidden shadow-xl shrink-0 border-b border-slate-800">
+                <div className="absolute inset-0 z-0 pointer-events-none">
+                    <div className="absolute -top-20 -left-20 w-96 h-96 bg-blue-600/15 blur-[100px] rounded-full"></div>
+                    <div className="absolute -bottom-20 -right-20 w-[450px] h-[450px] bg-indigo-600/15 blur-[120px] rounded-full"></div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-                    <div className="text-center max-w-4xl mx-auto">
-                        <div className="inline-flex items-center gap-3 px-6 py-2  bg-blue-500/10   text-blue-300 font-semibold tracking-wide uppercase text-sm mb-6 backdrop-blur-sm shadow-lg">
-                            <LifeBuoy className="w-5 h-5" />
-                            <span>Centre de Support & Documentation Ultime</span>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="text-center max-w-3xl mx-auto">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 font-semibold text-xs rounded-full mb-4 shadow-sm">
+                            <LifeBuoy className="w-4 h-4" />
+                            <span>Guide Intégral des Directives & Procédures d'Exécution</span>
                         </div>
-                        <h1 className="text-3xl md:text-5xl xl:text-6xl font-black text-white mb-6 leading-tight tracking-tighter">
-                            Maîtrisez <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">ACADEMIA CONNECT</span>
+                        <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+                            Manuels d'Action <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">Academia Connect</span>
                         </h1>
-                        <div className="relative max-w-2xl mx-auto mt-6">
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500  blur opacity-25"></div>
-                            <div className="relative flex items-center bg-[#112240]    shadow-2xl p-1.5">
-                                <Search className="w-6 h-6 ml-4 text-blue-400" />
-                                <input type="text" placeholder="Rechercher une fonctionnalité..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-transparent border-none text-white text-lg p-4 focus:outline-none" />
+                        <p className="text-xs sm:text-sm text-slate-400 mt-3 max-w-xl mx-auto">
+                            Consultez les procédures "Comment faire..." pas-à-pas et les directives d'exécution issues directement du code de l'application.
+                        </p>
+
+                        {/* Search Bar */}
+                        <div className="relative max-w-xl mx-auto mt-6">
+                            <div className="relative flex items-center bg-slate-800/90 border border-slate-700/80 rounded-2xl shadow-xl overflow-hidden focus-within:border-blue-500 transition-all">
+                                <Search className="w-5 h-5 ml-4 text-slate-400 shrink-0" />
+                                <input
+                                    type="text"
+                                    placeholder="Rechercher une procédure (ex: créer une école, faire l'appel, notes...)"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full bg-transparent border-none text-white text-sm p-3.5 pl-3 focus:outline-none placeholder-slate-400"
+                                />
                             </div>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <div className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
-                <div className="flex flex-col xl:flex-row gap-8 pb-8 xl:pb-0">
-                    <aside className="xl:w-1/3 2xl:w-[400px] shrink-0 sticky top-24 z-30 self-start max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
-                        <div className="bg-white/90 backdrop-blur-md shadow-xl p-3 md:p-6 shadow-blue-500/5">
-
+            {/* Main Content Layout */}
+            <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mt-8 relative z-20">
+                <div className="flex flex-col xl:flex-row gap-8">
+                    {/* Sidebar Navigation */}
+                    <aside className="xl:w-80 shrink-0 sticky top-24 z-30 self-start">
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-3">
+                            {/* Mobile Drawer Trigger */}
                             {(() => {
                                 const activeItem = menuItems.find(m => m.id === activeTab) || menuItems[0];
                                 const ActiveIcon = activeItem.icon;
                                 return (
                                     <div className="xl:hidden relative z-50">
-                                        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="w-full flex items-center justify-between bg-blue-50 p-4 border border-blue-100 shadow-sm font-bold text-blue-900">
+                                        <button
+                                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                            className="w-full flex items-center justify-between bg-blue-50 dark:bg-slate-800/80 p-3.5 rounded-xl border border-blue-200/60 dark:border-slate-700 text-blue-900 dark:text-white font-bold text-sm"
+                                        >
                                             <div className="flex items-center gap-3">
-                                                <ActiveIcon className="text-blue-600" size={20} />
+                                                <ActiveIcon className="text-blue-600 dark:text-blue-400" size={18} />
                                                 <div className="text-left">
-                                                    <div className="text-sm">{activeItem.label}</div>
-                                                    <div className="text-[10px] text-slate-500 font-normal">{activeItem.desc}</div>
+                                                    <div className="text-xs font-extrabold">{activeItem.label}</div>
+                                                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">{activeItem.desc}</div>
                                                 </div>
                                             </div>
-                                            <ChevronDown className={`transition-transform duration-300 shrink-0 ${isMobileMenuOpen ? 'rotate-180' : ''}`} size={20} />
+                                            <ChevronDown className={`transition-transform duration-300 shrink-0 ${isMobileMenuOpen ? 'rotate-180' : ''}`} size={18} />
                                         </button>
                                         <AnimatePresence>
                                             {isMobileMenuOpen && (
-                                                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="mt-2 bg-white shadow-xl z-50 flex flex-col border border-slate-100 max-h-[60vh] overflow-y-auto">
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: -8 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: -8 }}
+                                                    className="absolute top-full mt-2 left-0 w-full bg-white dark:bg-slate-900 shadow-2xl rounded-xl border border-slate-200 dark:border-slate-800 z-50 flex flex-col max-h-[60vh] overflow-y-auto"
+                                                >
                                                     {filteredMenuItems.map(item => (
-                                                        <button key={item.id} onClick={() => { handleTabChange(item.id); setIsMobileMenuOpen(false); }} className={`flex items-start gap-3 p-4 text-left hover:bg-slate-50 transition-colors ${activeTab === item.id ? 'bg-blue-50 text-blue-700' : 'text-slate-600 border-b border-slate-50 last:border-0'}`}>
-                                                            <item.icon size={18} className={`mt-0.5 shrink-0 ${activeTab === item.id ? 'text-blue-600' : 'text-slate-400'}`} />
+                                                        <button
+                                                            key={item.id}
+                                                            onClick={() => { handleTabChange(item.id); setIsMobileMenuOpen(false); }}
+                                                            className={`flex items-start gap-3 p-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${activeTab === item.id ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold' : 'text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 last:border-0'}`}
+                                                        >
+                                                            <item.icon size={16} className={`mt-0.5 shrink-0 ${activeTab === item.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`} />
                                                             <div>
-                                                                <div className="font-bold text-sm">{item.label}</div>
-                                                                <div className="text-xs text-slate-400">{item.desc}</div>
+                                                                <div className="text-xs font-bold">{item.label}</div>
+                                                                <div className="text-[10px] text-slate-500 dark:text-slate-400">{item.desc}</div>
                                                             </div>
                                                         </button>
                                                     ))}
@@ -1760,54 +1166,73 @@ const Support: React.FC = () => {
                                 );
                             })()}
 
-                            <nav className="hidden xl:flex flex-col gap-3">
+                            {/* Desktop Sidebar Nav */}
+                            <nav className="hidden xl:flex flex-col gap-1.5">
                                 {filteredMenuItems.length === 0 && (
-                                    <div className="p-4 text-center text-slate-500 font-medium">Aucun résultat trouvé.</div>
+                                    <div className="p-4 text-center text-xs text-slate-500 dark:text-slate-400">Aucune procédure trouvée.</div>
                                 )}
                                 {filteredMenuItems.map((item) => {
                                     const Icon = item.icon;
+                                    const isActive = activeTab === item.id;
                                     return (
-                                        <button key={item.id} onClick={() => handleTabChange(item.id)}
-                                            className={`w-full group flex items-start gap-4 p-5 font-bold transition-all ${activeTab === item.id ? 'bg-blue-600 text-white shadow-xl scale-[1.02]' : 'text-slate-700 bg-white hover:bg-slate-50'}`}>
-                                            <Icon size={20} className={activeTab === item.id ? 'text-white' : 'text-blue-600'} />
-                                            <div className="text-left flex-1 min-w-0">
-                                                <div className="text-lg whitespace-normal">{item.label}</div>
-                                                <div className={`text-xs ${activeTab === item.id ? 'text-blue-100' : 'text-slate-400'}`}>{item.desc}</div>
+                                        <button
+                                            key={item.id}
+                                            onClick={() => handleTabChange(item.id)}
+                                            className={`w-full flex items-start gap-3 p-3 rounded-xl font-bold transition-all text-left ${isActive
+                                                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70'
+                                                }`}
+                                        >
+                                            <Icon size={18} className={`mt-0.5 shrink-0 ${isActive ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-xs leading-snug">{item.label}</div>
+                                                <div className={`text-[10px] truncate ${isActive ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'}`}>
+                                                    {item.desc}
+                                                </div>
                                             </div>
-                                            <ChevronRight size={18} className={activeTab === item.id ? 'text-white' : 'text-slate-300'} />
+                                            <ChevronRight size={16} className={`shrink-0 mt-0.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                                         </button>
                                     );
                                 })}
                             </nav>
-
                         </div>
                     </aside>
 
-                    <main className="flex-1 min-w-0 overflow-hidden break-words">
+                    {/* Main Content Area */}
+                    <main ref={mainRef} className="flex-1 min-w-0">
                         <AnimatePresence mode="wait">
-                            <motion.div key={activeTab} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-                                className="bg-white shadow-2xl p-6 md:p-16 relative overflow-hidden">
-                                <div className="space-y-4">
-                                    {activeTab === 'getting-started' && render_getting_started()}
-                                    {activeTab === 'pdg' && render_pdg()}
-                                    {activeTab === 'direction' && render_direction()}
-                                    {activeTab === 'secretariat' && render_secretariat()}
-                                    {activeTab === 'teachers' && render_teachers()}
-                                    {activeTab === 'parents' && render_parents()}
-                                    {activeTab === 'troubleshooting' && render_troubleshooting()}
+                            <motion.div
+                                key={activeTab}
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -12 }}
+                                transition={{ duration: 0.2 }}
+                                className="bg-white dark:bg-slate-900 shadow-sm rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 md:p-10 relative overflow-hidden"
+                            >
+                                {activeTab === 'getting-started' && render_getting_started()}
+                                {activeTab === 'pdg' && render_pdg()}
+                                {activeTab === 'direction' && render_direction()}
+                                {activeTab === 'secretariat' && render_secretariat()}
+                                {activeTab === 'teachers' && render_teachers()}
+                                {activeTab === 'parents' && render_parents()}
+                                {activeTab === 'troubleshooting' && render_troubleshooting()}
 
-                                </div>
-                                <div className="mt-32 pt-16 ]   text-center">
-                                    <h2 className="text-4xl font-black text-slate-800 mb-6">FAQ & Support Technique</h2>
-                                    <p className="text-sm md:text-xl text-slate-500 mb-10">Notre documentation couvre l'intégralité des flux de travail.</p>
-                                    <div className="grid md:grid-cols-2 gap-8 text-left">
-                                        <div className="bg-slate-50 p-6 ">
-                                            <h4 className="font-bold mb-2">Comment synchroniser mes données ?</h4>
-                                            <p className="text-slate-600">L'application se synchronise automatiquement. En cas de déconnexion, elle utilise IndexDB pour sauvegarder vos modifications localement.</p>
+                                {/* Bottom Support Assistance Banner */}
+                                <div className="mt-12 pt-8 border-t border-slate-200/80 dark:border-slate-800">
+                                    <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3.5">
+                                            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                                <HelpCircle className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-sm text-slate-900 dark:text-white">Besoin d'aide sur une procédure spécifique ?</h4>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400">Consultez l'administrateur de votre établissement ou contactez notre équipe technique.</p>
+                                            </div>
                                         </div>
-                                        <div className="bg-slate-50 p-6 ">
-                                            <h4 className="font-bold mb-2">Support Linux / Wayland ?</h4>
-                                            <p className="text-slate-600">Nous avons désactivé l'accélération matérielle et forcé le backend X11 pour garantir une stabilité maximale sur les distributions Linux modernes.</p>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-800">
+                                                Support Direct 24/7
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -1817,17 +1242,18 @@ const Support: React.FC = () => {
                 </div>
             </div>
 
+            {/* Scroll To Top Button */}
             <AnimatePresence>
                 {showTopBtn && (
                     <motion.button
-                        initial={{ opacity: 0, scale: 0.5 }}
+                        initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.5 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
                         onClick={scrollToTop}
-                        className="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 text-white rounded-full shadow-2xl hover:bg-blue-700 hover:shadow-blue-500/50 transition-all group"
-                        title="Remonter en haut"
+                        className="fixed bottom-6 right-6 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+                        aria-label="Retour en haut"
                     >
-                        <ArrowUp size={24} className="group-hover:-translate-y-1 transition-transform" />
+                        <ArrowUp className="w-5 h-5" />
                     </motion.button>
                 )}
             </AnimatePresence>

@@ -23,7 +23,7 @@ const Students: React.FC = () => {
         try {
             const url = institutionId ? `/students?institutionId=${institutionId}` : '/students';
             const res = await api.get(url);
-            const exportData = res.data.map((s: any) => ({
+            const exportData = (res.data || []).map((s: any) => ({
                 ID: s.id,
                 Nom: s.lastName,
                 Prénom: s.firstName,
@@ -42,49 +42,49 @@ const Students: React.FC = () => {
     };
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                <div className="flex items-center gap-4">
+        <div className="space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
                     {institutionId && (
                         <button
                             onClick={() => navigate(ROUTES.DASHBOARD.PDG.SCHOOL_DETAILS.replace(':id', institutionId.toString()))}
-                            className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-sm"
+                            className="w-10 h-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm shrink-0"
                             title="Retour à l'établissement"
                         >
-                            <ArrowLeft size={20} />
+                            <ArrowLeft size={18} />
                         </button>
                     )}
                     <div>
-                        <h2 className="text-2xl font-black text-slate-800 tracking-tight">Liste des Élèves</h2>
-                        <p className="text-slate-500 font-medium">Vue d'ensemble sur l'effectif total des élèves.</p>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Liste des Élèves</h2>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Vue d'ensemble sur l'effectif total des élèves.</p>
                     </div>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-2.5">
                     <button
                         onClick={handleExport}
                         disabled={isExporting}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
+                        className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-200 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm disabled:opacity-50"
                     >
-                        {isExporting ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                        {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
                         Export Excel
                     </button>
                     <button
                         onClick={() => setShowCsvModal(true)}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+                        className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-200 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
                     >
-                        <Upload size={18} /> Importer CSV
+                        <Upload size={16} /> Importer CSV
                     </button>
                     <button
                         onClick={() => setIsDemoModalOpen(true)}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+                        className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-200 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
                     >
-                        <Users size={18} /> Rapport
+                        <Users size={16} /> Rapport
                     </button>
                     <button
                         onClick={() => navigate(`${ROUTES.DASHBOARD.PDG.ENROLL}${institutionId ? `?institutionId=${institutionId}` : ''}`)}
-                        className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-extrabold flex items-center gap-2 shadow-xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all"
                     >
-                        <Plus size={18} /> Nouvelle Inscription
+                        <Plus size={16} /> Nouvelle Inscription
                     </button>
                 </div>
             </div>
@@ -107,7 +107,7 @@ const Students: React.FC = () => {
                     }}
                 />
             )}
-        </>
+        </div>
     );
 };
 

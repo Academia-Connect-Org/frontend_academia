@@ -16,44 +16,46 @@ const Teachers: React.FC = () => {
     }, [user?.institution?.id]);
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Corps Enseignant</h2>
-                    <p className="text-slate-500">Gérez les profils, les spécialités et suivez la performance.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Corps Enseignant</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gérez les profils, les spécialités et suivez la performance.</p>
                 </div>
-                <div className="flex gap-4">
-                    <button className="bg-white   px-6 py-3  font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
-                        <Download size={18} /> Exporter
+                <div className="flex flex-wrap gap-3">
+                    <button className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
+                        <Download size={16} /> Exporter
                     </button>
                     <Link
                         to={ROUTES.DASHBOARD.DIRECTION.ENROLL}
-                        className="bg-indigo-600 text-white px-8 py-3  font-extrabold flex items-center gap-2 shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-md transition-all"
                     >
-                        <Plus size={18} /> Nouvel Enseignant
+                        <Plus size={16} /> Nouvel Enseignant
                     </Link>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <KPICard label="Total Enseignants" count={overview?.totalTeachers ?? "..."} icon={Users} color="text-indigo-600" bg="bg-indigo-50" />
-                <KPICard label="Moyenne Évaluation" count="4.8/5" icon={Star} color="text-amber-600" bg="bg-amber-50" />
-                <KPICard label="Matières Couvertes" count={overview?.totalSubjects ?? "..."} icon={BookOpen} color="text-emerald-600" bg="bg-emerald-50" />
-                <KPICard label="Taux de Présence" count="98%" icon={Clock} color="text-blue-600" bg="bg-blue-50" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <KPICard label="Total Enseignants" count={overview?.totalTeachers ?? 0} icon={Users} color="text-indigo-600 dark:text-indigo-400" bg="bg-indigo-50 dark:bg-indigo-950/40" />
+                <KPICard label="Moyenne Évaluation" count={`${overview?.averageRating ?? 0}/5`} icon={Star} color="text-amber-600 dark:text-amber-400" bg="bg-amber-50 dark:bg-amber-950/40" />
+                <KPICard label="Matières Couvertes" count={overview?.totalSubjects ?? 0} icon={BookOpen} color="text-emerald-600 dark:text-emerald-400" bg="bg-emerald-50 dark:bg-emerald-950/40" />
+                <KPICard label="Taux de Présence" count={`${overview?.teacherAttendanceRate ?? 0}%`} icon={Clock} color="text-blue-600 dark:text-blue-400" bg="bg-blue-50 dark:bg-blue-950/40" />
             </div>
 
             <TeacherList role={(user?.role as any) || "DIRECTION"} institutionId={user?.institution?.id} />
-        </>
+        </div>
     );
 };
 
 const KPICard = ({ label, count, icon: Icon, color, bg }: any) => (
-    <div className="bg-white p-6 ] shadow-sm   group transition-all duration-300 hover:shadow-lg">
-        <div className={`w-12 h-12 ${bg} ${color}  flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
-            <Icon size={24} />
+    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+        <div className={`w-12 h-12 ${bg} ${color} rounded-xl flex items-center justify-center shrink-0`}>
+            <Icon size={22} />
         </div>
-        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">{label}</p>
-        <h4 className="text-2xl font-black text-slate-800 tracking-tight">{count}</h4>
+        <div className="min-w-0">
+            <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">{label}</p>
+            <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{count}</h4>
+        </div>
     </div>
 );
 

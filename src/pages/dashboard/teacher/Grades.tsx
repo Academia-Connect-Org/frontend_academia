@@ -10,7 +10,6 @@ import { useAuth } from '../../../context/AuthContext';
 import api from '../../../api/axios';
 
 // Sub-components
-// MatrixCard is now used in HistoryView
 import HistoryView from './grades/HistoryView';
 import CreateView from './grades/CreateView';
 import AveragesView from './grades/AveragesView';
@@ -98,7 +97,6 @@ const Grades: React.FC = () => {
 
     React.useEffect(() => {
         fetchInitialData();
-        // Set default maxPoints based on institution type
         if (user?.institution?.type === 'ECOLE') {
             setMaxPoints(10);
         } else {
@@ -111,7 +109,6 @@ const Grades: React.FC = () => {
     }, [view]);
 
     const switchToCreate = () => {
-        // Reset to defaults but try to keep the first available class
         if (user?.institution?.type === 'ECOLE') {
             setMaxPoints(10);
         } else {
@@ -215,7 +212,6 @@ const Grades: React.FC = () => {
                             academicYear: session.academicYear
                         }
                     });
-                    const dest = user?.institution?.type === 'ECOLE' ? 'à la Direction' : 'au Provisoriat';
                     showToast(`Moyennes envoyées ${dest}`);
                 } catch (err) {
                     console.error("Error publishing session:", err);
@@ -226,16 +222,11 @@ const Grades: React.FC = () => {
     };
 
     const fetchInitialData = async () => {
-        if (!user?.id) {
-            console.error("fetchInitialData: NO USER ID found in context");
-            return;
-        }
+        if (!user?.id) return;
         setLoading(true);
-        console.log("fetchInitialData: Starting for user", user.id, "Institution type:", user?.institution?.type);
         try {
             const instId = typeof user.institution === 'object' ? user.institution.id : (user.institution || 1);
             const classesUrl = `/classes/teacher/${user.id}`;
-            console.log("fetchInitialData: Calling URL:", classesUrl);
 
             const [classesRes, subjectsRes, historyRes, teacherRes] = await Promise.all([
                 api.get(classesUrl),
@@ -245,9 +236,7 @@ const Grades: React.FC = () => {
             ]);
 
             const teacherClasses = classesRes.data || [];
-            console.log("fetchInitialData: SUCCESS. Classes found:", teacherClasses.length, teacherClasses);
             const allSubjects = subjectsRes.data || [];
-            console.log("fetchInitialData: Subjects found:", allSubjects.length);
             const teacherDetails = teacherRes.data || {};
             const specialties = teacherDetails.specialties || (user as any)?.specialties || [];
 
@@ -294,9 +283,7 @@ const Grades: React.FC = () => {
     };
 
     const handleClassChange = async (clsId: string) => {
-        console.log("DEBUG: handleClassChange called with ID:", clsId, "Available classes:", classes.length, classes);
         const cls = classes.find((c: any) => String(typeof c === 'object' ? c.id : c) === String(clsId));
-        console.log("DEBUG: found class:", cls);
         setSelectedClass(cls);
         if (cls) {
             const actualId = typeof cls === 'object' ? cls.id : cls;
@@ -319,14 +306,6 @@ const Grades: React.FC = () => {
     };
 
     const handleSaveGrades = async () => {
-        console.log("DEBUG [handleSaveGrades] State:", { 
-            selectedClass: selectedClass?.id || selectedClass, 
-            classType: typeof selectedClass,
-            selectedSubject: selectedSubject?.id || selectedSubject,
-            subjectType: typeof selectedSubject,
-            userId: user?.id 
-        });
-
         if (!selectedClass) {
             showToast("Veuillez sélectionner une classe", "error");
             return;
@@ -363,16 +342,13 @@ const Grades: React.FC = () => {
                     };
                 });
 
-            console.log("Saving grades payload:", gradesPayload);
             if (gradesPayload.length === 0) {
                 showToast("Veuillez saisir au moins une note", "error");
                 setIsSaving(false);
                 return;
             }
 
-            const response = await api.post('/grades/batch', gradesPayload);
-            console.log("Save response:", response.data);
-
+            await api.post('/grades/batch', gradesPayload);
             showToast("Notes enregistrées avec succès");
             setView('HISTORY');
             fetchInitialData();
@@ -472,26 +448,36 @@ const Grades: React.FC = () => {
         }
     };
 
-    const handleCalculateAverages = async () => {
-        if (!selectedClass || (!selectedSubject && user?.institution?.type !== 'ECOLE')) return;
+     const handleCalculateAverages = async (overrideCls?: any, overrideSub?: any, overrideTrim?: string, overrideYear?: string) => {
+        const clsToUse = overrideCls !== undefined ? overrideCls : selectedClass;
+        const subToUse = overrideSub !== undefined ? overrideSub : selectedSubject;
+        const trimToUse = overrideTrim !== undefined ? overrideTrim : trimester;
+        const yearToUse = overrideYear !== undefined ? overrideYear : academicYear;
+
+        if (!clsToUse || (!subToUse && user?.institution?.type !== 'ECOLE')) {
+            setView('AVERAGES');
+            setCalculatedResults([]);
+            return;
+        }
         setView('AVERAGES');
         try {
             const isEcole = user?.institution?.type === 'ECOLE';
-            const clsId = typeof selectedClass === 'object' ? selectedClass.id : selectedClass;
-            const subId = typeof selectedSubject === 'object' ? selectedSubject.id : selectedSubject;
+            const clsId = typeof clsToUse === 'object' ? clsToUse.id : clsToUse;
+            const subId = typeof subToUse === 'object' ? subToUse.id : subToUse;
 
-            // For ECOLE, we fetch ALL subject grades for the class
-            const [gradesRes, hwSubRes] = await Promise.all([
+            const [gradesRes, hwSubRes, studentsRes] = await Promise.all([
                 isEcole 
-                    ? api.get(`/grades/classe/${clsId}`, { params: { trimester, academicYear } })
-                    : api.get(`/grades/classe/${clsId}/subject/${subId}`, { params: { trimester, academicYear } }),
+                    ? api.get(`/grades/classe/${clsId}`, { params: { trimester: trimToUse, academicYear: yearToUse } })
+                    : api.get(`/grades/classe/${clsId}/subject/${subId}`, { params: { trimester: trimToUse, academicYear: yearToUse } }),
                 isEcole
-                    ? api.get(`/submissions/classe/${clsId}`, { params: { trimester, academicYear } })
-                    : api.get(`/submissions/classe/${clsId}/subject/${subId}`, { params: { trimester, academicYear } })
+                    ? api.get(`/submissions/classe/${clsId}`, { params: { trimester: trimToUse, academicYear: yearToUse } })
+                    : api.get(`/submissions/classe/${clsId}/subject/${subId}`, { params: { trimester: trimToUse, academicYear: yearToUse } }),
+                api.get(`/students/classe/${clsId}`).catch(() => ({ data: [] }))
             ]);
 
             const gradesData = gradesRes.data || [];
             const hwSubmissions = hwSubRes.data || [];
+            const activeStudents = studentsRes.data && studentsRes.data.length > 0 ? studentsRes.data : students;
 
             const normalizedHws = hwSubmissions.map((s: any) => ({
                 id: `hw-${s.id}`,
@@ -538,9 +524,7 @@ const Grades: React.FC = () => {
 
             const finalResults: any[] = [];
             
-            // Loop through students
-            students.forEach(student => {
-                // Determine which subjects to calculate for this student
+            activeStudents.forEach((student: any) => {
                 const studentSubjects = isEcole 
                     ? subjects 
                     : subjects.filter(s => String(s.id) === String(subId));
@@ -558,12 +542,9 @@ const Grades: React.FC = () => {
                     let noteExam = 0;
 
                     if (isEcole) {
-                        // In primary school (ECOLE), it's simpler: Average of all grades for the subject
-                        // (Usually only composition, but let's be safe and average everything for that subject)
                         const totalPoints = sGrades.reduce((acc, g) => acc + (g.value / g.maxPoints) * 10, 0);
-                        moyTrim = totalPoints / sGrades.length; // Normalized to 10 for ECOLE
+                        moyTrim = totalPoints / sGrades.length;
                     } else {
-                        // In secondary school (ETABLISSEMENT), (Homework + Exam) / 2
                         const devoirs = sGrades.filter((g: any) => g.type !== 'EXAM' && g.type !== 'EXAMEN');
                         const exam = sGrades.find((g: any) => g.type === 'EXAM' || g.type === 'EXAMEN');
 
@@ -576,6 +557,7 @@ const Grades: React.FC = () => {
                     }
 
                     const mention = getGradeMention(moyTrim, isEcole ? 10 : 20);
+                    const coeff = subject.coefficient || 1;
 
                     finalResults.push({
                         student,
@@ -583,8 +565,8 @@ const Grades: React.FC = () => {
                         moyenneDevoirs: moyDev,
                         noteExamen: noteExam,
                         moyenneTrimestrielle: moyTrim,
-                        coefficient: subject.coefficient || 1,
-                        points: moyTrim * (subject.coefficient || 1),
+                        coefficient: coeff,
+                        points: moyTrim * coeff,
                         observation: mention?.label || '-'
                     });
                 });
@@ -699,46 +681,45 @@ const Grades: React.FC = () => {
 
     if (loading) {
         return (
-            <>
-                <div className="min-h-[60vh] flex flex-col items-center justify-center">
-                    <div className="w-16 h-16     animate-spin mb-4"></div>
-                </div>
-            </>
+            <div className="py-16 text-center">
+                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Chargement des notes...</p>
+            </div>
         );
     }
 
     return (
-        <>
+        <div className="space-y-6">
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-4xl font-black text-slate-800 tracking-tight leading-none mb-3">Gestion des Notes</h2>
-                    <p className="text-slate-500 font-medium">Saisissez les notes, calculez les moyennes et exportez les résultats.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Gestion des Notes</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Saisissez les notes, calculez les moyennes et exportez les résultats.</p>
                 </div>
-                <div className="flex bg-slate-100 p-2 ] shadow-inner">
+                <div className="flex flex-wrap bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-700">
                     <button
                         onClick={() => setView('HISTORY')}
-                        className={`flex items-center gap-3 px-6 py-4 ] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'HISTORY' ? 'bg-white text-blue-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-xs transition-all ${view === 'HISTORY' ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900'}`}
                     >
-                        <History size={20} /> Hist. Notes
+                        <History size={16} /> Hist. Notes
                     </button>
                     <button
                         onClick={() => setView('AVERAGE_HISTORY')}
-                        className={`flex items-center gap-3 px-6 py-4 ] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'AVERAGE_HISTORY' ? 'bg-white text-indigo-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-xs transition-all ${view === 'AVERAGE_HISTORY' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900'}`}
                     >
-                        <Calculator size={20} /> Hist. Moyennes
+                        <Calculator size={16} /> Hist. Moyennes
                     </button>
                     <button
                         onClick={switchToCreate}
-                        className={`flex items-center gap-3 px-6 py-4 ] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'CREATE' ? 'bg-white text-emerald-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-xs transition-all ${view === 'CREATE' ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900'}`}
                     >
-                        <Plus size={20} /> Saisie Notes
+                        <Plus size={16} /> Saisie Notes
                     </button>
                     <button
                         onClick={() => handleCalculateAverages()}
-                        className={`flex items-center gap-3 px-6 py-4 ] font-black uppercase text-[10px] tracking-widest transition-all ${view === 'AVERAGES' ? 'bg-white text-amber-600 shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-xs transition-all ${view === 'AVERAGES' ? 'bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900'}`}
                     >
-                        <TrendingUp size={20} /> Calcul Moyennes
+                        <TrendingUp size={16} /> Calcul Moyennes
                     </button>
                 </div>
             </div>
@@ -796,9 +777,16 @@ const Grades: React.FC = () => {
 
             {view === 'AVERAGES' && (
                 <AveragesView
+                    classes={classes}
+                    subjects={subjects}
                     selectedClass={selectedClass}
+                    handleClassChange={handleClassChange}
                     selectedSubject={selectedSubject}
+                    setSelectedSubject={setSelectedSubject}
                     trimester={trimester}
+                    setTrimester={setTrimester}
+                    academicYear={academicYear}
+                    setAcademicYear={setAcademicYear}
                     coefficient={coefficient}
                     setCoefficient={setCoefficient}
                     setView={setView}
@@ -833,7 +821,7 @@ const Grades: React.FC = () => {
                 cancelText={confirmModal.cancelText}
                 type={confirmModal.type}
             />
-        </>
+        </div>
     );
 };
 

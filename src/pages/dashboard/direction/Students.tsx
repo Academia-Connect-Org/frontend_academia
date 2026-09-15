@@ -41,40 +41,40 @@ const Students: React.FC = () => {
     };
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Gestion Scolaire</h2>
-                    <p className="text-slate-500">Suivez les inscriptions, l'assiduité et les résultats des élèves.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Gestion Scolaire</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Suivez les inscriptions, l'assiduité et les résultats des élèves.</p>
                 </div>
-                <div className="flex flex-col sm:flex-row flex-wrap gap-4 w-full md:w-auto">
+                <div className="flex flex-wrap gap-3">
                     <button
                         onClick={handleExport}
                         disabled={exporting}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50 w-full sm:w-auto"
+                        className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-50"
                     >
-                        <Download size={18} /> {exporting ? 'Exportation...' : 'Exporter Liste'}
+                        <Download size={16} /> {exporting ? 'Exportation...' : 'Exporter Liste'}
                     </button>
                     <button
                         onClick={() => setShowCsvModal(true)}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm w-full sm:w-auto"
+                        className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
                     >
-                        <Upload size={18} /> Importer CSV
+                        <Upload size={16} /> Importer CSV
                     </button>
                     <button
                         onClick={() => navigate(ROUTES.DASHBOARD.DIRECTION.ENROLL)}
-                        className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-600 flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm w-full sm:w-auto"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all"
                     >
-                        <Plus size={18} /> Ajouter Élève
+                        <Plus size={16} /> Ajouter Élève
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <KPICard label="Effectif Total" count={overview?.totalStudents ?? "..."} icon={GraduationCap} color="text-indigo-600" bg="bg-indigo-50" />
-                <KPICard label="Présents (Aujourd'hui)" count="000" icon={UserCheck} color="text-emerald-600" bg="bg-emerald-50" />
-                <KPICard label="Absents" count="000" icon={UserX} color="text-rose-600" bg="bg-rose-50" />
-                <KPICard label="En Retard" count="00" icon={Clock} color="text-amber-600" bg="bg-amber-50" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <KPICard label="Effectif Total" count={overview?.totalStudents ?? 0} icon={GraduationCap} color="text-indigo-600 dark:text-indigo-400" bg="bg-indigo-50 dark:bg-indigo-950/40" />
+                <KPICard label="Présents (Aujourd'hui)" count={overview?.presentToday ?? 0} icon={UserCheck} color="text-emerald-600 dark:text-emerald-400" bg="bg-emerald-50 dark:bg-emerald-950/40" />
+                <KPICard label="Absents" count={overview?.absentToday ?? 0} icon={UserX} color="text-rose-600 dark:text-rose-400" bg="bg-rose-50 dark:bg-rose-950/40" />
+                <KPICard label="En Retard" count={overview?.lateToday ?? 0} icon={Clock} color="text-amber-600 dark:text-amber-400" bg="bg-amber-50 dark:bg-amber-950/40" />
             </div>
 
             <StudentList role={(user?.role as any) || "DIRECTION"} institutionId={user?.institution?.id} />
@@ -85,21 +85,23 @@ const Students: React.FC = () => {
                     onClose={() => setShowCsvModal(false)}
                     onSuccess={() => {
                         setShowCsvModal(false);
-                        window.location.reload(); // Quick refresh to show new students
+                        window.location.reload();
                     }}
                 />
             )}
-        </>
+        </div>
     );
 };
 
 const KPICard = ({ label, count, icon: Icon, color, bg }: any) => (
-    <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 group transition-all duration-300">
-        <div className={`w-12 h-12 ${bg} ${color} rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
-            <Icon size={24} />
+    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+        <div className={`w-12 h-12 ${bg} ${color} rounded-xl flex items-center justify-center shrink-0`}>
+            <Icon size={22} />
         </div>
-        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">{label}</p>
-        <h4 className="text-2xl font-black text-slate-800 tracking-tight">{count}</h4>
+        <div className="min-w-0">
+            <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">{label}</p>
+            <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{count}</h4>
+        </div>
     </div>
 );
 
