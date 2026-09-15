@@ -5,7 +5,7 @@ const getApiBaseUrl = () => {
     const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     if (envUrl) return envUrl;
     if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-        return 'https://academia-api.duckdns.org/api';
+        return '/api';
     }
     return 'http://localhost:8080/api';
 };
