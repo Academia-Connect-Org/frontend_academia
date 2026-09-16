@@ -238,8 +238,8 @@ const Enroll: React.FC = () => {
             const institution = user?.role === 'PDG' ? pdgInstitutions.find(inst => inst.id === Number(instId)) : user?.institution;
             const schoolName = institution?.name ? ` ${institution.name}` : '';
 
-            const apkFilename = import.meta.env.VITE_APK_FILENAME || 'academia-connect-android.apk';
-            const messageText = `Bonjour${nameGreeting},\n\nL'établissement${schoolName} vous invite à télécharger l'application ACADEMIA CONNECT pour procéder à l'inscription de votre enfant.\n\n📱 Lien de téléchargement :\nhttps://school.nb-mind.com/downloads/${apkFilename}\n\n🔑 Code de l'établissement :\n${schoolCode}\n\nAprès avoir créé votre compte, utilisez ce code depuis votre tableau de bord pour retrouver notre établissement et procéder à l'inscription de votre enfant. Merci.`;
+            const apkFilename = import.meta.env.VITE_APK_FILENAME || 'academia-connect_v1.0.2.apk';
+            const messageText = `Bonjour${nameGreeting},\n\nL'établissement${schoolName} vous invite à télécharger l'application ACADEMIA CONNECT pour procéder à l'inscription de votre enfant.\n\n📱 Lien de téléchargement :\nhttps://academia.nb-mind.com/downloads/${apkFilename}\n\n🔑 Code de l'établissement :\n${schoolCode}\n\nAprès avoir créé votre compte, utilisez ce code depuis votre tableau de bord pour retrouver notre établissement et procéder à l'inscription de votre enfant. Merci.`;
 
             const waLink = `https://wa.me/${parentData.phone.replace(/\+/g, '')}?text=${encodeURIComponent(messageText)}`;
 

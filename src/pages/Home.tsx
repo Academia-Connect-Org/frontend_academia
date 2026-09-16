@@ -1080,7 +1080,7 @@ const Home: React.FC = () => {
                                 </p>
                             </div>
                             <a
-                                href="https://school.nb-mind.com/downloads/Academia%20Connect%20Setup%201.0.0.exe"
+                                href="https://academia.nb-mind.com/downloads/Academia%20Connect%20Setup%201.0.0.exe"
                                 className="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:-translate-y-0.5"
                             >
                                 Télécharger .exe
@@ -1125,7 +1125,7 @@ const Home: React.FC = () => {
                                 </p>
                             </div>
                             <a
-                                href="https://school.nb-mind.com/downloads/academia-connect_1.0.0_amd64.deb"
+                                href="https://academia.nb-mind.com/downloads/academia-connect_1.0.0_amd64.deb"
                                 className="w-full py-2.5 px-4 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:-translate-y-0.5"
                             >
                                 Télécharger .deb
@@ -1152,7 +1152,7 @@ const Home: React.FC = () => {
                                 </p>
                             </div>
                             <a
-                                href={`https://school.nb-mind.com/downloads/${import.meta.env.VITE_APK_FILENAME || 'academia-connect_v1.0.2.apk'}`}
+                                href={`https://academia.nb-mind.com/downloads/${import.meta.env.VITE_APK_FILENAME || 'academia-connect_v1.0.2.apk'}`}
                                 className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:-translate-y-0.5"
                             >
                                 Télécharger .apk

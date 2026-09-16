@@ -1,8 +1,17 @@
 {
   "rewrites": [
     {
+      "source": "/downloads/:path*",
+      "destination": "https://academia-api.duckdns.org/api/files/downloads/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://academia-api.duckdns.org/api/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
 }
+
